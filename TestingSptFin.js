@@ -1,4 +1,4 @@
 function bdttester(){
-    window.alert("I'm bdttester(), and I loaded.");
+    console.log("I'm bdttester(), and I loaded.");
     return true;
 }
