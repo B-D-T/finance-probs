@@ -4,7 +4,7 @@ function bdttester(){
 }
 
 
-function katexLoadFonts(){
+(function katexLoadFonts(){
     window.WebFontConfig = {
         custom: {
             families: ['KaTeX_AMS', 'KaTeX_Caligraphic:n4,n7', 'KaTeX_Fraktur:n4,n7',
@@ -13,4 +13,4 @@ function katexLoadFonts(){
                 'KaTeX_Size4', 'KaTeX_Typewriter'],
         },
     };
-}
+})();
