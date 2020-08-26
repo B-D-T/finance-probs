@@ -1,1 +1,1 @@
-"3.29 + 16^x = 26.27"
+String.raw`c = \pm\sqrt{a^2 + b^2}`
