@@ -1,4 +1,3 @@
-const filename = "TestingSptFin-0616.js";
 
 function bdttester(){
     console.log("I'm bdttester(), and I loaded " + filename);
