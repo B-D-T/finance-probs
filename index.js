@@ -1,7 +1,3 @@
-// When someone adds this package, the index.js file is the one that gets loaded.
-exports.printMsg = function() {
-    console.log("This is a message from the finance-probs package");
-}
 
 function bdttester(){
     console.log("I'm bdttester(), and I loaded " + filename);
@@ -32,3 +28,11 @@ function loadProb(probID){
         },
     };
 })();
+
+/*
+// This was the first line, when this was an NPM package
+// When someone adds this package, the index.js file is the one that gets loaded.
+exports.printMsg = function() {
+    console.log("This is a message from the finance-probs package");
+}
+*/
