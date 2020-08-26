@@ -1,6 +1,12 @@
+const filename = "TestingSptFin-0616.js";
+
 function bdttester(){
-    console.log("I'm still bdttester(), and I loaded.");
+    console.log("I'm bdttester(), and I loaded " + filename);
     return true;
+}
+
+const problems = {
+    quesid433: String.raw`c = \pm\sqrt{a^2 + b^2}`
 }
 
 // For each Qualtrics question I'd write loadProb('quesid433') or something. I should also make the element dynamic, but I'll need to think about that a bit more
@@ -10,10 +16,6 @@ function loadProb(probID){
     katex.render(strToLoad, bdtQ2, {
         throwOnError: false
     });    
-}
-
-const problems = {
-    quesid433: String.raw`c = \pm\sqrt{a^2 + b^2}`
 }
 
 
