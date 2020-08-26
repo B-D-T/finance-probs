@@ -3,6 +3,10 @@ function bdttester(){
     return true;
 }
 
+katex.render(String.raw`c = \pm\sqrt{a^2 + b^2}`, bdtQ2, {
+    throwOnError: false
+});
+
 
 (function katexLoadFonts(){
     window.WebFontConfig = {
