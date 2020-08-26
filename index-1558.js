@@ -1,4 +1,4 @@
-jQuery.getScript("https://cdn.jsdelivr.net/gh/B-D-T/finance-probs/master/probs/433.js", function(data, textStatus, jqxhr) {
+jQuery.getScript("https://cdn.jsdelivr.net/gh/B-D-T/finance-probs/probs/433.js", function(data, textStatus, jqxhr) {
     console.log(data); //data returned
     console.log(textStatus); //success
     console.log(jqxhr.status); //200
