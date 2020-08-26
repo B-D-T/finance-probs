@@ -1,6 +1,6 @@
 
 function bdttester(){
-    console.log("I'm bdttester(), and I loaded " + filename);
+    console.log("I'm still bdttester(), and I loaded " + filename);
     return true;
 }
 
