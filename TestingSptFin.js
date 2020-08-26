@@ -3,9 +3,18 @@ function bdttester(){
     return true;
 }
 
-katex.render(String.raw`c = \pm\sqrt{a^2 + b^2}`, bdtQ2, {
-    throwOnError: false
-});
+// For each Qualtrics question I'd write loadProb('quesid433') or something. I should also make the element dynamic, but I'll need to think about that a bit more
+function loadProb(probID){
+    let strToLoad = problems[probID];
+    console.log("I'm loadProb(" + probID + ") and I'm trying to load this string: " + strToLoad);
+    katex.render(strToLoad, bdtQ2, {
+        throwOnError: false
+    });    
+}
+
+const problems = {
+    quesid433: String.raw`c = \pm\sqrt{a^2 + b^2}`
+}
 
 
 (function katexLoadFonts(){
