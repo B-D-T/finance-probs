@@ -1,4 +1,12 @@
 
+jQuery.getScript("probs/433.js", function(data, textStatus, jqxhr) {
+    console.log(data); //data returned
+    console.log(textStatus); //success
+    console.log(jqxhr.status); //200
+    console.log('Load was performed.');
+    });
+    
+    
 function bdttester(){
     console.log("I'm still bdttester(), and I loaded");
     return true;
@@ -10,7 +18,8 @@ const problems = {
 
 // For each Qualtrics question I'd write loadProb('quesid433') or something. I should also make the element dynamic, but I'll need to think about that a bit more
 function loadProb(probID){
-    let strToLoad = problems[probID];
+    //let strToLoad = problems[probID];
+    strToLoad = stem();
     console.log("I'm loadProb(" + probID + ") and I'm trying to load this string: " + strToLoad);
     katex.render(strToLoad, bdtQ2, {
         throwOnError: false
