@@ -1,6 +1,6 @@
 {
   "name": "finance-probs",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Code used with sport finance problem sets (formerly Webwork)",
   "main": "index.js",
   "scripts": {
@@ -11,10 +11,13 @@
     "url": "git+https://github.com/B-D-T/finance-probs.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "B-D-T",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/B-D-T/finance-probs/issues"
   },
-  "homepage": "https://github.com/B-D-T/finance-probs#readme"
+  "homepage": "https://github.com/B-D-T/finance-probs#readme",
+  "dependencies": {
+    "katex": "^0.12.0"
+  }
 }
