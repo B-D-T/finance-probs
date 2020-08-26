@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Testing page
+    </title>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script defer src="https://cdn.jsdelivr.net/gh/B-D-T/finance-probs/index-1155.js" crossorigin="anonymous"></script>
+
+
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css"
+        integrity="sha384-qCEsSYDSH0x5I45nNW4oXemORUZnYFtPy/FqB/OjqxabTMW5HVaaH9USK4fN3goV" rel="stylesheet" />
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.js"
+        integrity="sha384-YFVvRUwgqxkAVN9bmAVLsKilmOKfQLyUx0ZlmDNs0aBUTsvMLnRxE3Km0NrZa0i9" crossorigin="anonymous">
+        </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.js"
+        integrity="sha256-4O4pS1SH31ZqrSO2A/2QJTVjTPqVe+jnYgOWUVr7EEc=" crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+
+
+    <div id="bdtQ2">
+        <script>
+
+            bdttester();
+            loadProb('quesid433');
+
+            katex.render(strToLoad, bdtQ2, {
+                throwOnError: false
+            });   
+        </script>
+
+    </div>
+
+    <script>
+        (function katexLoadFonts() {
+            window.WebFontConfig = {
+                custom: {
+                    families: ['KaTeX_AMS', 'KaTeX_Caligraphic:n4,n7', 'KaTeX_Fraktur:n4,n7',
+                        'KaTeX_Main:n4,n7,i4,i7', 'KaTeX_Math:i4,i7', 'KaTeX_Script',
+                        'KaTeX_SansSerif:n4,n7,i4', 'KaTeX_Size1', 'KaTeX_Size2', 'KaTeX_Size3',
+                        'KaTeX_Size4', 'KaTeX_Typewriter'],
+                },
+            };
+        })();
+    </script>
+
+</body>
+
+</html>

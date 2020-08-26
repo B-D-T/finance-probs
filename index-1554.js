@@ -1,5 +1,4 @@
-
-jQuery.getScript("probs/433.js", function(data, textStatus, jqxhr) {
+jQuery.getScript("./probs/433.js", function(data, textStatus, jqxhr) {
     console.log(data); //data returned
     console.log(textStatus); //success
     console.log(jqxhr.status); //200
