@@ -2,6 +2,8 @@
 let objQuesCaller = {};
 // let objFromQues = {}; I don't need this, but someday I might, so I'm keeping it around
 
+const baseURL = 'https://cdn.jsdelivr.net/gh/B-D-T/finance-probs/';
+
 // We could pass 3 informational args to the function, but no need. scriptLoaded = function( data, textStatus, jqxhr )
 scriptLoaded = function(){
 	fnToCall = window[objQuesCaller.fnName];
@@ -10,11 +12,9 @@ scriptLoaded = function(){
 	return objFromQues;
 }
 
-jsonLoaded = function(objLocations) {
+jsonLoaded = function(objQuesFileInfo) {
 	const quesNum = objQuesCaller.fnName.slice(6);
-	const baseURL = 'https://cdn.jsdelivr.net/gh/B-D-T/finance-probs/ques/';
-	scriptToLoad = baseURL + objLocations[quesNum];
-
+	scriptToLoad = baseURL + 'ques/' + objQuesFileInfo[quesNum].filename;
 	// scriptLoaded happens ONLY after the external 433.js is loaded.
 	jQuery.getScript( scriptToLoad, scriptLoaded);
 }
@@ -24,8 +24,8 @@ function loadQues(paramQuesCaller){
 	// This is where we populate objQuesCaller so it can be used globally
 	objQuesCaller = paramQuesCaller;
 	
-	// The first argument fetches objLocations.json.
+	// The first argument fetches objQuesFileInfo.json.
 	// The 1st arg passes the JSON, as an object, the second argument (the callback).
-	// The second argument only runs once it gets objLocations from the first argument. 
-	jQuery.getJSON('./ques/objLocations.json', jsonLoaded);
+	// The second argument only runs once it gets objQuesFileInfo from the first argument. 
+	jQuery.getJSON(baseURL + 'supporting/objQuesFileInfo.json', jsonLoaded);
 }

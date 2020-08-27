@@ -6,20 +6,32 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-    <script defer src="https://cdn.jsdelivr.net/gh/B-D-T/finance-probs/main.js" crossorigin="anonymous"></script>
-    
+    <!-- <script defer src="https://cdn.jsdelivr.net/gh/B-D-T/finance-probs/main.js" crossorigin="anonymous"></script> -->
+    <script src="main.js"></script>
+
     <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css" integrity="sha384-qCEsSYDSH0x5I45nNW4oXemORUZnYFtPy/FqB/OjqxabTMW5HVaaH9USK4fN3goV" rel="stylesheet" />
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.js" integrity="sha384-YFVvRUwgqxkAVN9bmAVLsKilmOKfQLyUx0ZlmDNs0aBUTsvMLnRxE3Km0NrZa0i9" crossorigin="anonymous"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.js" integrity="sha256-4O4pS1SH31ZqrSO2A/2QJTVjTPqVe+jnYgOWUVr7EEc=" crossorigin="anonymous"></script>
+
 </head>
 
 <body>
 
-    <div id="divQuesID433"></div>
+    <!-- 
+        Copy the line below in the HTML of the main question. It's the only thing you'll put there.
+        Change the <div> name in the HTML to match the question. The DIV is populated by by the custom JS.
+
+    -->
+    <div id="divQues433">Code</div>
+
 
     <script>
         // Customize objQuesInfo with anything the custom JS needs.
-        // Change the <div> names (above) as needed -- they'll be set by the custom JS.
+        // REQUIRED: fnName and quesVars (even if it's empty). Those must be direct children of objQuesInfo.
+        //   fnName - The main.js code pulls from the 7th character to the end (i.e., it drop 'fnQues' to leave the question number).
+        //   quesVars - That gets passed to the custom JS for each question. You can put whatever you want under that.
+        // loadQues is a function on main.js. It calls this question's JS 
+
         const objQuesInfo = {
             fnName: "fnQues433",
             quesVars: {
@@ -27,8 +39,8 @@
                 varB: 10
             }
         };
-        // loadQues is a function on main.js. It calls this question's JS 
         loadQues(objQuesInfo);
+
     </script>
 
 
