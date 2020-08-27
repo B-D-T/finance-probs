@@ -9,7 +9,7 @@ function fnQues433(objVars) {
         }
     };
 
-    jQuery("#divQues433").text('The response is ' + objToReturn.ansValue);
+    jQuery("#divQues433").text('The response is ' + objToReturn.solution.firstline);
     return objToReturn;
 }
 
