@@ -1,16 +1,16 @@
 
-fnQues433 = function(qv, cust) {
+fnQues433 = function(quesVariables, objAddlInfo) {
 
     // Variables passed to this question
-    const a = qv.a;
-    const b = qv.b;
-    const c = qv.c;
+    const a = quesVariables.a;
+    const b = quesVariables.b;
+    const c = quesVariables.c;
 
     // Calculations
     const d = c - a;
-    const lnb = cfRound(ln(b), 5);
-    const lnd = cfRound(ln(d), 5);
-    const ans = ln(c - a) / ln(b);
+    const lnb = udfRound(udfLn(b), 5);
+    const lnd = udfRound(udfLn(d), 5);
+    const ans = udfLn(c - a) / udfLn(b);
 
     let obj = {};
 
@@ -39,14 +39,19 @@ fnQues433 = function(qv, cust) {
         Now, use the calculator to determine the natural log of the numbers.
         ${kxbig(["x*",lnb,"=",lnd].join(""))}
         
-        Finally, to solve for ${kx("x")}, divide each side by the number that's multiplying the variable (${kx(""+lnb)}).
-        ${kxbig(["\\frac{x*", lnb, "}{", lnb, "} = \\frac{", lnd, "}{", lnb, "}"].join(''))}
-        ${kxbig(["x = \\frac{", lnd, "}{", lnb, "}"].join(''))}
+        Finally, to solve for ${kx("x")}, divide each side by the number that's multiplying the variable (${kx(lnb)}).
+        ${kxbig([
+            "\\frac{x*", lnb, "}{", lnb, "} = \\frac{", lnd, "}{", lnb, "}"].join('')
+            )}
+        ${kxbig([
+            "x = \\frac{", lnd, "}{", lnb, "}"].join('')
+            )}
         ${kxbig("x = "+ans)}
         `
 
-    jQuery("#divQues433").html(obj.stem);
-    jQuery("#divQues433-2").html(obj.solution);
+    jQuery("#divQues433-stem").html(obj.stem);
+    jQuery("#divQues433-ansFormatReqs").html(obj.ansFormatReqs);
+    jQuery("#divQues433-solution").html(obj.solution);
 
     return obj;
 }
