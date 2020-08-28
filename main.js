@@ -1,6 +1,5 @@
 // Declare the object that accepts each question's object of variables
 let objQuesCaller = {};
-// let objFromQues = {}; I don't need this, but someday I might, so I'm keeping it around
 
 const BASE_URL = "./"; // 'https://cdn.jsdelivr.net/gh/B-D-T/finance-probs@latest/';
 
