@@ -4,27 +4,24 @@ let objQuesCaller = {};
 
 const baseURL = "./"; // 'https://cdn.jsdelivr.net/gh/B-D-T/finance-probs@latest/';
 
-
-// This is an object of whoat should be passed to all the custom question files.
-// I don't know what will go in here yet (load custom functions, probably), but I'm building it for future flexibility.
-const otherToQues = {
-	
-};
-
-
 // We could pass 3 informational args to the function, but no need. scriptLoaded = function( data, textStatus, jqxhr )
 scriptLoaded = function(){
 	fnToCall = window[objQuesCaller.fnName];
-    objFromQues = fnToCall(objQuesCaller.quesVars, otherToQues);
-    // There's nothing left to do at this point
-	return objFromQues;
+    objFromQues = fnToCall(objQuesCaller.quesVars);
+	return objFromQues;     // There's nothing left to do at this point, but I'm return the object anyway
 }
 
 jsonLoaded = function(objQuesFileInfo) {
 	const quesNum = objQuesCaller.fnName.slice(6);
-	scriptToLoad = baseURL + 'ques/' + objQuesFileInfo[quesNum].filename;
+	const scriptToLoad = baseURL + 'ques/' + objQuesFileInfo[quesNum].filename;
+	const udfScript = baseURL + 'supporting/userDefinedFunctions.js';
+
 	// scriptLoaded happens ONLY after the external 433.js is loaded.
-	jQuery.getScript( scriptToLoad, scriptLoaded);
+	// We also need udfScript to finish loading. 
+	// The code below uses nested callbacks, though this risks callback hell if we keep going.
+	jQuery.getScript( scriptToLoad, function() {
+		jQuery.getScript( udfScript, scriptLoaded);
+	});
 }
 
 // This loads first because it's called by the HTML

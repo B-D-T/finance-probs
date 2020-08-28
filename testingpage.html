@@ -20,9 +20,14 @@
     <!-- 
         Copy the line below in the HTML of the main question. It's the only thing you'll put there.
         Change the <div> name in the HTML to match the question. The DIV is populated by by the custom JS.
+            Note: I created a second div just because I wanted to see the output of the stem and the solution, which normally wouldn't be on the same page
 
     -->
-    <div id="divQues433">Code</div>
+    <div id="divQues433">Stem</div>
+    <div id="divQues433-2">
+        <hr>
+        Solution
+    </div>
 
 
     <script>
@@ -43,23 +48,6 @@
         loadQues(objQuesInfo);
 
     </script>
-
-
-
-
-    <!-- <script>
-        // This was in the HTML initially, but I moved all that to the backend instead.
-        (function katexLoadFonts() {
-            window.WebFontConfig = {
-                custom: {
-                    families: ['KaTeX_AMS', 'KaTeX_Caligraphic:n4,n7', 'KaTeX_Fraktur:n4,n7',
-                        'KaTeX_Main:n4,n7,i4,i7', 'KaTeX_Math:i4,i7', 'KaTeX_Script',
-                        'KaTeX_SansSerif:n4,n7,i4', 'KaTeX_Size1', 'KaTeX_Size2', 'KaTeX_Size3',
-                        'KaTeX_Size4', 'KaTeX_Typewriter'],
-                },
-            };
-        })();
-    </script> -->
 
 </body>
 
