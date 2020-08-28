@@ -8,9 +8,11 @@ fnQues433 = function(quesVariables, objAddlInfo) {
 
     // Calculations
     const d = c - a;
-    const lnb = udfRound(udfLn(b), 5);
-    const lnd = udfRound(udfLn(d), 5);
-    const ans = udfLn(c - a) / udfLn(b);
+    const lnb = uRound(uLn(b), 5); // functions starting with u are [probably] from the user-defined-functions.js file
+    const lnd = uRound(uLn(d), 5);
+    const ans = uLn(c - a) / uLn(b);
+
+    const bx = b+"^x"; // this isn't necessary, but it makes the code a bit more readable because I use it a lot
 
     let obj = {};
 
@@ -19,34 +21,34 @@ fnQues433 = function(quesVariables, objAddlInfo) {
     }
 
     obj.stem = `
-        Solve for ${kx("x")} given:
-        ${kxbig([a,"+",b,"^x=",c].join(""))}
+        Solve for ${kxx} given:
+        ${kxbig([a, "+", bx, "=", c])}
         `
 
     obj.solution = `
-        Subtract ${kx("a")} from each side. 
-        That will isolate ${kx(b+"^x")} on the left side.
-        ${kxbig(b+"^x="+c+"-"+a)}
-        ${kxbig(b+"^x="+d)}
+        Subtract ${a} from each side. 
+        That will isolate ${kx(bx)} on the left side.
+        ${kxbig([bx, "=", c , "-", a])}
+        ${kxbig([bx, "=", d])}
 
         The variable is in the exponent, 
         so we need to bring it down with the rest of the equation in order to solve for it. 
         To do this, we can use the natural log (ln). 
         When you take the natural log of each side of the equation, 
         the variable moves down and is multiplied by the rest of the term.
-        ${kxbig("x*ln("+b+")=ln("+d+")")}
+        ${kxbig([ "x*ln(", b, ")=ln(", d, ")" ])}
 
         Now, use the calculator to determine the natural log of the numbers.
-        ${kxbig(["x*",lnb,"=",lnd].join(""))}
+        ${kxbig(["x*", lnb, "=", lnd])}
         
-        Finally, to solve for ${kx("x")}, divide each side by the number that's multiplying the variable (${kx(lnb)}).
+        Finally, to solve for ${kxx}, divide each side by the number that's multiplying the variable (${lnb}).
         ${kxbig([
-            "\\frac{x*", lnb, "}{", lnb, "} = \\frac{", lnd, "}{", lnb, "}"].join('')
-            )}
-        ${kxbig([
-            "x = \\frac{", lnd, "}{", lnb, "}"].join('')
-            )}
-        ${kxbig("x = "+ans)}
+            uFrac("x*"+lnb, lnb ), 
+            " = ",
+            uFrac(lnd, lnb)
+        ])}
+        ${kxbig(`x = ${uFrac(lnd, lnb)}` )}
+        ${kxbig(`x = ${ans}`)}
         `
 
     jQuery("#divQues433-stem").html(obj.stem);
@@ -66,3 +68,5 @@ const fileInfo = {
     "ExcelTestbankID": 433,
     "PGFileName": "alg_natural_log.pg"
 }
+
+
