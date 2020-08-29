@@ -50,10 +50,9 @@ fnQues433 = function(quesVariables, objAddlInfo) {
         `
 
     jQuery("#divQues433-stem").html(obj.stem);
-    //jQuery("#divQues433-ansFormatReqs").html(obj.ansFormatReqs);
     jQuery("#divQues433-solution").html(obj.solution);
 
-    jQuery("#" + quesVariables.qtrxQuesID + ".InputText").attr("placeholder", obj.ansBoxMessage);
+    jQuery("#" + quesVariables.qtrxQuesID + " .InputText").attr("placeholder", obj.ansBoxMessage);
 
     return obj;
 }
