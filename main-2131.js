@@ -1,7 +1,7 @@
 // Declare the object that accepts each question's object of variables
 let objQuesCaller = {};
 
-const BASE_URL = 'https://cdn.jsdelivr.net/gh/B-D-T/finance-probs@latest/'; // "./";
+const BASE_URL = 'https://cdn.jsdelivr.net/gh/B-D-T/finance-probs@latest/'; //"./";
 
 // We could pass 3 informational args to the function, but no need. scriptLoaded = function( data, textStatus, jqxhr )
 scriptLoaded = function(){
