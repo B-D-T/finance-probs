@@ -16,9 +16,7 @@ fnQues433 = function(quesVariables, objAddlInfo) {
 
     let obj = {};
 
-    obj.ansFormatReqs = {
-        decimals: 5
-    }
+    obj.ansBoxMessage  = objAnsBoxMessages.decimalPlaces4;
 
     obj.stem = `
         Solve for ${kxx} given:
@@ -52,8 +50,10 @@ fnQues433 = function(quesVariables, objAddlInfo) {
         `
 
     jQuery("#divQues433-stem").html(obj.stem);
-    jQuery("#divQues433-ansFormatReqs").html(obj.ansFormatReqs);
+    //jQuery("#divQues433-ansFormatReqs").html(obj.ansFormatReqs);
     jQuery("#divQues433-solution").html(obj.solution);
+
+    jQuery("#" + quesVariables.qtrxQuesID + ".InputText").attr("placeholder", obj.ansBoxMessage);
 
     return obj;
 }
