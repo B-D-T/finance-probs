@@ -26,38 +26,24 @@
         Change the <div> name in the HTML to match the question. The DIV is populated by by the custom JS.
         Note: I created a second div just because I wanted to see the output of the stem and the solution, which normally wouldn't be on the same page
     -->
-    <div id="divQues433-stem">Stem</div>
+    <div id="divQues205-stem">Stem</div>
     <div>
         <hr />
     </div>
-    <div id="divQues433-solution">Solution</div>
-
+    <div id="divQues205-solution">Solution</div>
 
     <script>
         // Customize objQuesInfo with anything the custom JS needs.
-        // REQUIRED: fnName and quesVars (even if it's empty). Those must be direct children of objQuesInfo.
-        //   fnName - The main.js code pulls from the 7th character to the end (i.e., it drop 'fnQues' to leave the question number).
-        //   quesVars - That gets passed to the custom JS for each question. You can put whatever you want under that.
-        // loadQues is a function on main.js. It calls this question's JS 
-//
-        // const objQuesInfo = {
-        //     fnName: "fnQues433",
-        //     quesVars: {
-        //         qtrxQuesID: this.questionId,
-        //         a: 3,
-        //         b: 20,
-        //         c: 30
-        //     }
-        // };
-        // loadQues(objQuesInfo);
 
         const objQtrx = {
-            fnName: "fnQues433",
+            fnName: "fnQues205",
             qtrxQuesInfo: this
         };
 
-        const getEDValue = (theKey) => Qualtrics.SurveyEngine.getEmbeddedData(theKey);
-        loadQues(objQtrx, getEDValue);
+//      const getEDValue = (theKey) => Qualtrics.SurveyEngine.getEmbeddedData(theKey);
+        let getEDValueTEST = function(){console.log("getEDValue is doing nothing, I hope")};
+        let setEDValueTEST = function(){console.log("setEDValue is doing nothing, I hope")};
+        loadQues(objQtrx, getEDValueTEST, setEDValueTEST);
 
     </script>
 
