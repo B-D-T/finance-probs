@@ -16,43 +16,65 @@ const uLn = (value) => Math.log(value);
 const uFrac = (numerator, denominator) => ["\\frac{", numerator, "}{", denominator, "}"].join('')
 
 // If the variable is already in the embedded data, it uses that. Otherwise, it creates one in the embedded data based on our definition.
-function fetchQuesVars(objVarDefs) {
-    let qv = {};
-    jQuery.when(fetchEachKV(objVarDefs)).then(function(){ return qv; });
+function fetchQuesVars(objRandomVars) {
+    let objQuesVarsActual = {};
+    jQuery.when(fetchEachKV(objRandomVars)).then(function(){ return objQuesVarsActual; });
 
-    function fetchEachKV(objVarDefs) {
+    function fetchEachKV(objRandomVars) {
         console.log("I'm fetchEachKV. My object is: ");
-        console.log(objVarDefs);
-        jQuery.each(objVarDefs, function (theKey, theValue) {
-            console.log(`jQuery.each(obvVarsDefs), about to sync ${theKey}:${theValue}`);
-            jQuery.when(syncEmbeddedData(theKey, theValue)).then( function(returnedValue) {
-                console.log(`I'm about to write qv[${theKey}] = ${returnedValue}`);
-                qv[theKey] = returnedValue;
-            })
-        });
+        console.log(objRandomVars);
+        jQuery.each(objRandomVars, function (theKey, randValue) {
+            console.log(`jQuery.each(objRandomVars), about to sync "${theKey}"`);
 
-        function syncEmbeddedData(theKey, theValue) {
-            console.log(`syncEmbeddedData working on ${theKey}:${theValue}.`);
-            let newValue = jQuery.when(getEDValue(theKey)).then(function (edValue) {
+            jQuery.when(getEDValue(theKey)).then(function (edValue) {
                 console.log(`getEDValue returned ${edValue}. I'm going to write that to ${theKey}`);
-                let storedEDValue = edValue;
-                if (storedEDValue) {
-                    console.log(`It looks like ${theKey}:${storedEDValue} was already in the embedded data, so I'm going to return ${storedEDValue} without setting anything`);
-                    return storedEDValue;
+                if (edValue) {
+                    console.log(`It looks like ${theKey}:${edValue} was already in the embedded data, so I'm going to return ${edValue} without setting anything`);
+                    objQuesVarsActual[theKey] = edValue;
                 } else {
-                    console.log(`So ${theKey} isn't in the embedded data. Let's setEdValue(${theKey}, ${theValue}).`);
-                    jQuery.when(setEDValue(theKey, theValue)).then(function(){
-                        console.log(`In theory, I just set ${theKey}:${theValue} to embedded data. I'll believe it when I see it.`)
-                        return theValue;
-                    })
+                    console.log(`So ${theKey} isn't in the embedded data. Let's setEdValue(${theKey}, ${randValue}).`);
+                    jQuery.when(setEDValue(theKey, randValue)).then(function(){
+                        console.log(`In theory, I just set ${theKey}:${randValue} to embedded data. I'll believe it when I see it. Now, I'll lie to you that I'm writing that to the objQuesVarsActual object.`)
+                        objQuesVarsActual[theKey] = randValue;
+                    });
                 };
             });
-            console.log(`The "newValue" is ${newValue}. I'm sending that upstairs... we'll see what they actually receive. Here it is for inspction:`);
-            console.log(newValue);
-            return newValue;
-        }
+        });
+        return "Done fetching and setting. Godspeed, variables."
     }
 }
+
+// function fetchQuesVars(objRandomVars) {
+//     let qv = {};
+//     jQuery.when(fetchEachKV(objRandomVars)).then(function(){ return qv; });
+
+//     function fetchEachKV(objRandomVars) {
+//         console.log("I'm fetchEachKV. My object is: ");
+//         console.log(objRandomVars);
+//         jQuery.each(objRandomVars, function (theKey, theValue) {
+//             console.log(`jQuery.each(obvVarsDefs), about to sync ${theKey}:${theValue}`);
+//             jQuery.when(syncEmbeddedData(theKey, theValue)).then( function() { return "Back to the question."}) });
+
+//         function syncEmbeddedData(theKey, theValue) {
+//             console.log(`syncEmbeddedData working on ${theKey}:${theValue}.`);
+//             jQuery.when(getEDValue(theKey)).then(function (edValue) {
+//                 console.log(`getEDValue returned ${edValue}. I'm going to write that to ${theKey}`);
+//                 let storedEDValue = edValue;
+//                 if (storedEDValue) {
+//                     console.log(`It looks like ${theKey}:${storedEDValue} was already in the embedded data, so I'm going to return ${storedEDValue} without setting anything`);
+//                     qv[theKey] = storedEDValue;
+//                 } else {
+//                     console.log(`So ${theKey} isn't in the embedded data. Let's setEdValue(${theKey}, ${theValue}).`);
+//                     jQuery.when(setEDValue(theKey, theValue)).then(function(){
+//                         console.log(`In theory, I just set ${theKey}:${theValue} to embedded data. I'll believe it when I see it.`)
+//                         qv[theKey] = theValue;
+//                         return theValue;
+//                     })
+//                 };
+//             });
+//         }
+//     }
+// }
 
 
 // Create shorthand for katex.renderToString

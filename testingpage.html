@@ -36,28 +36,19 @@
     <script>
         // Customize objQuesInfo with anything the custom JS needs.
         // REQUIRED: fnName and quesVars (even if it's empty). Those must be direct children of objQuesInfo.
-        //   fnName - The main.js code pulls from the 7th character to the end (i.e., it drop 'fnQues' to leave the question number).
+        //   fnName - The main.js code pulls from the 7th character to the end (i.e., it drops 'fnQues' to leave the question number).
         //   quesVars - That gets passed to the custom JS for each question. You can put whatever you want under that.
-        // loadQues is a function on main.js. It calls this question's JS 
-//
-        // const objQuesInfo = {
-        //     fnName: "fnQues433",
-        //     quesVars: {
-        //         qtrxQuesID: this.questionId,
-        //         a: 3,
-        //         b: 20,
-        //         c: 30
-        //     }
-        // };
-        // loadQues(objQuesInfo);
+        //   isProduction - this is an optional property. If it's set to false, this will pull local files (i.e., from your computer). If omitted or set to true, it pulls the real files.
+        // loadQues() is a function on main.js. It calls this question's JS .
 
         const objQtrx = {
             fnName: "fnQues433",
-            qtrxQuesInfo: this
+            qtrxQuesInfo: this,
+            isProduction: false
         };
-
         const getEDValue = (theKey) => Qualtrics.SurveyEngine.getEmbeddedData(theKey);
-        loadQues(objQtrx, getEDValue);
+        const setEDValue = (theKey, theValue) => Qualtrics.SurveyEngine.setEmbeddedData(theKey, theValue);
+        loadQues(objQtrx, getEDValue, setEDValue);
 
     </script>
 

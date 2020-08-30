@@ -1,5 +1,5 @@
 
-fnQues433 = function () {
+fnQues433 = function (objFromMainQues) {
 
     let defineQuesVars = {
         "a": uRand(2, 4, .01),
@@ -8,10 +8,19 @@ fnQues433 = function () {
     }
 
     const windowScope = this;
-    // Line when testing:
-    // jQuery.each(returnedObjOfVars, function (edKey, edValue){windowScope[edKey] = edValue});
-    // line for production:
-    jQuery.when(fetchQuesVars(defineQuesVars)).then(function (returnedObjOfVars) {jQuery.each(returnedObjOfVars, function (edKey, edValue) {windowScope[edKey] = edValue; console.log(`New ${edKey} is ${edValue}`); }); fillPage(); });
+    if (objFromMainQues.isProduction) {
+        return createEDVarInScope(returnedObjOfVars); // pass the real, embedded data variables
+    } else {
+        return createEDVarInScope(defineQuesVars); // pass the variables created above
+    };
+
+    function createEDVarInScope(objEDVars){
+        jQuery.each(objEDVars, function (edKey, edValue) {
+            windowScope[edKey] = edValue;
+            console.log(`New ${edKey} is ${edValue}`); 
+        });
+        return fillPage();
+    }
 
     function fillPage() {
 
