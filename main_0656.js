@@ -17,7 +17,7 @@ scriptLoaded = function(){
 }
 
 jsonLoaded = function(objQuesFileInfo) {
-	const scriptToLoad = BASE_URL + 'ques/' + objQuesFileInfo[quesNum].filename;
+	const scriptToLoad = BASE_URL + 'ques/' + objQuesFileInfo[quesNum()].filename;
 	//const scriptToLoad = objQuesFileInfo[quesNum()].filename; // TESTING - use line above in production
 	const udfScript = BASE_URL + 'supporting/user-defined-functions.js';
 	//const udfScript = "https://dl.dropbox.com/s/f8rgqsuc94cn0lf/user-defined-functions.js";// TESTING - use line above in production
