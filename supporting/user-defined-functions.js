@@ -47,7 +47,8 @@ function fetchQuesVars(objVarDefs) {
                     })
                 };
             });
-            console.log(`The "newValue" is ${newValue}. I'm sending that upstairs... we'll see what they actually receive.`);
+            console.log(`The "newValue" is ${newValue}. I'm sending that upstairs... we'll see what they actually receive. Here it is for inspction:`);
+            console.log(newValue);
             return newValue;
         }
     }
