@@ -53,21 +53,6 @@ function fetchQuesVars(objVarDefs) {
     }
 }
 
-// function syncEmbeddedData(theKey, theValue) {
-//     jQuery.when( getEDValue(theKey) ).then(function( edValue ) {
-//         let storedEDValue = edValue;
-//         console.log("storedEDValue for " + theKey + " is " + storedEDValue);
-//         if (storedEDValue) {
-//             console.log("The ED value for " + theKey + " already exists. It's "+storedEDValue);
-//             return storedEDValue;
-//         } else {
-//             const newValue = Qualtrics.SurveyEngine.setEmbeddedData(theKey, theValue);
-//             console.log("New ED value for " + theKey + ". It's "+theValue);
-//             return newValue;
-//         };
-//       });
-// }
-
 
 // Create shorthand for katex.renderToString
 // We can pass the math as a string, number, or array
