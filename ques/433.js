@@ -8,11 +8,11 @@ fnQues433 = function (objFromMainQues) {
 
     // Static code
     let obj = {};
-    obj.ansBoxMessage = objAnsBoxMessages.decimalPlaces4;
-    const windowScope = this;
+    obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
+    const windowScope = this; const varPrefix = "var_q" + quesNum() + "z__";
+    jQuery.each(quesVars, function(theKey, theValue){const newKey = varPrefix + theKey; quesVars[newKey] = [theValue]; delete quesVars[theKey]; });
     if (objFromMainQues.isProduction) { return createEDVarInScope(fetchQuesVars(quesVars)) } else { return createEDVarInScope(quesVars); }
-    function createEDVarInScope(objEDVars) { jQuery.each(objEDVars, function (edKey, edValue) { windowScope[edKey] = edValue; }); return fillPage(); }
-    function fillPage() {
+    function createEDVarInScope(objEDVars) { jQuery.each(objEDVars, function (edKey, edValue) { const origKey = edKey.replace(varPrefix, ''); quesVars[origKey]= quesVars[edKey]; delete quesVars[edKey]; windowScope[origKey] = edValue; }); return fillPage(); } function fillPage() {
     // End static code
 
         // Calculations
