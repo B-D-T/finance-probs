@@ -29,7 +29,6 @@ fnQues433 = function (objFromMainQues) {
             `
             Solve for ${kxx} given:
             ${kxbig([a, "+", bx, "=", c])}
-            ${kxbig(texRoot("x", 8))}
         `
 
         obj.solution =

@@ -27,9 +27,7 @@ scriptsLoaded = function () {
 jsonLoaded = function(objQuesFileInfo) {
 
 	const quesScriptLocation = baseURL() + (objQuesCaller.isProduction ? "" : "ques/") + objQuesFileInfo[quesNum()].filename;
-	//const udfScriptLocation = baseURL() + (objQuesCaller.isProduction ? "F_41InomybaYnBhJ3" : "supporting/user-defined-functions.js")
-	//const udfScriptLocation = "https://umassamherst.co1.qualtrics.com/WRQualtricsControlPanel/File.php?F=F_41InomybaYnBhJ3";
-	const udfScriptLocation = "https://dl.dropbox.com/s/f8rgqsuc94cn0lf/user-defined-functions.js";//
+	const udfScriptLocation = objQuesCaller.isProduction ? "https://dl.dropbox.com/s/f8rgqsuc94cn0lf/user-defined-functions.js" : baseURL() + "supporting/user-defined-functions.js"
 
 	// scriptLoaded happens ONLY after the external 433.js is loaded.
 	// We also need udfScript to finish loading. 
