@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Testing page</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- <script defer src="https://cdn.jsdelivr.net/gh/B-D-T/finance-probs/main.js" crossorigin="anonymous"></script> -->
+    <script src="main.js"></script>
+
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css"
+        integrity="sha384-qCEsSYDSH0x5I45nNW4oXemORUZnYFtPy/FqB/OjqxabTMW5HVaaH9USK4fN3goV" rel="stylesheet" />
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.js"
+        integrity="sha384-YFVvRUwgqxkAVN9bmAVLsKilmOKfQLyUx0ZlmDNs0aBUTsvMLnRxE3Km0NrZa0i9"
+        crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.js"
+        integrity="sha256-4O4pS1SH31ZqrSO2A/2QJTVjTPqVe+jnYgOWUVr7EEc=" crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+
+    <!-- 
+        Create DIVs in the HTML of the question. It's the only thing you'll put in each question.
+        Change the <div> name in the HTML to match the question. The DIV is populated by by the custom JS.
+        Note: I created a second div just because I wanted to see the output of the stem and the solution, which normally wouldn't be on the same page
+    -->
+    <div id="divQues454-stem">Stem</div>
+    <div>
+        <hr />
+    </div>
+    <div id="divQues454-solution">Solution</div>
+
+
+    <script>
+        // Customize objQuesInfo with anything the custom JS needs.
+        // REQUIRED: fnName and quesVars (even if it's empty). Those must be direct children of objQuesInfo.
+        //   fnName - The main.js code pulls from the 7th character to the end (i.e., it drops 'fnQues' to leave the question number).
+        //   quesVars - That gets passed to the custom JS for each question. You can put whatever you want under that.
+        //   isProduction - this is an optional property. If it's set to false, this will pull local files (i.e., from your computer). If omitted or set to true, it pulls the real files.
+        // loadQues() is a function on main.js. It calls this question's JS .
+
+        const objQtrx = {
+            fnName: "fnQues454",
+            qtrxQuesInfo: this,
+            isProduction: false
+        };
+        const getEDValue = (theKey) => Qualtrics.SurveyEngine.getEmbeddedData(theKey);
+        const setEDValue = (theKey, theValue) => Qualtrics.SurveyEngine.setEmbeddedData(theKey, theValue);
+        loadQues(objQtrx, getEDValue, setEDValue);
+
+    </script>
+
+</body>
+
+</html>

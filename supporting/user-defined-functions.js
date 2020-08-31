@@ -1,3 +1,4 @@
+// user-defined-functions.js
 
 const objAnsBoxMessages = {
     percAsDecimal: "Submit answer as a decimal. E.g., 65.4321% would be 0.654321",
@@ -11,86 +12,6 @@ const uRound = (value, decimals) => Number(Math.round(value + 'e' + decimals) + 
 
 // Use "ln" for natural log (log base e). I'm just renaming an existing method here, but it's easier to understand when it's "ln."
 const uLn = (value) => Math.log(value);
-
-// Create a LaTex-style fraction
-const uFrac = (numerator, denominator) => ["\\frac{", numerator, "}{", denominator, "}"].join('')
-
-// If the variable is already in the embedded data, it uses that. Otherwise, it creates one in the embedded data based on our definition.
-function fetchQuesVars(objRandomVars) {
-    let objQuesVarsActual = {};
-    jQuery.when(fetchEachKV(objRandomVars)).then(function(){ return objQuesVarsActual; });
-
-    function fetchEachKV(objRandomVars) {
-        console.log("I'm fetchEachKV. My object is: ");
-        console.log(objRandomVars);
-        jQuery.each(objRandomVars, function (theKey, randValue) {
-            console.log(`jQuery.each(objRandomVars), about to sync "${theKey}"`);
-
-            jQuery.when(getEDValue(theKey)).then(function (edValue) {
-                console.log(`getEDValue returned ${edValue}. I'm going to write that to ${theKey}`);
-                if (edValue) {
-                    console.log(`It looks like ${theKey}:${edValue} was already in the embedded data, so I'm going to return ${edValue} without setting anything`);
-                    objQuesVarsActual[theKey] = edValue;
-                } else {
-                    console.log(`So ${theKey} isn't in the embedded data. Let's setEdValue(${theKey}, ${randValue}).`);
-                    jQuery.when(setEDValue(theKey, randValue)).then(function(){
-                        console.log(`In theory, I just set ${theKey}:${randValue} to embedded data. I'll believe it when I see it. Now, I'll lie to you that I'm writing that to the objQuesVarsActual object.`)
-                        objQuesVarsActual[theKey] = randValue;
-                    });
-                };
-            });
-        });
-        return "Done fetching and setting. Godspeed, variables."
-    }
-}
-
-// function fetchQuesVars(objRandomVars) {
-//     let qv = {};
-//     jQuery.when(fetchEachKV(objRandomVars)).then(function(){ return qv; });
-
-//     function fetchEachKV(objRandomVars) {
-//         console.log("I'm fetchEachKV. My object is: ");
-//         console.log(objRandomVars);
-//         jQuery.each(objRandomVars, function (theKey, theValue) {
-//             console.log(`jQuery.each(obvVarsDefs), about to sync ${theKey}:${theValue}`);
-//             jQuery.when(syncEmbeddedData(theKey, theValue)).then( function() { return "Back to the question."}) });
-
-//         function syncEmbeddedData(theKey, theValue) {
-//             console.log(`syncEmbeddedData working on ${theKey}:${theValue}.`);
-//             jQuery.when(getEDValue(theKey)).then(function (edValue) {
-//                 console.log(`getEDValue returned ${edValue}. I'm going to write that to ${theKey}`);
-//                 let storedEDValue = edValue;
-//                 if (storedEDValue) {
-//                     console.log(`It looks like ${theKey}:${storedEDValue} was already in the embedded data, so I'm going to return ${storedEDValue} without setting anything`);
-//                     qv[theKey] = storedEDValue;
-//                 } else {
-//                     console.log(`So ${theKey} isn't in the embedded data. Let's setEdValue(${theKey}, ${theValue}).`);
-//                     jQuery.when(setEDValue(theKey, theValue)).then(function(){
-//                         console.log(`In theory, I just set ${theKey}:${theValue} to embedded data. I'll believe it when I see it.`)
-//                         qv[theKey] = theValue;
-//                         return theValue;
-//                     })
-//                 };
-//             });
-//         }
-//     }
-// }
-
-
-// Create shorthand for katex.renderToString
-// We can pass the math as a string, number, or array
-const kx = function (mathToBeRendered, renderingOptions) {
-    const mathForKatex = Array.isArray(mathToBeRendered) ? mathToBeRendered.join("") : mathToBeRendered.toString()
-    return katex.renderToString(mathForKatex, renderingOptions);
-}
-
-// I write things like "Solve for x" a lot, so kxx is just shorthand.
-const kxx = kx("x");
-
-// The default displayMode for kx is inline {displayMode:false}.
-// The line below is shorthand for displayMode:true, which makes the katex bigger, centers it, and puts it on its own line.
-const kxbig = (mathToBeRendered) => kx(mathToBeRendered, { displayMode: true })
-
 
 // Generate a random number between two numbers
 const uRand = function (min, max, step) {
@@ -114,3 +35,55 @@ const countDecimals = function (value) {
     if (Math.floor(value) === value) return 0;
     return value.toString().split(".")[1].length || 0;
 }
+
+// Calculate the nth root of a number (from https://www.w3resource.com/javascript-exercises/javascript-math-exercise-26.php)
+// r^n = x, so the nth root of x is r (n√x = r)
+const uthRoot = function(num, nArg, precArg) {
+    const n = nArg || 2; // defaults to square root
+    const prec = precArg || 12; // defaults to 12 places of precision
+
+    let x = 1; // Initial guess
+    for (let i = 0; i < prec; i++) {
+        x = 1 / n * ((n - 1) * x + (num / Math.pow(x, n - 1)));
+    }
+    return x;
+}
+
+// If the variable is already in the embedded data, it uses that. Otherwise, it creates one in the embedded data based on our definition.
+function fetchQuesVars(objRandomVars) {
+    let objQuesVarsActual = {};
+
+    jQuery.each(objRandomVars, function (theKey, randValue) {
+        jQuery.when(getEDValue(theKey)).then(function (edValue) {
+            if (edValue) {
+                objQuesVarsActual[theKey] = edValue;
+            } else {
+                jQuery.when(setEDValue(theKey, randValue)).then(function () {
+                    objQuesVarsActual[theKey] = randValue;
+                });
+            };
+        });
+    });
+    return objQuesVarsActual;
+}
+
+
+// Create shorthand for katex.renderToString
+// We can pass the math as a string, number, or array
+const kx = function (mathToBeRendered, renderingOptions) {
+    const mathForKatex = Array.isArray(mathToBeRendered) ? mathToBeRendered.join("") : mathToBeRendered.toString()
+    return katex.renderToString(mathForKatex, renderingOptions);
+}
+
+// I write things like "Solve for x" a lot, so kxx is just shorthand.
+const kxx = kx("x");
+
+// The default displayMode for kx is inline {displayMode:false}.
+// The line below is shorthand for displayMode:true, which makes the katex bigger, centers it, and puts it on its own line.
+const kxbig = (mathToBeRendered) => kx(mathToBeRendered, { displayMode: true })
+
+// Create a Tex-style fraction
+const texFrac = (numerator, denominator) => ["\\frac{", numerator, "}{", denominator, "}"].join('')
+
+// Create a Tex-style nth root
+const texRoot = (base, root) => ["\\sqrt[", root, "]{", base, "}"].join('')

@@ -1,10 +1,12 @@
 // main.js
 
 // Declare the object that accepts each question's info
-let objQuesCaller = { "isProduction": false };
-if (objQuesCaller.isProduction) {
+let objQuesCaller = { "isProduction": true };
+if (objQuesCaller.isProduction = false) {
+	// Do nothing
+} else {
 	let getEDValue = x => x;
-	let setEDValue = x => x;		
+	let setEDValue = x => x;
 }
 
 
@@ -15,7 +17,7 @@ const baseURL = () => objQuesCaller.isProduction ? "https://umassamherst.co1.qua
 const quesNum = () => objQuesCaller.fnName.slice(6)
 
 // We could pass 3 informational args to the function, but no need. scriptLoaded = function( data, textStatus, jqxhr )
-scriptsLoaded = function(){
+scriptsLoaded = function () {
 	fnToCall = window[objQuesCaller.fnName];
 	objFromQues = fnToCall(objQuesCaller);
 	writeHTML(objFromQues);
@@ -25,26 +27,32 @@ scriptsLoaded = function(){
 jsonLoaded = function(objQuesFileInfo) {
 
 	const quesScriptLocation = baseURL() + (objQuesCaller.isProduction ? "" : "ques/") + objQuesFileInfo[quesNum()].filename;
-	const udfScriptLocation = objQuesCaller.isProduction ? "https://umassamherst.co1.qualtrics.com/WRQualtricsControlPanel/File.php?F=F_41InomybaYnBhJ3" : "supporting/user-defined-functions.js"
-	//const udfScript = "https://dl.dropbox.com/s/f8rgqsuc94cn0lf/user-defined-functions.js";//
+	//const udfScriptLocation = baseURL() + (objQuesCaller.isProduction ? "F_41InomybaYnBhJ3" : "supporting/user-defined-functions.js")
+	//const udfScriptLocation = "https://umassamherst.co1.qualtrics.com/WRQualtricsControlPanel/File.php?F=F_41InomybaYnBhJ3";
+	const udfScriptLocation = "https://dl.dropbox.com/s/f8rgqsuc94cn0lf/user-defined-functions.js";//
 
 	// scriptLoaded happens ONLY after the external 433.js is loaded.
 	// We also need udfScript to finish loading. 
 	// The code below uses nested callbacks, though this risks callback hell if we keep going.
-	jQuery.getScript( quesScriptLocation, function() {
-		jQuery.getScript( udfScriptLocation, scriptsLoaded);
+	// jQuery.getScript( quesScriptLocation, function() {
+	// 	jQuery.getScript( udfScriptLocation, scriptsLoaded);
+	// });
+
+	jQuery.getScript(udfScriptLocation, function () {
+		console.log("main.js says that UDF script has been loaded.");
+		jQuery.getScript(quesScriptLocation, scriptsLoaded);
 	});
 }
 
 
 // This loads first because it's called by the HTML
-function loadQues(paramQuesCaller, funcToGetED, funcToSetED){
+function loadQues(paramQuesCaller, funcToGetED, funcToSetED) {
 	objQuesCaller = paramQuesCaller;
-
-	let jsonLocation = baseURL() + ( objQuesCaller.isProduction ? "F_cZ4KGzL5VCK4Z9j" : "supporting/objQuesFileInfo.json" );
+	let jsonLocation = baseURL() + (objQuesCaller.isProduction ? "F_cZ4KGzL5VCK4Z9j" : "supporting/xx_testing_objQuesFileInfo.json");
 	// https://dl.dropbox.com/s/0try408etjvmyc0/objQuesFileInfo.json // <-- can delete this line once we stop using Dropbox for development
 
-	if (objQuesCaller.isProduction){
+
+	if (objQuesCaller.isProduction) {
 		// This is where we populate objQuesCaller and getED() so they can be used globally
 		getEDValue = funcToGetED;
 		setEDValue = funcToSetED;
@@ -54,11 +62,12 @@ function loadQues(paramQuesCaller, funcToGetED, funcToSetED){
 	// The 1st arg passes the JSON, as an object, the second argument (the callback).
 	// The second argument only runs once it gets objQuesFileInfo from the first argument. 
 	jQuery.getJSON(jsonLocation, jsonLoaded);
+
 }
 
-function writeHTML(obj){
+function writeHTML(obj) {
 	const qtrxDivID = "#divQues" + quesNum();
-	jQuery(`${qtrxDivID}-stem`).html(obj.stem);
+	jQuery(qtrxDivID+"-stem").html(obj.stem);
 	const qtrxQuesID = objQuesCaller.QuestionID; // this is the internal Qualtrics ID
 	jQuery("#" + qtrxQuesID + " .InputText").attr("placeholder", obj.ansBoxMessage);
 	jQuery(`${qtrxDivID}-solution`).html(obj.solution);
