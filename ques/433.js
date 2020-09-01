@@ -37,11 +37,13 @@ fnQues433 = function (objFromMainQues) {
             Subtract ${a} from each side. 
             That will isolate ${kx(bx)} on the left side.
             
-            <div class="equation-container d-flex justify-content-start mt-3 mb-2">
-                ${kxbig([bx, "=", c, "-", a])}
-            </div>
-            <div class="equation-container d-flex justify-content-start mt-2 mb-3">
-                ${kxbig([bx, "=", d_round])}
+            <div class="border p-2 my-2">
+                <div class="equation-container d-flex justify-content-start mt-3 mb-2">
+                    ${kxbig([bx, "=", c, "-", a])}
+                </div>
+                <div class="equation-container d-flex justify-content-start mt-2 mb-3">
+                    ${kxbig([bx, "=", d_round])}
+                </div>
             </div>
 
             The variable is in the exponent, 
@@ -50,31 +52,38 @@ fnQues433 = function (objFromMainQues) {
             When you take the natural log of each side of the equation, 
             the variable moves down and is multiplied by the rest of the term.
             
-            <div class="equation-container d-flex justify-content-start my-3">
-                ${kxbig(["x*ln(", b, ")=ln(", d_round, ")"])}
+            <div class="border p-2 my-2">
+                <div class="equation-container d-flex justify-content-start my-3">
+                    ${kxbig(["x*ln(", b, ")=ln(", d_round, ")"])}
+                </div>
             </div>
 
             Now, use the calculator to determine the natural log of the numbers.
             
-            <div class="equation-container d-flex justify-content-start my-3">
-                ${kxbig(["x*", lnb, "=", lnd])}
+            <div class="border p-2 my-2">
+                <div class="equation-container d-flex justify-content-start my-3">
+                    ${kxbig(["x*", lnb, "=", lnd])}
+                </div>
             </div>
             
             Finally, to solve for ${kxx}, divide each side by the number that's multiplying the variable (${lnb}).
-            <div class="equation-container d-flex justify-content-start my-4">
-                ${kxbig([
-                    texFrac("x*" + lnb, lnb),
-                    " = ",
-                    texFrac(lnd, lnb)
-                ])}
-            </div>
-
-            <div class="equation-container d-flex justify-content-start my-4">
-                ${kxbig(`x = ${texFrac(lnd, lnb)}`)}
-            </div>
             
-            <div class="equation-container d-flex justify-content-start my-4">
-                ${kxbig(`x = ${ans}`)}
+            <div class="border p-2 my-2">
+                <div class="equation-container d-flex justify-content-start my-4">
+                    ${kxbig([
+                        texFrac("x*" + lnb, lnb),
+                        " = ",
+                        texFrac(lnd, lnb)
+                    ])}
+                </div>
+
+                <div class="equation-container d-flex justify-content-start my-4">
+                    ${kxbig(`x = ${texFrac(lnd, lnb)}`)}
+                </div>
+            
+                <div class="equation-container d-flex justify-content-start my-4">
+                    ${kxbig(`x = ${ans}`)}
+                </div>
             </div>
         `
 
