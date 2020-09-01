@@ -1,3 +1,7 @@
+body {
+    font-family: helvetica, arial, sans-serif !important;
+}
+
 .equation-container .katex-display {
     margin: 0px;
 }
@@ -5,3 +9,9 @@
 .equation-container span {
     font-weight: 700 !important;
 }
+
+.katex-html .base {
+    font: inherit;
+    font-size: 0.9em;
+}
+

@@ -75,7 +75,8 @@ function fetchQuesVars(objRandomVars) {
 // Create shorthand for katex.renderToString
 // We can pass the math as a string, number, or array
 kx = function (mathToBeRendered, renderingOptions) {
-    const mathForKatex = Array.isArray(mathToBeRendered) ? mathToBeRendered.join("") : mathToBeRendered.toString()
+    const mathForKatex = Array.isArray(mathToBeRendered) ? mathToBeRendered.join("") : mathToBeRendered.toString();
+    
     return katex.renderToString(mathForKatex, renderingOptions);
 }
 
@@ -84,7 +85,22 @@ kxx = kx("x");
 
 // The default displayMode for kx is inline {displayMode:false}.
 // The line below is shorthand for displayMode:true, which makes the katex bigger, centers it, and puts it on its own line.
-kxbig = (mathToBeRendered) => kx(mathToBeRendered, { displayMode: true })
+kxbig = (mathToBeRendered, displayOptions = null) => {
+
+    let response = `
+        <div class="equation-container d-flex justify-content-start my-3">
+            ${kx(mathToBeRendered, { displayMode: true })}
+        </div>
+    `
+
+    if (displayOptions != null && displayOptions.border) {
+        response = `<div class="border rounded p-3 my-3">
+                ${response}
+            </div>
+        `;
+    }
+    return response;
+}
 
 // Create a Tex-style fraction
 texFrac = (numerator, denominator) => ["\\frac{", numerator, "}{", denominator, "}"].join('')

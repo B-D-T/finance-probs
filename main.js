@@ -2,7 +2,7 @@
 
 // Declare the object that accepts each question's info
 objQuesCaller = { "isProduction": true };
-if (objQuesCaller.isProduction = false) {
+if (!objQuesCaller.isProduction) {
 	// Do nothing
 } else {
 	let getEDValue = x => x;
@@ -40,9 +40,11 @@ jsonLoaded = function(objQuesFileInfo) {
 
 // This loads first because it's called by the HTML
 function loadQues(paramQuesCaller, funcToGetED, funcToSetED) {
-	jQuery.each(paramQuesCaller, function(theKey, theValue){
-		objQuesCaller[theKey]=theValue;
-	});
+	// jQuery.each(paramQuesCaller, function(theKey, theValue){
+	// 	objQuesCaller[theKey]=theValue;
+	// });
+	objQuesCaller = jQuery.extend(objQuesCaller, paramQuesCaller);
+
 	let jsonLocation = baseURL() + (objQuesCaller.isProduction ? "F_cZ4KGzL5VCK4Z9j" : "supporting/xx_testing_objQuesFileInfo.json");
 
 	if (objQuesCaller.isProduction) {
