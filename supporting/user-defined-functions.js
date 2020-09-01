@@ -1,5 +1,7 @@
 // user-defined-functions.js
 
+console.log("user-defined-functions.js loaded");
+
 ansBoxMessages = function (msgKeyToReturn) {
     const objAnsBoxMessages = {
         percAsDecimal: "Submit answer as a decimal. E.g., 65.4321% would be 0.654321",
