@@ -12,9 +12,10 @@ fnQues433 = function (objFromMainQues) {
     const windowScope = this; const varPrefix = "var_q" + quesNum() + "z__";
     jQuery.each(quesVars, function(theKey, theValue){const newKey = varPrefix + theKey; quesVars[newKey] = [theValue]; delete quesVars[theKey]; });
     if (objFromMainQues.isProduction) { return createEDVarInScope(fetchQuesVars(quesVars)) } else { return createEDVarInScope(quesVars); }
-    function createEDVarInScope(objEDVars) { jQuery.each(objEDVars, function (edKey, edValue) { const origKey = edKey.replace(varPrefix, ''); quesVars[origKey]= quesVars[edKey]; delete quesVars[edKey]; windowScope[origKey] = edValue; }); return fillPage(); } function fillPage() {
+    function createEDVarInScope(objEDVars) { jQuery.each(objEDVars, function (edKey, edValue) { const origKey = edKey.replace(varPrefix, ''); quesVars[origKey]= quesVars[edKey]; delete quesVars[edKey]; windowScope[origKey] = edValue; }); return fillPage(); } 
     // End static code
 
+    function fillPage() {
         // Calculations
         const d = c - a;
         const ans = uLn(c - a) / uLn(b);
@@ -35,28 +36,46 @@ fnQues433 = function (objFromMainQues) {
             `
             Subtract ${a} from each side. 
             That will isolate ${kx(bx)} on the left side.
-            ${kxbig([bx, "=", c, "-", a])}
-            ${kxbig([bx, "=", d_round])}
+            
+            <div class="equation-container d-flex justify-content-start mt-3 mb-2">
+                ${kxbig([bx, "=", c, "-", a])}
+            </div>
+            <div class="equation-container d-flex justify-content-start mt-2 mb-3">
+                ${kxbig([bx, "=", d_round])}
+            </div>
 
             The variable is in the exponent, 
             so we need to bring it down with the rest of the equation in order to solve for it. 
             To do this, we can use the natural log (ln). 
             When you take the natural log of each side of the equation, 
             the variable moves down and is multiplied by the rest of the term.
-            ${kxbig(["x*ln(", b, ")=ln(", d_round, ")"])}
+            
+            <div class="equation-container d-flex justify-content-start my-3">
+                ${kxbig(["x*ln(", b, ")=ln(", d_round, ")"])}
+            </div>
 
             Now, use the calculator to determine the natural log of the numbers.
-            ${kxbig(["x*", lnb, "=", lnd])}
+            
+            <div class="equation-container d-flex justify-content-start my-3">
+                ${kxbig(["x*", lnb, "=", lnd])}
+            </div>
             
             Finally, to solve for ${kxx}, divide each side by the number that's multiplying the variable (${lnb}).
-            ${kxbig([
-                texFrac("x*" + lnb, lnb),
-                " = ",
-                texFrac(lnd, lnb)
-            ])}
+            <div class="equation-container d-flex justify-content-start my-4">
+                ${kxbig([
+                    texFrac("x*" + lnb, lnb),
+                    " = ",
+                    texFrac(lnd, lnb)
+                ])}
+            </div>
 
-            ${kxbig(`x = ${texFrac(lnd, lnb)}`)}
-            ${kxbig(`x = ${ans}`)}
+            <div class="equation-container d-flex justify-content-start my-4">
+                ${kxbig(`x = ${texFrac(lnd, lnb)}`)}
+            </div>
+            
+            <div class="equation-container d-flex justify-content-start my-4">
+                ${kxbig(`x = ${ans}`)}
+            </div>
         `
 
         return obj;
