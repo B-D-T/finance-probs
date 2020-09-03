@@ -1,52 +1,47 @@
-fnQues455 = function (){//quesVariables, objAddlInfo) {
+fnQues455 = function (objFromMainQues) {
 
 
-let defineQuesVars = {
-    "a": uRand(2,8,1),
-    "b": uRand(10,29,1),
-    "c": uRand(30,50,2)
-}
+    let quesVars = {
+        "a": uRand(2, 8, 1),
+        "b": uRand(10, 29, 1),
+        "c": uRand(30, 50, 2)
+    }
 
-// KELSEY -- don't touch
-    // If the variable is already in the embedded data, it uses that. Otherwise, it creates one in the embedded data based on our definition.
-    // Create local variables with the same names as the keys in defineQuesVars. These are what we'll use in our code.
-    jQuery.each(defineQuesVars, function(theKey, theValue){ 
-        window[theKey] = theValue;  //<-- TESTING. Real one is something like syncEmbeddedData(theValue); 
-        console.log("New student name is " + getEDValue("StudentNameFL"));
-    });
-    // end KELSEY
-    
-// Calculations
-const d = c-b;
-const ax = a+"x";
-const ans = ((c-b)/a);
-const ansr = uRound((c-b)/a, 5);
+    // Static code
+    let obj = {};
+    obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
+    const windowScope = this; const varPrefix = "var_q" + quesNum() + "z__";
+    jQuery.each(quesVars, function (theKey, theValue) { const newKey = varPrefix + theKey; quesVars[newKey] = [theValue]; delete quesVars[theKey]; });
+    if (objFromMainQues.isProduction) { return createEDVarInScope(fetchQuesVars(quesVars)) } else { return createEDVarInScope(quesVars); }
+    function createEDVarInScope(objEDVars) { jQuery.each(objEDVars, function (edKey, edValue) { const origKey = edKey.replace(varPrefix, ''); quesVars[origKey] = quesVars[edKey]; delete quesVars[edKey]; windowScope[origKey] = edValue; }); return fillPage(); } function fillPage() {
+    // End static code
 
-// KELSEY don't touch
-let obj = {};
-obj.ansBoxMessage = objAnsBoxMessages.decimalPlaces4;
-// end KELSEY
+        // Calculations
+        const d = c - b;
+        const ax = a + "x";
+        const ans = ((c - b) / a);
+        const ansr = uRound((c - b) / a, 5);
 
-obj.stem = `
-    Solve for ${kxx} given:
-    ${kxbig([ax, "+", b, "=", c])}
-`
+        obj.stem = `
+        Solve for ${kxx} given:
+        ${kxbig([ax, "+", b, "=", c])}
+        `
 
-obj.solution = `
-    Subtract ${b} from each side. That will leave ${kx(ax)} on the left side.
-    ${kxbig([ax, "+", b, "-", b, "=", c, "-", b])}
-    ${kxbig([ax, "=", d])}
-    
-    Divide each side by ${a} to isolate the variable.
-    ${kxbig([
-        uFrac(ax, a), 
+        obj.solution = `
+        Subtract ${b} from each side. That will leave ${kx(ax)} on the left side.
+        ${kxbig([ax, "+", b, "-", b, "=", c, "-", b])}
+        ${kxbig([ax, "=", d])}
+            
+        Divide each side by ${a} to isolate the variable.
+        ${kxbig([
+        texFrac(ax, a),
         "=",
-        uFrac(d, a)
-    ])}
+        texFrac(d, a)
+        ])}
 
-    ${kxbig(`x = ${uFrac(ax,a)}`)}
-    ${kxbig(`x = ${ans}`)}
-`
-return obj;
-
+        ${kxbig(`x = ${texFrac(ax, a)}`)}
+        ${kxbig(`x = ${ans}`)}
+        `
+        return obj;
+    }
 }

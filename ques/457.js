@@ -1,52 +1,52 @@
-fnQues457 = function (){//quesVariables, objAddlInfo) {
+fnQues457 = function (objFromMainQues) {
 
 
-    let defineQuesVars = {
+    let quesVars = {
         "a": uRand(10,19,.001),
         "b": uRand(21,29,.01),
         "c": uRand(600,750,1)
     }
-    
-    // KELSEY -- don't touch
-        // If the variable is already in the embedded data, it uses that. Otherwise, it creates one in the embedded data based on our definition.
-        // Create local variables with the same names as the keys in defineQuesVars. These are what we'll use in our code.
-        jQuery.each(defineQuesVars, function(theKey, theValue){ 
-            window[theKey] = theValue;  //<-- TESTING. Real one is something like syncEmbeddedData(theValue); 
-            console.log("New student name is " + getEDValue("StudentNameFL"));
-        });
-        // end KELSEY
-        
-    // Calculations
-    const d = a-b;
-    const e = c/d;
-    const ans = c/(a-b)
-    
-    // KELSEY don't touch
+
+
+    // Static code
     let obj = {};
-    obj.ansBoxMessage = objAnsBoxMessages.decimalPlaces4;
-    // end KELSEY
-    
-    obj.stem = `
+    obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
+    const windowScope = this; const varPrefix = "var_q" + quesNum() + "z__";
+    jQuery.each(quesVars, function (theKey, theValue) { const newKey = varPrefix + theKey; quesVars[newKey] = [theValue]; delete quesVars[theKey]; });
+    if (objFromMainQues.isProduction) { return createEDVarInScope(fetchQuesVars(quesVars)) } else { return createEDVarInScope(quesVars); }
+    function createEDVarInScope(objEDVars) { jQuery.each(objEDVars, function (edKey, edValue) { const origKey = edKey.replace(varPrefix, ''); quesVars[origKey] = quesVars[edKey]; delete quesVars[edKey]; windowScope[origKey] = edValue; }); return fillPage(); } function fillPage() {
+    // End static code
+
+        // Calculations
+        const d = a - b;
+        const ans = c / (a - b)
+
+        // Display vars
+        const d_round = uRound(d,5);
+
+        obj.stem = `
         Solve for ${kxx} given:
-        ${kxbig(a, "x-", b, "x=",c)}
+        ${kxbig([a, "x-", b, "x=", c])}
     `
-    
-    obj.solution = `
-        ${kxbig(a, "x-", b, "x=",c)}
+
+        obj.solution = `
+        ${kxbig([a, "x-", b, "x=", c])}
 
         The same variable (x) on the left side of the equation is 
         being multiplied by two different coefficients. Therefore, 
         we can simplify the problem by subtracting the coefficients.
     
-        ${kxbig((a-b), "x=", c)}
-        ${kxbig(d, "x=", c)}
+        ${kxbig(`(${a} - ${b})x=${c}`)}
+        
+        ${kxbig([d_round, "x=", c])}
 
-        To isolate x, divide each side by the coefficient (${d}).
-        ${kxbig(uFrac((d, "x"), d), "=", uFrac(c,d))}
+        To isolate x, divide each side by the coefficient (${d_round}). 
+        ${kxbig([texFrac(d_round+"x", d_round), "=", texFrac(c, d_round)])}
 
         ${kxbig(`x = ${ans}`)}
 
     `
-    return obj;
-    
+        return obj;
+
     }
+}

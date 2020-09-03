@@ -1,38 +1,34 @@
-fnQues459 = function (){//quesVariables, objAddlInfo) {
+fnQues459 = function (objFromMainQues) {
 
 
-    let defineQuesVars = {
-        "a": uRand(9,60,1),
-        "b": uRand(1.001,4.999,.001),
+    let quesVars = {
+        "a": uRand(9, 60, 1),
+        "b": uRand(1.001, 4.999, .001),
     }
-    
-    // KELSEY -- don't touch
-        // If the variable is already in the embedded data, it uses that. Otherwise, it creates one in the embedded data based on our definition.
-        // Create local variables with the same names as the keys in defineQuesVars. These are what we'll use in our code.
-        jQuery.each(defineQuesVars, function(theKey, theValue){ 
-            window[theKey] = theValue;  //<-- TESTING. Real one is something like syncEmbeddedData(theValue); 
-            console.log("New student name is " + getEDValue("StudentNameFL"));
-        });
-        // end KELSEY
-        
-    // Calculations
-    const c = uRound(ln(a), 5);
-    const d = uRound(ln(b), 5);
-    const ans = (ln(b))/(ln(a));
-    const ansn = uRound(ln(b)/ln(a), 5)
-    
-    // KELSEY don't touch
+
+    // Static code
     let obj = {};
-    obj.ansBoxMessage = objAnsBoxMessages.decimalPlaces4;
-    // end KELSEY
-    
-    obj.stem = `
+    obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
+    const windowScope = this; const varPrefix = "var_q" + quesNum() + "z__";
+    jQuery.each(quesVars, function (theKey, theValue) { const newKey = varPrefix + theKey; quesVars[newKey] = [theValue]; delete quesVars[theKey]; });
+    if (objFromMainQues.isProduction) { return createEDVarInScope(fetchQuesVars(quesVars)) } else { return createEDVarInScope(quesVars); }
+    function createEDVarInScope(objEDVars) { jQuery.each(objEDVars, function (edKey, edValue) { const origKey = edKey.replace(varPrefix, ''); quesVars[origKey] = quesVars[edKey]; delete quesVars[edKey]; windowScope[origKey] = edValue; }); return fillPage(); } function fillPage() {
+    // End static code
+
+        // Calculations
+        const c = uRound(uLn(a), 5);
+        const d = uRound(uLn(b), 5);
+        const ans = (uLn(b)) / (uLn(a));
+        const ansn = uRound(uLn(b) / uLn(a), 5)
+
+
+        obj.stem = `
         Solve for ${kxx} given:
-        ${kxbig(a^, "x=", b)}
+        ${kxbig(a + "^x=" + b)}
     `
-    
-    obj.solution = `
-        ${kxbig(a, ^"x=", b)}
+
+        obj.solution = `
+        ${kxbig([a, "^x=", b])}
 
         The variable is in the exponent, so we need to bring it 
         down with the rest of the equation in order to solve for 
@@ -40,17 +36,18 @@ fnQues459 = function (){//quesVariables, objAddlInfo) {
         take the natural log of each side of the equation, the 
         variable moves down and is multiplied by the rest of the term.
 
-        ${kxbig(x(ln(a)), "=", ln(b))}
+        ${kxbig("x(ln("+a+"))=ln("+b+")")}
 
         Use the calculator to determine the natural log of the numbers.
-        ${kxbig("x", *c, "=", d)}
+        ${kxbig("x(" + c + ")=" + d)}
     
         To solve for x, divide each side by the coefficient.
-        ${kxbig(uFrac(("x"*c), c), "=", uFrac(d,c))}
+        ${kxbig([texFrac("x("+c+")",c), "=", texFrac(d, c)])}
 
         ${kxbig(`x = ${ans}`)}
 
     `
-    return obj;
-    
+        return obj;
+
     }
+}
