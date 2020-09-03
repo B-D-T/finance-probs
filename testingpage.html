@@ -7,7 +7,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <!-- <script defer src="https://cdn.jsdelivr.net/gh/B-D-T/finance-probs/main.js" crossorigin="anonymous"></script> -->
-    <script src="main.js"></script>
+    <!-- <script src="main.js"></script> -->
 
     <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css"
         integrity="sha384-qCEsSYDSH0x5I45nNW4oXemORUZnYFtPy/FqB/OjqxabTMW5HVaaH9USK4fN3goV" rel="stylesheet" />
@@ -16,6 +16,16 @@
         crossorigin="anonymous"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.js"
         integrity="sha256-4O4pS1SH31ZqrSO2A/2QJTVjTPqVe+jnYgOWUVr7EEc=" crossorigin="anonymous"></script>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"
+        integrity="sha384-mll67QQFJfxn0IYznZYonOWZ644AWYC+Pt2cHqMaRhXVrursRwvLnLaebdGIlYNa" crossorigin="anonymous"
+        onload="renderMathInElement(document.getElementById('kxAutoRender'))"></script>
+
+
+    <!-- custom styling -->
+    <link rel="stylesheet" href="style.css" />
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
 
 </head>
 
@@ -26,11 +36,91 @@
         Change the <div> name in the HTML to match the question. The DIV is populated by by the custom JS.
         Note: I created a second div just because I wanted to see the output of the stem and the solution, which normally wouldn't be on the same page
     -->
-    <div id="divQues433-stem">Stem</div>
-    <div>
-        <hr />
+
+    <!--
+    <div class="container-fluid">
+        <div class="row mt-3">
+            <div class="col-12">
+                <div id="divQues433-stem">Stem</div>
+                <div>
+                    <hr />
+                </div>
+                <div id="divQues433-solution">Solution</div>
+            </div>
+        </div>
     </div>
-    <div id="divQues433-solution">Solution</div>
+    -->
+    <div id="kxAutoRender">
+
+        <!-- <div>
+            vara = random(2,9,1);
+            varb = random(2,7,1);
+            varc = random(10,40,1);
+            vard = varc/vara;
+            varde= vard;
+            varans = vard**varb;
+            varans1=varans;
+        Solve for x given:
+        </div> -->
+    
+        <!-- <div>\(  {vara}x ^\frac{1}{varb} = varc   \)</div> -->
+
+        <div id="makepretty"></div>
+        <div id="makeprettier"></div>
+
+        <script>
+            a = 2;
+            b = 5;
+            c = 30;
+            
+            //jQuery("#makepretty").text(`\\( \\fcolorbox{#FFFFFF}{#f0f0f0}{ I like to eat \\(ax^b = c\\) food all the time. }\\)`);
+            jQuery("#makeprettier").text(`\\(${a}x^${b} = ${c}\\)`);
+        </script>
+
+        <div>   
+        <script>
+            varQues = {
+                vara: 2,
+                varb: 5,
+                varc: 30,
+                varde: 30,
+                vard: 28,
+                vare: 29,
+                varans: 50
+            }
+        myString = `
+            \\( x = 
+            \\newline
+           \\newline\\)
+
+            \\(  {vara}x ^\\frac{1}{varb} = varc   \\newline \\newline \\)
+
+            Divide each side by the coefficient (vara) in order to leave the variable on the left. 
+            \\(  \\frac{{vara}x ^\\frac{1}{varb}}{vara} = \\frac{varc}{vara}   \\newline \\newline \\) 
+            
+            \\(  x ^\\frac{1}{varb} = varde   \\newline \\newline \\)
+
+            To isolate x without an exponent, we need to take the \\( \\frac{1}{varb} \\)-root of each side. Or, to put it another way, we can raise each side by the reciprocal of the exponent, which is this case is \\( \\frac{varb}{1} \\newline \\newline \\). The exponents on the left side reduce to 1, leaving x by itself. 
+            \\(    {(x^{\\frac{1}{varb}})}^{\\frac{varb}{1}}={(varde)}^{\\frac{varb}{1}}    \\newline \\newline \\)  
+            
+            \\(    (x^{\\frac{1}{varb}}*^{\\frac{varb}{1}})={(varde)}^{varb}    \\newline \\newline \\)  
+            
+            \\(    (x^{\\frac{varb}{varb}})={varde}^{varb}    \\newline \\newline \\) 
+            
+            \\(  x = varans  \\newline \\newline \\)
+        `;
+        jQuery.each(varQues, function(origVar, newVar){
+            myString = myString.replace(RegExp(origVar,"g"),newVar);
+        });
+//        myString = myString.replace("vara", "2");
+        console.log(myString);
+  //      myString = myString.replace(encodeURI("\f"), encodeURI("\\f"));
+        console.log(myString);
+        jQuery("#makepretty").text(myString);
+        </script>
+        </div>
+    </div>
+    
 
 
     <script>
@@ -48,7 +138,7 @@
         };
         const getEDValue = (theKey) => Qualtrics.SurveyEngine.getEmbeddedData(theKey);
         const setEDValue = (theKey, theValue) => Qualtrics.SurveyEngine.setEmbeddedData(theKey, theValue);
-        loadQues(objQtrx, getEDValue, setEDValue);
+        //loadQues(objQtrx, getEDValue, setEDValue);
 
     </script>
 
