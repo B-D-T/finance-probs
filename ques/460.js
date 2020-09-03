@@ -1,68 +1,62 @@
-fnQues460 = function (){//quesVariables, objAddlInfo) {
+fnQues460 = function (objFromMainQues) {
 
-
-    let defineQuesVars = {
-        "a": uRand(2,9,1),
-        "b": uRand(2,7,1),
-        "c": uRand(10,40,1)
+    let quesVars = {
+        "a": uRand(2, 9, 1),
+        "b": uRand(2, 7, 1),
+        "c": uRand(10, 40, 1)
     }
-    
-    // KELSEY -- don't touch
-        // If the variable is already in the embedded data, it uses that. Otherwise, it creates one in the embedded data based on our definition.
-        // Create local variables with the same names as the keys in defineQuesVars. These are what we'll use in our code.
-        jQuery.each(defineQuesVars, function(theKey, theValue){ 
-            window[theKey] = theValue;  //<-- TESTING. Real one is something like syncEmbeddedData(theValue); 
-            console.log("New student name is " + getEDValue("StudentNameFL"));
-        });
-        // end KELSEY
-        
-    // Calculations
-    const d = c/a;
-    const de = uRound(c/a, 5);
-    const ans = db;
-    const ans1 = uRound(db, 5)
-    
-    // KELSEY don't touch
+
+    // Static code
     let obj = {};
-    obj.ansBoxMessage = objAnsBoxMessages.decimalPlaces4;
-    // end KELSEY
-    
-    obj.stem = `
+    obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
+    const windowScope = this; const varPrefix = "var_q" + quesNum() + "z__";
+    jQuery.each(quesVars, function (theKey, theValue) { const newKey = varPrefix + theKey; quesVars[newKey] = [theValue]; delete quesVars[theKey]; });
+    if (objFromMainQues.isProduction) { return createEDVarInScope(fetchQuesVars(quesVars)) } else { return createEDVarInScope(quesVars); }
+    function createEDVarInScope(objEDVars) { jQuery.each(objEDVars, function (edKey, edValue) { const origKey = edKey.replace(varPrefix, ''); quesVars[origKey] = quesVars[edKey]; delete quesVars[edKey]; windowScope[origKey] = edValue; }); return fillPage(); } function fillPage() {
+    // End static code
+
+        // Calculations
+        const d = c / a;
+        const de = uRound(c / a, 5);
+        const ans = db;
+        const ans1 = uRound(db, 5)
+
+        obj.stem = `
         Solve for ${kxx} given:
-        ${kxbig([a, "x^", uFrac(1, b), "=", c])}
+        ${kxbig([a, "x^", texFrac(1, b), "=", c])}
     `
-    
-    obj.solution = `
-        ${kxbig([a, "x^", uFrac(1, b), "=", c])}
+
+        obj.solution = `
+        ${kxbig([a, "x^", texFrac(1, b), "=", c])}
     
         Divide each side by the coefficient (${a}) in order to leave 
         the variable on the left. 
-        ${kxbig(uFrac(c, b))}
+        ${kxbig(texFrac([(a + "x" + **uthRoot(b,3)), "=", texFrac(c, a)]))}
+        ${kxbig([texRoot(x, (1/b)), "=", de])}
 
-        which will simplify the fraction and leave an x in the denominator.
+        To isolate x without an exponent, we need to take the ${kx(texFrac(1, b))}
+        -root of each side. Or, to put it another way, we can raise each side by
+        the reciprocal of the exponent, which in this case is 
+        ${kx(texFrac(b, 1))}. The exponents on the left side reduce
+        to 1, leaving x by itself.
 
-        ${kxbig([a, "=", uFrac(de), "x"])}
+        ${kxbig([((("x", **, (texFrac(1,b))), **, texFrac(b,1)), 
+        "=", (de)** texFrac(b,1))])}
 
-        Then, rewrite the original problem in fractions and cross multiply by 
-        multiplying the left-side numerator & right-side denominator and the 
-        right-side numerator and left-side denominator..
+        ${kxbig([
+            "x"** (texFrac(1,b), "*", texFrac(b,1)),
+        "=",
+        (de)**b])}
 
-        ${kxbig([uFrac(a, 1), "=", uFrac(de, x)])}
-            
-        ${kxbig([a*x], "=", [de*1])}
-
-        ${kxbig([a, "x", "=", de])}
-
-        Divide each side by ${kxbig(a)}
-
-        ${kxbig(uFrac((a, "x"), a), "=", uFrac(de, a))}
-
-        ${kxbig(x, "=", uFrac(de, a))}
-
+        ${kxbig(["x"**, texFrac(b, b),
+        "=", 
+        (de)**b])}
+        
         ${kxbig(`x = ${ans}`)}
 
 
     `
-    return obj;
-    
+        return obj;
+
     }
+}

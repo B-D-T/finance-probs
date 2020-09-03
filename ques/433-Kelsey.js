@@ -66,12 +66,12 @@ fnQues433 = function (){//quesVariables, objAddlInfo) {
         
         Finally, to solve for ${kxx}, divide each side by the number that's multiplying the variable (${lnb}).
         ${kxbig([
-            uFrac("x*" + lnb, lnb),
+            texFrac("x*" + lnb, lnb),
             " = ",
-            uFrac(lnd, lnb)
+            texFrac(lnd, lnb)
         ])}
 
-        ${kxbig(`x = ${uFrac(lnd, lnb)}`)}
+        ${kxbig(`x = ${texFrac(lnd, lnb)}`)}
         ${kxbig(`x = ${ans}`)}
     `
     return obj;
