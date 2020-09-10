@@ -27,22 +27,24 @@ fnQues354 = function (objFromMainQues) {
         obj.stem =
             `
             Solve for ${kxx} given:
-            ${kxbig([a, "=", texFrac(c, (b, "x"))])}
+            ${kxbig([a, "=", texFrac(c, b + "x")])}
         `
 
         obj.solution =
             `
+            ${kxbig([a, "=", texFrac(c, (b + "x"))])}
+
             First divide the constants ${kx([texFrac(c, b)])}
             which will simplify the fraction and leave
             an x in the denominator.
-            ${kxbig(texFrac(de, "x"))}
+            ${kxbig(a+"="+texFrac(de, "x"))}
 
             Then, rewrite the original problem in fractions
-            and cross multiply by multiplying the left-side numerator
+            and cross multiply. Multiplying the left-side numerator
             & right-side denominator and the right-side numerator &
             left-side denominator..
             ${kxbig([texFrac(a, 1), "=", texFrac(de,"x")])}
-            ${kxbig((a + "x"), "=", (de + 1))}
+            ${kxbig([a + "x", "=", de, "*", 1])}
             ${kxbig([a + "x", "=", de])}
 
             Divide each side by ${a}.

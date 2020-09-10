@@ -38,9 +38,9 @@ fnQues456 = function (objFromMainQues) {
             To get the variables on the same side of the equation, 
             divide each side by ${kx(["("+a+"+x)^{"+d+"}"])}
             
-            [It's easiest to divide each side by the term with the smaller 
+            It's easiest to divide each side by the term with the smaller 
             exponent. In this case, ${kx("("+a+"+x)^{"+d+"}")} is smaller 
-            than ${kx("("+a+"+x)^{"+b+"}")}.] This will leave ${c} on the 
+            than ${kx("("+a+"+x)^{"+b+"}")}. This will leave ${c} on the 
             right side by itself.
 
             ${kxbig([texFrac("("+a+"+x)^{"+b+"}", "("+a+"+x)^{"+d+"}"), "=", c])}
@@ -49,7 +49,7 @@ fnQues456 = function (objFromMainQues) {
             we can simplify the problem by just subtracting the exponents.
             ${kxbig(["("+a+"+x)^{"+b+"-"+d+"}", "=", c])}
 
-            ${kxbig("("+a+"+x)^{"+(b-d)+"}")}
+            ${kxbig("("+a+"+x)^{"+(b-d)+"} = "+c)}
 
             In order to isolate the (1+x) term, take the ${e}-root of 
             each side.
