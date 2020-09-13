@@ -2,6 +2,14 @@
 
 console.log("user-defined-functions.js loaded");
 
+// When you use console.log(someObj), it passes a REFERENCE to someObj.
+// That means someObj will change as the code is running, and by the time you look at it,
+// it will have the final values. If you want to see the object AT THE TIME the line of code happens,
+// you need to use something like this: console.log("Here's the obj right now:", logObj(theObject) );
+logObj = function(someObj){
+    return JSON.parse(JSON.stringify(someObj));
+}
+
 ansBoxMessages = function (msgKeyToReturn) {
     const objAnsBoxMessages = {
         percAsDecimal: "Submit answer as a decimal. E.g., 65.4321% would be 0.654321",
@@ -55,6 +63,35 @@ uthRoot = function (num, nArg, precArg) {
     return x;
 }
 
+
+// Add prefix to create a key that's unique across ALL questions in the course.
+// This can be passed a string or an object.
+// If passed an object, it will iterated over the object to add prefixes to all the Keys.
+// Passing an empty string returns only the prefix. E.g., strPrefix = addPrefix(''); // returns "var_q433z__"
+function addPrefix(caller){
+    const strPrefix = "var_q" + quesNum() + "z__";
+    if (typeof caller === "string" ) { return strPrefix + caller; };
+    let objWithPrefixes = {};
+    jQuery.each(caller, function (theKey, theValue) {
+        const newKey = strPrefix + theKey;
+        objWithPrefixes[newKey] = theValue;
+        //delete callerObj[theKey];
+    });
+    return objWithPrefixes;
+}
+
+function createEDVarInScope(varsObject, theScope) {
+    strPrefix = addPrefix(''); // returns just the prefix
+    
+    jQuery.each(varsObject, function (passedKey, passedValue) {
+        // Remove the prefix from any keys that have it (change "var_q433z__varA" to "varA")
+        const simpleKey = passedKey.replace(strPrefix, '');
+        varsObject[simpleKey] = varsObject[passedKey];
+        // Write the variable to scope
+        theScope[simpleKey] = passedValue; 
+    }); 
+}
+
 // If the variable is already in the embedded data, it uses that. Otherwise, it creates one in the embedded data based on our definition.
 function fetchQuesVars(objRandomVars) {
     let objQuesVarsActual = {};
@@ -70,6 +107,7 @@ function fetchQuesVars(objRandomVars) {
             };
         });
     });
+    
     return objQuesVarsActual;
 }
 

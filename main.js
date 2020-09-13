@@ -1,7 +1,7 @@
 // main.js
 
 // Declare the object that accepts each question's info
-objQuesCaller = { "isProduction": true };
+objQuesCaller = { "isProduction": false };
 if (objQuesCaller.isProduction = false) {
 	// Do nothing
 } else {
@@ -60,10 +60,15 @@ function loadQues(paramQuesCaller, funcToGetED, funcToSetED) {
 
 function writeHTML(obj) {
 	const qtrxDivID = "#divQues" + quesNum();
+	console.log('qtrxDivID is', qtrxDivID);
 	jQuery(qtrxDivID+"-stem").html(obj.stem);
+
 	const qtrxQuesID = objQuesCaller.qtrxQuesInfo.questionId; // this is the internal Qualtrics ID
 	jQuery("#" + qtrxQuesID + " .InputText").attr("placeholder", obj.ansBoxMessage);
+
 	jQuery(`${qtrxDivID}-solution`).html(obj.solution);
+	
+	renderMathInElement(document.getElementById('kxAutoRender'));
 	cleanup();
 }
 

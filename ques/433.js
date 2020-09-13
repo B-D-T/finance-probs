@@ -1,89 +1,97 @@
 fnQues433 = function (objFromMainQues) {
+    //NOTE: THIS IS NOT 433. I NEED TO CHANGE THAT.
+    const windowScope = this; // global var
 
     let quesVars = {
-        "a": uRand(2, 4, .01),
-        "b": uRand(10, 30, 1),
-        "c": uRand(20, 40, .001)
+        "varA": uRand(2, 4, .01),
+        "varB": uRand(10, 30, 1),
+        "varC": uRand(20, 40, .001)
+    };
+    quesVars = addPrefix(quesVars, quesNum(true));
+
+    if (objFromMainQues.isProduction) {
+        return buildPage( fetchQuesVars(quesVars) );
+    } else { 
+        return buildPage(quesVars);
     }
 
-    // Static code
-    let obj = {};
-    obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
-    const windowScope = this; const varPrefix = "var_q" + quesNum() + "z__";
-    jQuery.each(quesVars, function(theKey, theValue){const newKey = varPrefix + theKey; quesVars[newKey] = [theValue]; delete quesVars[theKey]; });
-    if (objFromMainQues.isProduction) { return createEDVarInScope(fetchQuesVars(quesVars)) } else { return createEDVarInScope(quesVars); }
-    function createEDVarInScope(objEDVars) { jQuery.each(objEDVars, function (edKey, edValue) { const origKey = edKey.replace(varPrefix, ''); quesVars[origKey]= quesVars[edKey]; delete quesVars[edKey]; windowScope[origKey] = edValue; }); return fillPage(); } 
-    // End static code
+    function buildPage(objQuesVars){
+
+        // Overwrite initial quesVars with "official" quesVars
+        quesVars = objQuesVars;
+        createEDVarInScope(quesVars, windowScope);
+
+        // Variables created to calculate values used within the solution
+        // They don't need to have "calc" prefixes, 
+        // but I did it to ensure that no variable contained the name of another variable.
+        const calcVars = {
+            "calcD": varC - varA,
+            "calcTheAns": uLn(varC - varA) / uLn(varB)
+        };
+        createEDVarInScope(calcVars, windowScope);
+
+        // Variables created to improve readability when displaying on the website
+        const displayVars = {
+            "dispDRound": uRound(calcD, 5),
+            "dispLNvarB": uRound(uLn(varB), 5),
+            "dispLNvarD": uRound(uLn(calcD), 5)
+        };
+        createEDVarInScope(displayVars, windowScope);
+        
+        // Append the quesVars object to include the variables created for calculation and display purposes
+        jQuery.extend(quesVars, calcVars, displayVars);
+        
+        return fillPage();
+    }
+
 
     function fillPage() {
-        // Calculations
-        const d = c - a;
-        const ans = uLn(c - a) / uLn(b);
-
-        // Variables formatted for display 
-        const d_round = uRound(d, 5);
-        const lnb = uRound(uLn(b), 5); // functions starting with u are [probably] from the user-defined-functions.js file
-        const lnd = uRound(uLn(d), 5);
-        const bx = b + "^x";
-        const ansr = uRound(ans,5);
+    
+        let obj = {};
+        obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
 
         obj.stem =
             `
-            Solve for ${kxx} given:
-            ${kxbig([a, "+", bx, "=", c])}
+            Solve for \\(x\\) given:
+            $$
+                {varA}x ^\\frac{1}{varB} = varC
+            $$
         `
 
         obj.solution =
             `
-            Subtract ${a} from each side. 
-            That will isolate ${kx(bx)} on the left side.
+            \\(  {varA}x ^\\frac{1}{varB} = varC   \\newline \\newline \\)
+
+            Divide each side by the coefficient (varA) in order to leave the variable on the left. 
+            \\(  \\frac{{varA}x ^\\frac{1}{varB}}{varA} = \\frac{varC}{varA}   \\newline \\newline \\) 
             
-            <div><!-- class="equation-multi border rounded p-2 my-2">-->
-                ${kxbig([bx, "=", c, "-", a])}
-                ${kxbig([bx, "=", d_round])}
-            </div>
+            \\(  x^\\frac{1}{varB} = {dispDRound}   \\newline \\newline \\)
 
-            The variable is in the exponent, 
-            so we need to bring it down with the rest of the equation in order to solve for it. 
-            To do this, we can use the natural log (ln). 
-            When you take the natural log of each side of the equation, 
-            the variable moves down and is multiplied by the rest of the term.
+            To isolate x without an exponent, we need to take the \\( \\frac{1}{varB} \\)-root of each side.
+            Or, to put it another way, we can raise each side by the reciprocal of the exponent,
+            which is this case is \\( \\frac{varB}{1} \\).
+            The exponents on the left side reduce to 1, leaving x by itself. 
+            \\(
+                \\newline \\newline
+                {(x^{\\frac{1}{varB}})}^{\\frac{varB}{1}}={({dispDRound})}^{\\frac{varB}{1}}
+                \\newline \\newline
+            \\)  
             
-            ${kx("\\color{#0000FF}{x+2}")}<br>
-            ${kx("\\fcolorbox{#FFFFFF}{#f0f0f0}{x+2}")}
-
-            <div><!-- class="equation-multi border rounded p-2 my-2">-->
-            ${kxbig(["x*ln(", b, ")=ln(", d_round, ")"], { 'border': false })}
-            </div>
-
-            Now, use the calculator to determine the natural log of the numbers.
+            \\(    (x^{\\frac{1}{varB}}*^{\\frac{varB}{1}})={({dispDRound})}^{varB}    \\newline \\newline \\)  
             
-            <div><!-- class="border rounded p-1 my-1">-->
-            ${kxbig(["x*", lnb, "=", lnd], { 'border': false })}
-            </div>
+            \\(    (x^{\\frac{varB}{varB}})={dispDRound}^{varB}    \\newline \\newline \\) 
             
-            Finally, to solve for ${kxx}, divide each side by the number that's multiplying the variable (${lnb}).
-            
-            <div class="equation-multi"><!-- class="border rounded p-2 my-2">-->
-            ${kxbig([
-                texFrac("x*" + lnb, lnb),
-                " = ",
-                texFrac(lnd, lnb)
-            ])}
-            <hr>
-
-            ${kx("\\begin{aligned} a&=b + &c \\\\ d+e&=&f \\end{aligned}")}
-
-            <hr>
-            ${kxbig(`x = ${texFrac(lnd, lnb)}`)}
-    
-            ${kxbig(`x = ${ans}`)}
-            </div>
-
-            Of course, you always want to check your work:
-            ${kxbig([a, "+", b,"^{",ansr, "}=", c])}
+            \\(  x = {calcTheAns}  \\newline \\newline \\)
         `
 
+        // Replace the variables with the real values
+        jQuery.each(quesVars, function(origVar, newVar){
+            const strStem = obj.stem;
+            const strSolution = obj.solution;
+            obj.stem = strStem.replace(RegExp(origVar,"g"),newVar);
+            obj.solution = strSolution.replace(RegExp(origVar,"g"),newVar);
+        });
+        
         return obj;
     } // end of fillPage
 
