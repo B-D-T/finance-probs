@@ -1,12 +1,12 @@
-fnQues496 = function (objFromMainQues) {
+fnQues497 = function (objFromMainQues) {
     const windowScope = this; // global var (global to this function anyway)
 
     let quesVars = {
-        varPV: uRand(20000, 50000, 1000),
-        varRate: uRand(.05, .25, .01),
-        varN: uRand(5, 10, 1),
-        varY: 0,
-        varFV: "??"
+        varFV: uRand(20000,50000,1000),
+        varRate: uRand(.08, .20, .01),
+        varN: uRand(8, 20, 1),
+        varPV: "??",
+        get varY(){return this.varN} 
     };
 
     quesVars = addPrefix(quesVars, quesNum(true));
@@ -15,16 +15,12 @@ fnQues496 = function (objFromMainQues) {
     function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars, windowScope);
         
         let calcVars = {
-            calcGrowthRate: 1 + varRate,
-            get calcFVIF() {return this.calcGrowthRate ** varN},
-            get calcTheAns() {return varPV * this.calcFVIF}
+            calcTheAns: varFV * (1 /((1+varRate)**varN))
         };
         createEDVarInScope(calcVars, windowScope);
 
         let displayVars = {
-            dispRatePerc: uRound(varRate * 100, 0),
-            dispGrowthRate: uRound(calcGrowthRate, 5),
-            dispFVIF: uRound(calcFVIF, 5)
+            dispRatePerc: uRound(varRate * 100, 0)
         };
         createEDVarInScope(displayVars, windowScope); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
     }
@@ -35,13 +31,14 @@ fnQues496 = function (objFromMainQues) {
         obj.ansBoxMessage = ansBoxMessages("writeOutNums");
 
         obj.stem = probDisplay(quesVars)`
-            You have \$varPV right now. What is the value of \$varPV, varN years
-            from now, assuming dispRatePerc%?
+        <p>
+            You will receive a payment of \$varFV in varN years.
+            What is the present value of the payment in today's dollars (at t=0),
+            assuming a dispRatePerc% discount rate?
+        </p>
         `;
 
-        obj.solution = probDisplay(quesVars)`${explainFVSinglePmt_FV(quesVars)}
-
-        `;
+        obj.solution = probDisplay(quesVars)`${explainPVSinglePmt_PV(quesVars)}`;
 
         return obj;
     } // end of fillPage

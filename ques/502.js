@@ -1,4 +1,10 @@
-fnQues496 = function (objFromMainQues) {
+fnQues502 = function (objFromMainQues) {
+    
+//************************ 
+//THIS IS AN EXACT COPY OF 496.JS
+//************************ 
+
+
     const windowScope = this; // global var (global to this function anyway)
 
     let quesVars = {
