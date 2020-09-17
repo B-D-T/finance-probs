@@ -36,13 +36,13 @@ fnQues459 = function (objFromMainQues) {
         take the natural log of each side of the equation, the 
         variable moves down and is multiplied by the rest of the term.
 
-        ${kxbig("x*ln("+a+")=ln("+b+")")}
+        ${kxbig("x(ln("+a+"))=ln("+b+")")}
 
         Use the calculator to determine the natural log of the numbers.
         ${kxbig("x(" + c + ")=" + d)}
     
         To solve for x, divide each side by the coefficient.
-        ${kxbig([texFrac("x*"+c,c), "=", texFrac(d, c)])}
+        ${kxbig([texFrac("x("+c+")",c), "=", texFrac(d, c)])}
 
         ${kxbig(`x = ${ans}`)}
 

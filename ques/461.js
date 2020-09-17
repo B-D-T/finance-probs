@@ -35,12 +35,19 @@ fnQues461 = function (objFromMainQues) {
     `
 
         obj.solution = `
+<<<<<<< HEAD
         ${kxbig(`${a}^{(x+${b})}=${c}`)}<br />
+=======
+>>>>>>> UsingKaTeX
         The variable is in the exponent, so we need to bring it down 
         with the rest of the equation in order to solve for it. 
         To do this, we can use the natural log (ln). When you take 
         the natural log of each side of the equation, the exponent 
+<<<<<<< HEAD
         term (x+${b}) moves down and is multiplied by the natural log of ${a}.
+=======
+        term (x+${b}) moves down and is multiplied by the ${a}.
+>>>>>>> UsingKaTeX
         ${kxbig(`(x+${b})*ln(${d_round})=ln(${e_round})`)}
         ${kxbig(`(x+${b})*${d2}=${e2}`)}
 
@@ -48,9 +55,13 @@ fnQues461 = function (objFromMainQues) {
         the coefficient (${d2}), which will leave just x+${b} on the 
         left.
         ${kxbig([
+<<<<<<< HEAD
             texFrac(
                 (
                     "(x+" + b,")", "*", d2), d2),
+=======
+            texFrac((("x+" + b), "*", d2), d2),
+>>>>>>> UsingKaTeX
             "=",
             texFrac(e2, d2)
         ])}

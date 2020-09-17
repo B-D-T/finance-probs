@@ -1,7 +1,7 @@
 // main.js
 
 // Declare the object that accepts each question's info
-objQuesCaller = { "isProduction": true };
+objQuesCaller = { "isProduction": false };
 if (objQuesCaller.isProduction = false) {
 	// Do nothing
 } else {
@@ -44,7 +44,7 @@ function loadQues(paramQuesCaller, funcToGetED, funcToSetED) {
 		objQuesCaller[theKey]=theValue;
 	});
 	let jsonLocation = baseURL() + (objQuesCaller.isProduction ? "F_cZ4KGzL5VCK4Z9j" : "supporting/xx_testing_objQuesFileInfo.json");
-
+	
 	if (objQuesCaller.isProduction) {
 		// This is where we populate objQuesCaller and getED() so they can be used globally
 		getEDValue = funcToGetED;
@@ -61,9 +61,13 @@ function loadQues(paramQuesCaller, funcToGetED, funcToSetED) {
 function writeHTML(obj) {
 	const qtrxDivID = "#divQues" + quesNum();
 	jQuery(qtrxDivID+"-stem").html(obj.stem);
+
 	const qtrxQuesID = objQuesCaller.qtrxQuesInfo.questionId; // this is the internal Qualtrics ID
 	jQuery("#" + qtrxQuesID + " .InputText").attr("placeholder", obj.ansBoxMessage);
+
 	jQuery(`${qtrxDivID}-solution`).html(obj.solution);
+	
+	renderMathInElement(document.getElementById('kxAutoRender'));
 	cleanup();
 }
 

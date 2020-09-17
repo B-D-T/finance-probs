@@ -22,34 +22,32 @@ fnQues458 = function (objFromMainQues) {
 
         const e1 = 1 / d;
         const e = c * e1;
-        const d_root_c = c**(1/d);
-        const drc_round = uRound(d_root_c,5);
-        const e2 = d_root_c - b;
-        const E2 = uRound(d_root_c - b, 5);
+        const E = uRound(c * e1, 5);
+        const e2 = e - b;
+        const E2 = uRound(e - b, 5);
         const ans = e2 / a
 
 
         obj.stem = `
         Solve for ${kxx} given:
-        ${kxbig(`(${a}x+${b})^${d}=${c}`)}
+        ${kxbig(["(", a, "x+)^{"+b+"}", "=", c])}
     `
 
         obj.solution = `
-        ${kxbig(`(${a}x+${b})^${d}=${c}`)}
-
-        In order to isolate the ${kx(`(${a} x+ ${b})`)} term, 
-        take the ${d}-root of each side.
         ${kxbig([
-            texRoot(`(${a}x+${b})^${d}`, d),
-            "=",
-            texRoot(c,d)
-        ])}
+            "(", a, 
+            "x+)^{"+b+"}", 
+            "=", c])}
 
-        ${kxbig(`${a}x+${b}=${drc_round}`)}
+        In order to isolate the (${a} "x+" ${b}) term, 
+        take the ${d}-root of each side.
+        ${kxbig([texRoot(("("+a+"+x)^{"+d+"}"), d),
+            "=", texRoot(c,d)])}
+
+        ${kxbig([a, "x=", E2])}
 
         Because of the order of operations, we subtract ${b} from 
         each side to leave the coefficient & variable on the left.
-        ${kxbig(`${a}x+${b} -${b}=${drc_round}-${b}`)}
         ${kxbig([a, "x=", E2])}
 
         To solve for x, divide each side by the coefficient (${a}).
