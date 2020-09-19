@@ -1,0 +1,14 @@
+# User-specific configuration
+
+
+# Local links
+*.lnk
+
+
+# Temporary files
+*.swp
+
+
+# Test workbooks
+*.xlsx
+*.xlsm
