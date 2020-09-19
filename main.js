@@ -9,8 +9,7 @@ if (objQuesCaller.isProduction = false) {
 	let setEDValue = x => x;
 }
 
-baseURL = () => objQuesCaller.isProduction ? "https://umassamherst.co1.qualtrics.com/WRQualtricsControlPanel/File.php?F=" : "./";
-//const BASE_URL = 'https://cdn.jsdelivr.net/gh/B-D-T/finance-probs/'; //"./";
+baseURL = () => "./";
 
 // Returns the question number from my files (e.g., 433 for the algebra exponent question)
 quesNum = () => objQuesCaller.fnName.slice(6)
@@ -25,8 +24,8 @@ scriptsLoaded = function () {
 
 jsonLoaded = function (objQuesFileInfo) {
 
-	const quesScriptLocation = baseURL() + (objQuesCaller.isProduction ? "" : "ques/") + objQuesFileInfo[quesNum()].filename;
-	const udfScriptLocation = objQuesCaller.isProduction ? "https://dl.dropbox.com/s/f8rgqsuc94cn0lf/user-defined-functions.js" : baseURL() + "supporting/user-defined-functions.js"
+	const quesScriptLocation = baseURL() + "ques/" + objQuesFileInfo[quesNum()].filename;
+	const udfScriptLocation = baseURL() + "supporting/user-defined-functions.js"
 
 	// scriptLoaded happens ONLY after the external 433.js is loaded.
 	// We also need udfScript to finish loading. 
@@ -43,7 +42,7 @@ function loadQues(paramQuesCaller, funcToGetED, funcToSetED) {
 	jQuery.each(paramQuesCaller, function (theKey, theValue) {
 		objQuesCaller[theKey] = theValue;
 	});
-	let jsonLocation = baseURL() + (objQuesCaller.isProduction ? "F_cZ4KGzL5VCK4Z9j" : "supporting/xx_testing_objQuesFileInfo.json");
+	let jsonLocation = baseURL() + "supporting/objQuesFileInfo.json";
 
 	if (objQuesCaller.isProduction) {
 		// This is where we populate objQuesCaller and getED() so they can be used globally
@@ -57,9 +56,6 @@ function loadQues(paramQuesCaller, funcToGetED, funcToSetED) {
 	jQuery.getJSON(jsonLocation, jsonLoaded);
 
 }
-
-
-
 
 function writeHTML(obj) {
 	let strQuesNum = quesNum().toString();
