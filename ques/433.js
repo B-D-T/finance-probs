@@ -1,109 +1,117 @@
 fnQues433 = function (objFromMainQues) {
-    //NOTE: THIS IS NOT 433. I NEED TO CHANGE THAT.
-    const windowScope = this; // global var
+    const windowScope = this; // global var (global to this function anyway)
+
 
     let quesVars = {
         "varA": uRand(2, 4, .01),
         "varB": uRand(10, 30, 1),
         "varC": uRand(20, 40, .001)
     };
+
     quesVars = addPrefix(quesVars, quesNum(true));
+    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars); }
 
-    if (objFromMainQues.isProduction) {
-        return buildPage( fetchQuesVars(quesVars) );
-    } else { 
-        return buildPage(quesVars);
-    }
+    function buildPage(objQuesVars) {
+        quesVars = objQuesVars; createEDVarInScope(quesVars, windowScope);
 
-    function buildPage(objQuesVars){
-
-        // Overwrite initial quesVars with "official" quesVars
-        quesVars = objQuesVars;
-        createEDVarInScope(quesVars, windowScope);
-
-        // Variables created to calculate values used within the solution
-        // They don't need to have "calc" prefixes, 
-        // but I did it to ensure that no variable contained the name of another variable.
-        const calcVars = {
-            "calcD": varC - varA,
-            "calcTheAns": uLn(varC - varA) / uLn(varB)
+        let calcVars = {
+            calcD: varC - varA,
+            get calcTheAns() { return uLn(this.calcD) / uLn(varB) }
         };
         createEDVarInScope(calcVars, windowScope);
 
-        // Variables created to improve readability when displaying on the website
-        const displayVars = {
-            "dispDRound": uRound(calcD, 5),
-            "dispLNvarB": uRound(uLn(varB), 5),
-            "dispLNvarD": uRound(uLn(calcD), 5)
+        let displayVars = {
+            dispD: uRound(calcD, 5),
+            dispLnB: uRound(uLn(varB), 5),
+            dispLnD: uRound(uLn(calcD), 5),
+            dispTheAns: uRound(calcTheAns, 5)
         };
         createEDVarInScope(displayVars, windowScope);
         
-        // Append the quesVars object to include the variables created for calculation and display purposes
         jQuery.extend(quesVars, calcVars, displayVars);
-        
+        storeQuesRespVars(quesVars, calcTheAns);
         return fillPage();
     }
 
-
     function fillPage() {
-    
         let obj = {};
+
         obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
 
-        obj.stem =
-            `
+        obj.stem = probDisplay(quesVars)`
             Solve for \\(x\\) given:
-            $$
-                {varA}x ^\\frac{1}{varB} = varC
-            $$
+            \\[
+                {varA} + {varB}^x = {varC}
+            \\]
         `
 
-        obj.solution =
-            `
-            \\(  {varA}x ^\\frac{1}{varB} = varC   \\newline \\newline \\)
+        obj.solution = probDisplay(quesVars)`
+        <p>
+            The challenge with this problem is having a variable in the exponent.
+            But, we want to do what we can to simplify the equation before dealing with that term.
+        </p>
+        \\[
+            {varA} + {varB}^x = {varC}
+        \\]
+        <p>
+            Subtract varA from each side. 
+            That will isolate varB<sup>x</sup> on the left side.
+        </p>
+        \\[
+            \\begin{aligned}
+                varA + {varB}^x - varA &= varC - varA \\\\
+                {varB}^x &= varC - varA \\\\
+                {varB}^x &= dispD \\\\
+            \\end{aligned}
+        \\]
+        <p>
+            We need to get the variable out of the exponent.
+            Let's bring it down with the rest of the equation by using the natural log (ln). 
+            When you take the natural log of each side of the equation, 
+            the variable moves down and is multiplied by the rest of the term.
+        \\[
+            x * ln({varB}) = ln(dispD)
+        \\]
+        <p>
+            Use the calculator to determine the natural log of the numbers.
+        </p>
+        \\[
+            x * dispLnB = dispLnD
+        \\]
+        <p>
+            Finally, to solve for \\(x\\),
+            divide each side by the number that's multiplying the variable (dispLnB).
+        </p>
+        \\[
+            \\begin{aligned}
+                \\frac{x*dispLnB}{dispLnB} &= \\frac{dispLnD}{dispLnB} \\\\
+                {} \\\\
+                x &= \\frac{dispLnD}{dispLnB} \\\\
+                {} \\\\
+                x &= calcTheAns
+            \\end{aligned}
 
-            Divide each side by the coefficient (varA) in order to leave the variable on the left. 
-            \\(  \\frac{{varA}x ^\\frac{1}{varB}}{varA} = \\frac{varC}{varA}   \\newline \\newline \\) 
-            
-            \\(  x^\\frac{1}{varB} = {dispDRound}   \\newline \\newline \\)
-
-            To isolate x without an exponent, we need to take the \\( \\frac{1}{varB} \\)-root of each side.
-            Or, to put it another way, we can raise each side by the reciprocal of the exponent,
-            which is this case is \\( \\frac{varB}{1} \\).
-            The exponents on the left side reduce to 1, leaving x by itself. 
-            \\(
-                \\newline \\newline
-                {(x^{\\frac{1}{varB}})}^{\\frac{varB}{1}}={({dispDRound})}^{\\frac{varB}{1}}
-                \\newline \\newline
-            \\)  
-            
-            \\(    (x^{\\frac{1}{varB}}*^{\\frac{varB}{1}})={({dispDRound})}^{varB}    \\newline \\newline \\)  
-            
-            \\(    (x^{\\frac{varB}{varB}})={dispDRound}^{varB}    \\newline \\newline \\) 
-            
-            \\(  x = {calcTheAns}  \\newline \\newline \\)
+        \\]
         `
-
-        // Replace the variables with the real values
-        jQuery.each(quesVars, function(origVar, newVar){
-            const strStem = obj.stem;
-            const strSolution = obj.solution;
-            obj.stem = strStem.replace(RegExp(origVar,"g"),newVar);
-            obj.solution = strSolution.replace(RegExp(origVar,"g"),newVar);
-        });
-        
         return obj;
+
     } // end of fillPage
+}
 
 
-    // This should be set in the db, not here. But I wanted to capture it for now
-    const fileInfo = {
-        "QuesNum": 433,
-        "Subject": ["algebra"],
-        "Description": "Algebra problem where unknown x is in the exponent (solve using natural log)",
-        "Keywords": ["algebra", "natural log", "e", "exponents"],
-        "Author": "B. David Tyler",
-        "ExcelTestbankID": 433,
-        "PGFileName": "alg_natural_log.pg"
+// The question files (like 433.js) will always call this function on click.
+// Most of the time this will only be an intermediary for the sedEDQuesRespVars function,
+// but I can add any custom feedback in here too, if I have any.
+// I don't need to build an testing functionality because it'll never be called during testing (no clicks)
+// function fnQuesResp(stuResp){
+//     console.log("I'm fnQuesResp. I received this stuResp from the qtrx JS: ", stuResp);
+//     const objRespFeedback = { "stuResp": stuResp }
+//     return setEDQuesRespVars(objRespFeedback); 
+// }
+function fnQuesResp(objPageSubmit){ // received from addOnPageSubmit
+    const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
+    if (!(jQuery(`${qtrxDivID}-response`).length)){
+        let objRespFeedback = objPageSubmit;
+        return setEDQuesRespVars(objRespFeedback);
     }
 }

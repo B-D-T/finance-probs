@@ -1,62 +1,88 @@
 fnQues460 = function (objFromMainQues) {
+    const windowScope = this; // global var
 
     let quesVars = {
-        "a": uRand(2, 9, 1),
-        "b": uRand(2, 7, 1),
-        "c": uRand(10, 40, 1)
+        "varA": uRand(2, 4, .01),
+        "varB": uRand(10, 30, 1),
+        "varC": uRand(20, 40, .001)
+    };
+
+    quesVars = addPrefix(quesVars, quesNum(true));
+    if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
+
+    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars, windowScope);
+
+        let calcVars = {
+            "calcD": varC - varA,
+            get calcTheAns() { return uLn(this.calcD) / uLn(varB) }
+        };
+        createEDVarInScope(calcVars, windowScope);
+
+        let displayVars = {
+            "dispD": uRound(calcD, 5),
+            "dispLNvarB": uRound(uLn(varB), 5),
+            "dispLNvarD": uRound(uLn(calcD), 5),
+            "dispTheAns": uRound(calcTheAns, 5)
+        };
+        createEDVarInScope(displayVars, windowScope); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
     }
 
-    // Static code
-    let obj = {};
-    obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
-    const windowScope = this; const varPrefix = "var_q" + quesNum() + "z__";
-    jQuery.each(quesVars, function (theKey, theValue) { const newKey = varPrefix + theKey; quesVars[newKey] = [theValue]; delete quesVars[theKey]; });
-    if (objFromMainQues.isProduction) { return createEDVarInScope(fetchQuesVars(quesVars)) } else { return createEDVarInScope(quesVars); }
-    function createEDVarInScope(objEDVars) { jQuery.each(objEDVars, function (edKey, edValue) { const origKey = edKey.replace(varPrefix, ''); quesVars[origKey] = quesVars[edKey]; delete quesVars[edKey]; windowScope[origKey] = edValue; }); return fillPage(); } function fillPage() {
-    // End static code
-
-        // Calculations
-        const d = c / a;
-        const de = uRound(c / a, 5);
-        const ans = db;
-        const ans1 = uRound(db, 5)
-
-        obj.stem = `
-        Solve for ${kxx} given:
-        ${kxbig([a, "x^", texFrac(1, b), "=", c])}
-    `
-
-        obj.solution = `
-        ${kxbig([a, "x^", texFrac(1, b), "=", c])}
-    
-        Divide each side by the coefficient (${a}) in order to leave 
-        the variable on the left. 
-        ${kxbig(texFrac([(a + "x" + **uthRoot(b,3)), "=", texFrac(c, a)]))}
-        ${kxbig([texRoot(x, (1/b)), "=", de])}
-
-        To isolate x without an exponent, we need to take the ${kx(texFrac(1, b))}
-        -root of each side. Or, to put it another way, we can raise each side by
-        the reciprocal of the exponent, which in this case is 
-        ${kx(texFrac(b, 1))}. The exponents on the left side reduce
-        to 1, leaving x by itself.
-
-        ${kxbig([((("x", **, (texFrac(1,b))), **, texFrac(b,1)), 
-        "=", (de)** texFrac(b,1))])}
-
-        ${kxbig([
-            "x"** (texFrac(1,b), "*", texFrac(b,1)),
-        "=",
-        (de)**b])}
-
-        ${kxbig(["x"**, texFrac(b, b),
-        "=", 
-        (de)**b])}
+    function fillPage() {
+        let obj = {};
         
-        ${kxbig(`x = ${ans}`)}
+        obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
 
+        obj.stem = probDisplay(quesVars)`
+            Solve for \\(x\\) given:
+            \\[
+                {varA}x ^{\\frac{1}{varB}} = varC
+            \\]
+        `
 
-    `
+        obj.solution = probDisplay(quesVars)`
+            <p>
+                This problem presents a variable raised to a fractional exponent.
+            </p>
+            \\[
+                {varA}x ^{\\frac{1}{varB}} = varC
+            \\]
+
+            <p>
+                Divide each side by the coefficient (varA) in order to leave the variable on the left.
+            </p>
+            \\[
+                \\begin{aligned}
+                    \\frac{ {varA}x ^{\\frac{1}{varB}} }{varA} &= \\frac{varC}{varA} \\\\
+                    {} \\\\
+                    x^{\\frac{1}{varB}} &= {dispD}
+                \\end{aligned}
+            \\]
+            <p>
+                To isolate x without an exponent, we need to take the <sup>1</sup>/<sub>varB</sub>-root of each side.
+                Or, to put it another way, we can raise each side by the reciprocal of the exponent,
+                which is this case is <sup>varB</sup>/<sub>1</sub>.
+            </p>
+            <p>
+                When you raise and exponent to an exponent, you multiply the exponents.
+                Our exponents are both fractions, so we multiply the numerators by each other (1 * varB)
+                and the denominators by each other (varB * 1).
+                That leaves <sup>varB</sup>/<sub>varB</sub> on the left side,
+                which reduces to 1 and isolates x by itself. 
+            </p>
+            \\[
+                \\begin{aligned}
+                    {(x^{\\frac{1}{varB}})}^{\\frac{varB}{1}} &= {({dispD})}^{\\frac{varB}{1}}
+                    {} \\\\
+                    x^{\\frac{1}{varB}}*^{\\frac{varB}{1}} &= {dispD}^{varB}
+                    {} \\\\
+                    x^{\\frac{varB}{varB}} &= dispTheAns
+                    {} \\\\
+                    x &= calcTheAns
+                \\end{aligned}
+            \\]
+            `
+
         return obj;
 
-    }
+    } // end of fillPage
 }

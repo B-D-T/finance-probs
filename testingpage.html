@@ -35,36 +35,84 @@
 
 <body>
 
+<!-- -------------------------------------- -->
+
+    <div id="kxAutoRender"><div id="divQues433-stem">q433z-stem</div>
+
+    <hr>
+
+<!-- -------------------------------------- -->
 
     <div id="kxAutoRender">
-        <div id="divQues497-stem"></div>
-        <div>
-            <hr />
-        </div>
-        <div id="divQues497-solution"></div>
+        <div id="divQues433-stem">q433z-stem</div>
+        <hr>
+        <div id="divQues433-solution">q433z-solution</div>
+        <hr>
+        <!-- <div id="divQues433-response">q433z-response</div> -->
     </div>
 
-
+<!-- -------------------------------------- -->
 
     <script>
-        // Customize objQuesInfo with anything the custom JS needs.
-        // REQUIRED: fnName and quesVars (even if it's empty). Those must be direct children of objQuesInfo.
-        //   fnName - The main.js code pulls from the 7th character to the end (i.e., it drops 'fnQues' to leave the question number).
-        //   quesVars - That gets passed to the custom JS for each question. You can put whatever you want under that.
-        //   isProduction - this is an optional property. If it's set to false, this will pull local files (i.e., from your computer). If omitted or set to true, it pulls the real files.
+        // Customize objQtrx with anything the custom JS needs.
+        // I don't know that you'll need anything, but it's ready if needed.
+
+        // fnName - The main.js code pulls from the 7th character to the end (i.e., it drops 'fnQues' to leave the question number).
+        // isProduction - this is an optional property. If it's set to false, this will pull local files (i.e., from your computer). If omitted or set to true, it pulls the real files.
         // loadQues() is a function on main.js. It calls this question's JS .
 
-        const objQtrx = {
-            fnName: "fnQues497",
-            qtrxQuesInfo: this,
-            isProduction: false
-        };
-        const getEDValue = (theKey) => Qualtrics.SurveyEngine.getEmbeddedData(theKey);
-        const setEDValue = (theKey, theValue) => Qualtrics.SurveyEngine.setEmbeddedData(theKey, theValue);
-        loadQues(objQtrx, getEDValue, setEDValue);
+        //Qualtrics.SurveyEngine.addOnload(function () {
+            let strQuesNum = "433";
+
+            let objQtrx = {
+                fnName: "fnQues" + strQuesNum,
+                qtrxQuesInfo: this,
+                isProduction: false
+            };
+
+            let getEDValue = x => x;
+            let setEDValue = x => x;
+            if (objQtrx.isProduction) {
+                const eng = Qualtrics.SurveyEngine;
+                getEDValue = (theKey) => eng.getEmbeddedData(theKey);
+                setEDValue = (theKey, theValue) => eng.setEmbeddedData(theKey, theValue);
+            }
+            loadQues(objQtrx, getEDValue, setEDValue);
+
+            if (!(jQuery("#divQues" + strQuesNum + "-response").length)) {
+                eng.addOnPageSubmit(function (submitType) {
+                    fnQuesResp({
+                        "strQuesNum": strQuesNum,
+                        "submitType": submitType,
+                        "qtrxQuesID": Object.keys(eng.QuestionInfo)[0]
+                    });
+                });
+            }
+
+            
+        //});
+
+ //       Qualtrics.SurveyEngine.addOnReady(function () {
+
+//        });
+
+//        Qualtrics.SurveyEngine.addOnUnload(function () {
+
+//        });
+
 
     </script>
 
 </body>
+
+
+
+
+
+
+
+
+
+
 
 </html>

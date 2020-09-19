@@ -1,56 +1,82 @@
 fnQues354 = function (objFromMainQues) {
+    const windowScope = this; // global var (global to this function anyway)
 
 
     let quesVars = {
-        "a": uRand(10000,15000,2.1),
-        "b": uRand(2,9,1),
-        "c": uRand(60000,80000, 2.1)
+        "varA": uRand(10000,15000,2.1),
+        "varB": uRand(2,9,1),
+        "varC": uRand(60000,80000, 2.1)
     }
     
-    // Static code
-    let obj = {};
-    obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
-    const windowScope = this; const varPrefix = "var_q" + quesNum() + "z__";
-    jQuery.each(quesVars, function(theKey, theValue){const newKey = varPrefix + theKey; quesVars[newKey] = [theValue]; delete quesVars[theKey]; });
-    if (objFromMainQues.isProduction) { return createEDVarInScope(fetchQuesVars(quesVars)) } else { return createEDVarInScope(quesVars); }
-    function createEDVarInScope(objEDVars) { jQuery.each(objEDVars, function (edKey, edValue) { const origKey = edKey.replace(varPrefix, ''); quesVars[origKey]= quesVars[edKey]; delete quesVars[edKey]; windowScope[origKey] = edValue; }); return fillPage(); } function fillPage() {
-    // End static code
+    quesVars = addPrefix(quesVars, quesNum(true));
+    if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
 
-        // Calculations
-        const d = c/b;
-        const ans = d/a;
+    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars, windowScope);
 
-        // Variables formatted for display 
-        const de = uRound((c/b), 5);
-        const ce = uRound((de/a), 5); // functions starting with u are [probably] from the user-defined-functions.js file
+        let calcVars = {
+            calcD: varC / varB,
+            get calcTheAns() {return calcD / varA }
+        };
+        createEDVarInScope(calcVars, windowScope);
 
-        obj.stem =
-            `
-            Solve for ${kxx} given:
-            ${kxbig([a, "=", texFrac(c, (b, "x"))])}
+        let displayVars = {
+            dispD: uRound(calcD, 5),
+            dispTheAns: uRound(calcTheAns, 5)
+        };
+        createEDVarInScope(displayVars, windowScope); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
+    }
+
+    function fillPage() {
+        let obj = {};
+        
+        obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
+
+        obj.stem = probDisplay(quesVars)`
+            Solve for \\(x\\) given:
+            \\[
+                varA = \\frac{varC}{{varB}x}
+            \\]
         `
 
-        obj.solution =
-            `
-            First divide the constants ${kx([texFrac(c, b)])}
-            which will simplify the fraction and leave
-            an x in the denominator.
-            ${kxbig(texFrac(de, "x"))}
-
-            Then, rewrite the original problem in fractions
-            and cross multiply by multiplying the left-side numerator
-            & right-side denominator and the right-side numerator &
-            left-side denominator..
-            ${kxbig([texFrac(a, 1), "=", texFrac(de,"x")])}
-            ${kxbig((a + "x"), "=", (de + 1))}
-            ${kxbig([a + "x", "=", de])}
-
-            Divide each side by ${a}.
-            ${kxbig([texFrac(a + "x", a), "=", texFrac(de, a)])}
-            ${kxbig(texFrac(de, a))}
-
-            ${kxbig(`x = ${ans}`)}
+        obj.solution = probDisplay(quesVars)`
+            <p>
+                First divide the constants (varC/varB)
+                which will simplify the fraction and leave
+                an x in the denominator.
+            </p>
+            \\[
+                varA = \\frac{dispD}{x}
+            \\]
+            <p>
+                Then, rewrite the original problem in fractions
+                and cross multiply by multiplying the left-side numerator
+                & right-side denominator and the right-side numerator &
+                left-side denominator.
+            </p>
+            \\[
+                \\begin{aligned}
+                    \\frac{varA}{1} &= \\frac{dispD}{x} \\\\
+                    {} \\\\
+                    {varA}*x &= dispD * 1 \\\\
+                    {} \\\\
+                    {varA}*x &= dispD
+                \\end{aligned}
+            \\]
+            <p>
+                Divide each side by varA to isolate x on the left side.
+            </p>
+            \\[
+                \\begin{aligned}
+                    \\frac{{varA}*x}{varA} &= \\frac{dispD}{varA} \\\\
+                    {} \\\\
+                    x &= \\frac{dispD}{varA} \\\\
+                    {} \\\\
+                    x &= dispTheAns
+                \\end{aligned}
+            \\]
         `
 
         return obj;
-    } }// end of fillPage
+
+    } // end of fillPage
+}

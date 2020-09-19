@@ -1,6 +1,75 @@
 // user-defined-functions.js
 
-console.log("user-defined-functions.js loaded");
+// This needs to be a "global" variable because some vars are set in the page's code (433.js)
+// i.e., objQuesResp.strQuesVarsObj  and objQuesResp.correctAns 
+// if (typeof objQuesResp === "undefined") { var objQuesResp = {}; }
+storeQuesRespVars = (theQuesVars, theAns) => {
+    let objQuesResp = {
+        "quesNum": quesNum(),
+        "strQuesVarsObj": theQuesVars,
+        "correctAns": theAns
+    };
+
+    // Write the information to a hidden DIV
+    let strDivQuesRespStorage = "<div id='divQuesRespStorage' style='display:none'>";
+    strDivQuesRespStorage += JSON.stringify(objQuesResp);
+    strDivQuesRespStorage += "</div>";
+    jQuery("body").append(strDivQuesRespStorage);
+}
+
+
+
+
+
+// The storeQuesRespVars function puts the values in a temporary DIV
+// This function writes them into long-term storage (i.e., Embedded Data)
+setEDQuesRespVars = (objRespFeedback) => {
+//    console.log("I'm setEDQuesRespVars. I received this objRespFeedback from fnQuesResp: ", objRespFeedback);
+
+    let stuResp = document.getElementById("QR~" + objRespFeedback.qtrxQuesID).value;
+    stuResp = sanitizeInput(stuResp);
+    objRespFeedback = { "stuResp": stuResp };
+
+    // Retrieve stored question information from hidden DIV
+    const strQuesRespStorage = jQuery("#divQuesRespStorage").text().trim();
+
+    // Convert the stored information to an object
+    let objQuesResp = JSON.parse(strQuesRespStorage);
+
+    // Check answer
+    objQuesResp["percCorrect"] = respPercCorrect(objRespFeedback.stuResp, objQuesResp.correctAns);
+
+    // Store feedback that will be shown to user when they see the Solution
+    objQuesResp["respFeedback"] = objRespFeedback;
+
+    const strObjName = "objQuesResp" + objQuesResp.quesNum.toString(); // objRespQues433
+    const strQuesRespED = JSON.stringify(objQuesResp);
+
+    console.log("About to be written to ED --> " + strObjName + ": " + strQuesRespED)
+
+    // Write quesResp to Embedded Data
+    setEDValue(strObjName, strQuesRespED);
+}
+
+showFeedback = (strEDQuesResp) => {
+    const objQuesResp = JSON.parse(strEDQuesResp);
+
+    const dispPercCorrect = parseFloat(objQuesResp.percCorrect * 100).toFixed(0) + "%";
+
+    let resultIcon = dispPercCorrect == "100%" ? 
+    `<span style="color: green;">&#10004;</span>` :
+    `<span style="color: red;">&#10008;</span>`
+
+    let dispQuesResp = `
+        Your answer: ${objQuesResp.respFeedback.stuResp}
+        <br />
+        Score: ${dispPercCorrect}
+        ${resultIcon}
+    `;
+
+    return dispQuesResp;
+}
+
 
 // When you use console.log(someObj), it passes a REFERENCE to someObj.
 // That means someObj will change as the code is running, and by the time you look at it,
@@ -66,6 +135,13 @@ uthRoot = function (num, nArg, precArg) {
 }
 
 
+// Create a Tex-style fraction for display
+texFrac = (numerator, denominator) => ["\\frac{", numerator, "}{", denominator, "}"].join('')
+
+// Create a Tex-style nth root for display
+texRoot = (base, root) => ["\\sqrt[", root, "]{", base, "}"].join('')
+
+
 // As of now (Sept 2020), this just replaces the variables in the text with the values.
 // It is called by the function listed before the tagged template literal,
 // which at this point doesn't even have tags in it.
@@ -84,7 +160,7 @@ function probDisplay(objQuesVars) {
     }
 }
 
-function fStrReplaceVarsWithVals(paramStr, theObj){
+function fStrReplaceVarsWithVals(paramStr, theObj) {
     jQuery.each(theObj, function (origVar, newVar) {
         paramStr = paramStr.replace(RegExp(origVar, "g"), newVar);
     });
@@ -142,11 +218,84 @@ function fetchQuesVars(objRandomVars) {
 
 
 
+// Most questions can be graded with this.
+// The ones that can't will do their own grading within each question.
+// Pass a single answer to check or pass arrays of answers.
+function respPercCorrect(stuResp, correctAns, rawTolerance) {
+
+    // Return 0 if stuResp is null or empty (this will allow stuResp = 0)
+    if (stuResp === null || stuResp === "") { return 0; }
+
+    // If this is only checking a single value, run the check and return 1/0
+    if (!Array.isArray(correctAns)) { return percCorrect(stuResp, correctAns, rawTolerance); }
+
+    let ptsPossible = 0;
+    let ptsEarned = 0;
+
+    // If the student submitted only one answer, convert it to an array
+    stuResp = !Array.isArray(stuResp) ? stuResp.split() : stuResp
+
+    // For multi-answer questions, assign 1 point to each answer.
+    // Students can earn a point each time through.
+    jQuery.each(correctAns, (index, curAns) => {
+        ptsPossible += 1;
+        const curResp = stuResp[index] || 0;
+        ptsEarned += percCorrect(curResp, curAns, rawTolerance);
+    });
+
+    return ptsEarned / ptsPossible;
+
+    function percCorrect(respToEvaluate, paramCorrectAns, rawTolerance) {
+        curCorrectAns = parseFloat(paramCorrectAns);
+
+        // If a rawTolerance is passed, the code will accept answers +/- that amount.
+        // Otherwise, it uses a percent difference (i.e., curCorrectAns +/- 1.25% ).
+        // The default is 0.0125 (2^-3) because the binary system is happier with that.
+        const tolAmt = rawTolerance || curCorrectAns * 0.0125;
+
+        // Clean text in the student's answer
+        let numRespToEvaluate = convertRespToNum(respToEvaluate);
+
+        const isCorrect = Math.abs(numRespToEvaluate - curCorrectAns) < tolAmt;
+
+        return isCorrect ? 1 : 0;
+    }
+
+    function convertRespToNum(theResp) {
+        let resp = theResp.toString().trim();
+
+        const charsToRemove = [",", "\\$"];
+        jQuery.each(charsToRemove, function (i, char) {
+            const regex = new RegExp(char, "g");
+            resp = resp.replace(regex, '');
+        });
+
+        return parseFloat(resp);
+    }
+}
+
+
+function sanitizeInput(userInput) {
+    // Code from https://stackoverflow.com/questions/2794137/sanitizing-user-input-before-adding-it-to-the-dom-in-javascript
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#x27;',
+        "/": '&#x2F;',
+        "`": '&grave;'
+    };
+    const reg = /[&<>"'/]/ig;
+    return userInput.replace(reg, (match) => (map[match]));
+}
+
+
 
 
 
 // Wraps each term in a color statement
-function addColorToVars(paramStr, colorObj){
+function addColorToVars(paramStr, colorObj) {
     jQuery.each(colorObj, function (varName, varColor) {
         paramStr = paramStr.replace(RegExp(varName, "g"), `{\\color{${varColor}}{${varName}}}`);
     });
@@ -154,7 +303,7 @@ function addColorToVars(paramStr, colorObj){
 }
 
 
-function explainPVSinglePmt_PV(qvObj){
+function explainPVSinglePmt_PV(qvObj) {
     // Right now I'm just using black because I found the colors distracting. But I'll leave the code in case I change my mind down the road.
     let objColors = {
         varY: "black",
@@ -167,7 +316,7 @@ function explainPVSinglePmt_PV(qvObj){
     let myStr = `
         <p>
             There is a lump sum (\$varFV) in the future (year varN),
-            and you want to know what it is going to be worth in year ${qvObj.varY-qvObj.varN}.
+            and you want to know what it is going to be worth in year ${qvObj.varY - qvObj.varN}.
             Let's see this on a timeline:
             ${timelinePVSinglePmt(qvObj)}
         </p>
@@ -186,18 +335,18 @@ function explainPVSinglePmt_PV(qvObj){
 }
 
 
-function solvePVSinglePmt_PV(qv, objColors){
+function solvePVSinglePmt_PV(qv, objColors) {
     const varPV = qv.varPV;
     const varFV = qv.varFV;
     const varN = qv.varN;
     const varRate = qv.varRate;
     const varY = qv.varY;
 
-    const calcPVYear = varY-varN;
-    const calcFVIF = (1+varRate)**varN;
-    const calcPVIF = 1/calcFVIF;
-    const dispGrowthRate = uRound(1+varRate, 4);
-    const dispFVIF = uRound(calcFVIF,5);
+    const calcPVYear = varY - varN;
+    const calcFVIF = (1 + varRate) ** varN;
+    const calcPVIF = 1 / calcFVIF;
+    const dispGrowthRate = uRound(1 + varRate, 4);
+    const dispFVIF = uRound(calcFVIF, 5);
     const dispPVIF = uRound(calcPVIF, 5);
     const calcTheAns = varFV * calcPVIF;
 
@@ -223,7 +372,7 @@ function timelinePVSinglePmt(qv) {
     <div style="width:300px;text-align: center; margin:25px;">
         <div style="display:flex; justify-content:center; font-weight:bold;">
             <div style="width:15%;">Year</div>
-            <div style="width:20%;">${qv.varY-qv.varN}</div>
+            <div style="width:20%;">${qv.varY - qv.varN}</div>
             <div style="width:45%;"></div>
             <div style="width:20%;">varN</div>
         </div>
@@ -242,7 +391,7 @@ function timelinePVSinglePmt(qv) {
     return fStrReplaceVarsWithVals(myStr, qv);
 }
 
-function tvmtreePVSinglePmt(qv, objColors){
+function tvmtreePVSinglePmt(qv, objColors) {
     const formulaVars = {
         varY: "y",
         varN: "n",
@@ -276,7 +425,7 @@ function tvmtreePVSinglePmt(qv, objColors){
 }
 
 // Returns HTML for variables in the Present Value of a single payment formula
-function identifyPVVars(qv, objColors){
+function identifyPVVars(qv, objColors) {
     let myStr = `
     List the variables in the formula and write what is known and unknown.
     \\[
@@ -294,7 +443,7 @@ function identifyPVVars(qv, objColors){
 }
 
 
-function explainFVSinglePmt_FV(qvObj){
+function explainFVSinglePmt_FV(qvObj) {
     // Right now I'm just using black because I found the colors distracting. But I'll leave the code in case I change my mind down the road.
     let objColors = {
         varY: "black",
@@ -307,7 +456,7 @@ function explainFVSinglePmt_FV(qvObj){
     let myStr = `
         <p>
             You have a lump sum (\$varPV) in year varY,
-            and you want to know what it is worth in year ${varY+varN}.
+            and you want to know what it is worth in year ${varY + varN}.
             Let's see this on a timeline:
             ${timelineFVSinglePmt(qvObj)}
         </p>
@@ -325,7 +474,7 @@ function explainFVSinglePmt_FV(qvObj){
     return fStrReplaceVarsWithVals(myStr, qvObj);
 }
 
-function explainFVSinglePmt_N(qvObj){
+function explainFVSinglePmt_N(qvObj) {
     // Right now I'm just using black because I found the colors distracting. But I'll leave the code in case I change my mind down the road.
     let objColors = {
         varY: "black",
@@ -358,15 +507,15 @@ function explainFVSinglePmt_N(qvObj){
     return fStrReplaceVarsWithVals(myStr, qvObj);
 }
 
-function solveFVSinglePmt_FV(qv, objColors){
+function solveFVSinglePmt_FV(qv, objColors) {
     let myStr = `
     Plug the variables into the formula and solve for the unknown term.
     \\[
         \\begin{aligned}
         FV_{varY+varN} &= varPV(1+varRate)^{varN} \\\\
-        FV_{${varY+varN}} &= varPV({dispGrowthRate})^{varN} \\\\
-        FV_{${varY+varN}} &= varPV({dispFVIF}) \\\\
-        FV_{${varY+varN}} &= calcTheAns
+        FV_{${varY + varN}} &= varPV({dispGrowthRate})^{varN} \\\\
+        FV_{${varY + varN}} &= varPV({dispFVIF}) \\\\
+        FV_{${varY + varN}} &= calcTheAns
         \\end{aligned}
     \\]
     `;
@@ -375,7 +524,7 @@ function solveFVSinglePmt_FV(qv, objColors){
 }
 
 
-function solveFVSinglePmt_N(qv, objColors){
+function solveFVSinglePmt_N(qv, objColors) {
     let myStr = `
     Plug the variables into the formula and solve for the unknown term.
     \\[
@@ -435,7 +584,7 @@ function timelineFVSinglePmt(qv) {
 
 
 // Returns HTML for the Future Value of a single payment formula on the TVM Decision Tree
-function tvmtreeFVSinglePmt(qv, objColors){
+function tvmtreeFVSinglePmt(qv, objColors) {
     const formulaVars = {
         varY: "y",
         varN: "n",
@@ -471,7 +620,7 @@ function tvmtreeFVSinglePmt(qv, objColors){
 
 
 // Returns HTML for variables in the Future Value of a single payment formula
-function identifyFVVars(qv, objColors){
+function identifyFVVars(qv, objColors) {
     let myStr = `
     List the variables in the formula and write what is known and unknown.
     \\[
@@ -492,10 +641,6 @@ function identifyFVVars(qv, objColors){
 
 
 
-
-
-
-
 /*
 // Create shorthand for katex.renderToString
 // We can pass the math as a string, number, or array
@@ -510,10 +655,6 @@ kxx = kx("x");
 // The default displayMode for kx is inline {displayMode:false}.
 // The line below is shorthand for displayMode:true, which makes the katex bigger, centers it, and puts it on its own line.
 kxbig = (mathToBeRendered) => kx(mathToBeRendered, { displayMode: true })
-
-// Create a Tex-style fraction
-texFrac = (numerator, denominator) => ["\\frac{", numerator, "}{", denominator, "}"].join('')
-
-// Create a Tex-style nth root
-texRoot = (base, root) => ["\\sqrt[", root, "]{", base, "}"].join('')
 */
+
+console.log("user-defined-functions.js loaded");

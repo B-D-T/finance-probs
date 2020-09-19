@@ -23,7 +23,7 @@ scriptsLoaded = function () {
 	return objFromQues;
 }
 
-jsonLoaded = function(objQuesFileInfo) {
+jsonLoaded = function (objQuesFileInfo) {
 
 	const quesScriptLocation = baseURL() + (objQuesCaller.isProduction ? "" : "ques/") + objQuesFileInfo[quesNum()].filename;
 	const udfScriptLocation = objQuesCaller.isProduction ? "https://dl.dropbox.com/s/f8rgqsuc94cn0lf/user-defined-functions.js" : baseURL() + "supporting/user-defined-functions.js"
@@ -40,11 +40,11 @@ jsonLoaded = function(objQuesFileInfo) {
 
 // This loads first because it's called by the HTML
 function loadQues(paramQuesCaller, funcToGetED, funcToSetED) {
-	jQuery.each(paramQuesCaller, function(theKey, theValue){
-		objQuesCaller[theKey]=theValue;
+	jQuery.each(paramQuesCaller, function (theKey, theValue) {
+		objQuesCaller[theKey] = theValue;
 	});
 	let jsonLocation = baseURL() + (objQuesCaller.isProduction ? "F_cZ4KGzL5VCK4Z9j" : "supporting/xx_testing_objQuesFileInfo.json");
-	
+
 	if (objQuesCaller.isProduction) {
 		// This is where we populate objQuesCaller and getED() so they can be used globally
 		getEDValue = funcToGetED;
@@ -58,22 +58,33 @@ function loadQues(paramQuesCaller, funcToGetED, funcToSetED) {
 
 }
 
+
+
+
 function writeHTML(obj) {
-	const qtrxDivID = "#divQues" + quesNum();
-	jQuery(qtrxDivID+"-stem").html(obj.stem);
+	let strQuesNum = quesNum().toString();
+	const qtrxDivID = "#divQues" + strQuesNum;
+	jQuery(qtrxDivID + "-stem").html(obj.stem);
 
 	const qtrxQuesID = objQuesCaller.qtrxQuesInfo.questionId; // this is the internal Qualtrics ID
 	jQuery("#" + qtrxQuesID + " .InputText").attr("placeholder", obj.ansBoxMessage);
 
 	jQuery(`${qtrxDivID}-solution`).html(obj.solution);
-	
+
+
+	// Only run this on questions
+	const divQuesRespName = `${qtrxDivID}-response`;
+	if (jQuery(divQuesRespName).length) {
+		jQuery(divQuesRespName).html( showFeedback( getEDValue("objQuesResp" + strQuesNum) ) );
+	}
+
 	renderMathInElement(document.getElementById('kxAutoRender'));
 	cleanup();
 }
 
 // This is the last function run before returning to the HTML
-function cleanup(){
-	jQuery.each(objQuesCaller, function(key,val){
+function cleanup() {
+	jQuery.each(objQuesCaller, function (key, val) {
 		delete objQuesCaller[key];
 	});
 }
