@@ -1,4 +1,5 @@
 // main.js
+let strCurrentPackage = "0.1.3";
 
 // Declare the object that accepts each question's info
 objQuesCaller = { "isProduction": false };
@@ -9,7 +10,14 @@ if (objQuesCaller.isProduction = false) {
 	let setEDValue = x => x;
 }
 
-baseURL = () => "./";
+baseURL = function() {
+	return (objQuesCaller.isProduction) ?  baseURLProduction() : "./"
+
+	function baseURLProduction(){
+		console.log("main.js loaded from version ", strCurrentPackage);
+		return "https://cdn.jsdelivr.net/npm/finance-probs@" + strCurrentPackage + "/";
+	}
+}
 
 // Returns the question number from my files (e.g., 433 for the algebra exponent question)
 quesNum = () => objQuesCaller.fnName.slice(6)
@@ -71,7 +79,7 @@ function writeHTML(obj) {
 	// Only run this on questions
 	const divQuesRespName = `${qtrxDivID}-response`;
 	if (jQuery(divQuesRespName).length) {
-		jQuery(divQuesRespName).html( showFeedback( getEDValue("objQuesResp" + strQuesNum) ) );
+		jQuery(divQuesRespName).html(showFeedback(getEDValue("objQuesResp" + strQuesNum)));
 	}
 
 	renderMathInElement(document.getElementById('kxAutoRender'));

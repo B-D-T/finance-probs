@@ -6,8 +6,31 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-    <!-- <script defer src="https://cdn.jsdelivr.net/gh/B-D-T/finance-probs/main.js" crossorigin="anonymous"></script> -->
+    <!--
+        I was trying to force the pulling of the most recent package, but I gave up for now.  
+
+        <script>(function currentPackageVersionFinProbs() {
+            let currentVersion = "";
+            jQuery.when(
+                jQuery.get("https://api.npms.io/v2/package/finance-probs", function (success) {
+                    currentVersion = success.collected.metadata.version;
+                })
+            ).done(function () {
+                let strDivPackageVersion = "<div id='strDivPackageVersion' style='display:none'>";
+                strDivPackageVersion += currentVersion;
+                strDivPackageVersion += "</div>";
+                jQuery("body").append(strDivPackageVersion);
+                console.log("strDivPackageVersion added: ", strDivPackageVersion);
+                return currentVersion;
+            });
+        })();
+    </script> -->
+
+    <!-- ADD THIS LINE TO THE QUALTRICS LOOK AND FEEL SECTION (update to the latest package, of course) -->
+    <!-- <script defer src="https://cdn.jsdelivr.net/npm/finance-probs@0.1.3" crossorigin="anonymous"></script> -->
     <script src="main.js"></script>
+
+
 
     <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css"
         integrity="sha384-qCEsSYDSH0x5I45nNW4oXemORUZnYFtPy/FqB/OjqxabTMW5HVaaH9USK4fN3goV" rel="stylesheet" />
@@ -79,32 +102,32 @@
             // loadQues() is a function on main.js. It calls this question's JS .
 
             //Qualtrics.SurveyEngine.addOnload(function () {
-            let strQuesNum = "433";
+            // let strQuesNum = "433";
 
-            let objQtrx = {
-                fnName: "fnQues" + strQuesNum,
-                qtrxQuesInfo: this,
-                isProduction: false
-            };
+            // let objQtrx = {
+            //     fnName: "fnQues" + strQuesNum,
+            //     qtrxQuesInfo: this,
+            //     isProduction: false
+            // };
 
-            let getEDValue = x => x;
-            let setEDValue = x => x;
-            if (objQtrx.isProduction) {
-                const eng = Qualtrics.SurveyEngine;
-                getEDValue = (theKey) => eng.getEmbeddedData(theKey);
-                setEDValue = (theKey, theValue) => eng.setEmbeddedData(theKey, theValue);
-            }
-            loadQues(objQtrx, getEDValue, setEDValue);
+            // let getEDValue = x => x;
+            // let setEDValue = x => x;
+            // if (objQtrx.isProduction) {
+            //     const eng = Qualtrics.SurveyEngine;
+            //     getEDValue = (theKey) => eng.getEmbeddedData(theKey);
+            //     setEDValue = (theKey, theValue) => eng.setEmbeddedData(theKey, theValue);
+            // }
+            // loadQues(objQtrx, getEDValue, setEDValue);
 
-            if (!(jQuery("#divQues" + strQuesNum + "-response").length)) {
-                eng.addOnPageSubmit(function (submitType) {
-                    fnQuesResp({
-                        "strQuesNum": strQuesNum,
-                        "submitType": submitType,
-                        "qtrxQuesID": Object.keys(eng.QuestionInfo)[0]
-                    });
-                });
-            }
+            // if (!(jQuery("#divQues" + strQuesNum + "-response").length)) {
+            //     eng.addOnPageSubmit(function (submitType) {
+            //         fnQuesResp({
+            //             "strQuesNum": strQuesNum,
+            //             "submitType": submitType,
+            //             "qtrxQuesID": Object.keys(eng.QuestionInfo)[0]
+            //         });
+            //     });
+            // }
 
 
         //});

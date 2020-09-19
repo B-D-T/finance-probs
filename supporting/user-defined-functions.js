@@ -657,4 +657,4 @@ kxx = kx("x");
 kxbig = (mathToBeRendered) => kx(mathToBeRendered, { displayMode: true })
 */
 
-console.log("user-defined-functions.js loaded");
+console.log("user-defined-functions.js loaded. This file is on Dropbox.");
