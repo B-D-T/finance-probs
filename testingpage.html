@@ -56,9 +56,8 @@
 
 </head>
 
-<!-- Heading text within the Qualtrics Look & Feel section (2020-09-18) -->
-
-<script src="https://umassamherst.co1.qualtrics.com/WRQualtricsControlPanel/File.php?F=F_cD8YOxtG2Dfy7yt"></script>
+<!-- Pre-NPM heading text within the Qualtrics Look & Feel section (2020-09-18) -->
+<!-- <script src="https://umassamherst.co1.qualtrics.com/WRQualtricsControlPanel/File.php?F=F_cD8YOxtG2Dfy7yt"></script>
 <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.css"
     integrity="sha384-qCEsSYDSH0x5I45nNW4oXemORUZnYFtPy/FqB/OjqxabTMW5HVaaH9USK4fN3goV" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.js"
@@ -69,15 +68,16 @@
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js"
     integrity="sha384-mll67QQFJfxn0IYznZYonOWZ644AWYC+Pt2cHqMaRhXVrursRwvLnLaebdGIlYNa" crossorigin="anonymous">
     </script>
-
+ -->
 
 
 <body>
 
     <!-- -------------------------------------- -->
 
-    <div id="kxAutoRender">
+    <!-- <div id="kxAutoRender">
         <div id="divQues433-stem">q433z-stem</div>
+    </div> -->
 
         <hr>
 
@@ -88,7 +88,7 @@
             <hr>
             <div id="divQues433-solution">q433z-solution</div>
             <hr>
-            <!-- <div id="divQues433-response">q433z-response</div> -->
+            <div id="divQues433-response">q433z-response</div>
         </div>
 
         <!-- -------------------------------------- -->
@@ -102,32 +102,38 @@
             // loadQues() is a function on main.js. It calls this question's JS .
 
             //Qualtrics.SurveyEngine.addOnload(function () {
-            // let strQuesNum = "433";
+            let strQuesNum = "433";
 
-            // let objQtrx = {
-            //     fnName: "fnQues" + strQuesNum,
-            //     qtrxQuesInfo: this,
-            //     isProduction: false
-            // };
+            let objQtrx = {
+                fnName: "fnQues" + strQuesNum,
+                qtrxQuesInfo: this,
+                isProduction: false
+            };
 
-            // let getEDValue = x => x;
-            // let setEDValue = x => x;
-            // if (objQtrx.isProduction) {
-            //     const eng = Qualtrics.SurveyEngine;
-            //     getEDValue = (theKey) => eng.getEmbeddedData(theKey);
-            //     setEDValue = (theKey, theValue) => eng.setEmbeddedData(theKey, theValue);
-            // }
-            // loadQues(objQtrx, getEDValue, setEDValue);
+            let getEDValue = x => x;
+            let setEDValue = x => x;
+            if (objQtrx.isProduction) {
+                const eng = Qualtrics.SurveyEngine;
+                getEDValue = (theKey) => eng.getEmbeddedData(theKey);
+                setEDValue = (theKey, theValue) => eng.setEmbeddedData(theKey, theValue);
+            }
+            loadQues(objQtrx, getEDValue, setEDValue);
 
-            // if (!(jQuery("#divQues" + strQuesNum + "-response").length)) {
-            //     eng.addOnPageSubmit(function (submitType) {
-            //         fnQuesResp({
-            //             "strQuesNum": strQuesNum,
-            //             "submitType": submitType,
-            //             "qtrxQuesID": Object.keys(eng.QuestionInfo)[0]
-            //         });
-            //     });
-            // }
+            if (!(jQuery("#divQues" + strQuesNum + "-response").length)) {
+                let objRenderQuesResp = {
+                    "strQuesNum": strQuesNum
+                }
+                if (objQtrx.isProduction) {
+                    eng.addOnPageSubmit(function (submitType) {
+                        objRenderQuesResp["qtrxQuesID"] = Object.keys(eng.QuestionInfo)[0];
+                        objRenderQuesResp["submitType"] = submitType;
+                        fnQuesResp(objRenderQuesResp);
+                    });
+                } else {
+                    objRenderQuesResp["qtrxQuesID"] = "QID124"; // This should still throw an error
+                    objRenderQuesResp["submitType"] = "next";
+                }
+            }
 
 
         //});

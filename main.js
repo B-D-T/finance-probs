@@ -34,13 +34,21 @@ jsonLoaded = function (objQuesFileInfo) {
 
 	const quesScriptLocation = baseURL() + "ques/" + objQuesFileInfo[quesNum()].filename;
 	const udfScriptLocation = baseURL() + "supporting/user-defined-functions.js"
+	const tvmScriptLocation = baseURL() + "supporting/tvm-related.js"
 
-	// scriptLoaded happens ONLY after the external 433.js is loaded.
-	// We also need udfScript to finish loading. 
+
 	// The code below uses nested callbacks, though this risks callback hell if we keep going.
+	// We need udfScript to finish loading before we do anything else.
 	jQuery.getScript(udfScriptLocation, function () {
-		// At this point, the UDF script has been loaded
-		jQuery.getScript(quesScriptLocation, scriptsLoaded);
+		// At this point, the UDF script has been loaded.
+		// Now, we can load other scripts.
+		jQuery.getScript(tvmScriptLocation, function(){
+			// At this point, the TVM script has been loaded
+			// The next line loads quesScriptLocation, then it calls the scriptLoaded function.
+			// That is, scriptLoaded happens ONLY after the external 433.js is loaded.
+			jQuery.getScript(quesScriptLocation, scriptsLoaded);
+			
+		});
 	});
 }
 
@@ -79,10 +87,11 @@ function writeHTML(obj) {
 	// Only run this on questions
 	const divQuesRespName = `${qtrxDivID}-response`;
 	if (jQuery(divQuesRespName).length) {
-		jQuery(divQuesRespName).html(showFeedback(getEDValue("objQuesResp" + strQuesNum)));
+		const strHiddenQuesRespInfo = objQuesCaller.isProduction ? getEDValue("objQuesResp" + strQuesNum) : JSON.stringify({"respFeedback": {"stuResp": "123123"}, "percCorrect": 0.08 })
+		jQuery(divQuesRespName).html(showFeedback(strHiddenQuesRespInfo));
 	}
 
-	renderMathInElement(document.getElementById('kxAutoRender'));
+	renderMathInElement(document.getElementById('kxAutoRender')); // this is a Katex-specific function
 	cleanup();
 }
 
