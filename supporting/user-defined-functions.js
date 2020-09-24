@@ -1,3 +1,4 @@
+
 // user-defined-functions.js
 
 
@@ -5,7 +6,7 @@
 // This function writes those to a hidden <div> for temporary storage (like a cookie).
 // When the user leaves the page, those variables will be written into the Qualtrics embedded data.
 // Doing it this way reduces the getED and setED calls.
-storeQuesRespVars = (theQuesVars, theAns) => {
+function storeQuesRespVars(theQuesVars, theAns) {
     let objQuesResp = {
         "quesNum": quesNum(),
         "objQuesVars": theQuesVars, // the property stores an object
@@ -20,10 +21,13 @@ storeQuesRespVars = (theQuesVars, theAns) => {
 
 // The storeQuesRespVars function puts the values in a temporary DIV
 // This function writes them into long-term storage (i.e., Embedded Data)
-setEDQuesRespVars = (objRespFeedback) => {
+function setEDQuesRespVars(objRespFeedback) {
 
     // Read the student's response from the page and add it to the feedback object
-    let stuResp = objQuesCaller.isProduction ? document.getElementById("QR~" + objRespFeedback.qtrxQuesID).value : "123123123";
+    let stuResp = "123123123";
+    if (!(objQuesCaller.isProduction == false)) {
+        stuResp = document.getElementById("QR~" + objRespFeedback.qtrxQuesID).value;
+    }
     stuResp = sanitizeInput(stuResp);
     objRespFeedback = { "stuResp": stuResp };
 
@@ -40,15 +44,12 @@ setEDQuesRespVars = (objRespFeedback) => {
     const strObjName = "objQuesResp" + objQuesResp.quesNum.toString(); // objRespQues433
     const strQuesRespED = JSON.stringify(objQuesResp);
 
-//    console.log("About to be written to ED --> " + strObjName + ": " + strQuesRespED)
-
     // Write quesResp to Embedded Data (assuming we're in production,
     // although I don't think this function ever gets called during testing anyway).
-    if (objQuesCaller.isProduction) { setEDValue(strObjName, strQuesRespED); }
+    setEDValue(strObjName, strQuesRespED);
 }
 
-showFeedback = (strEDQuesResp) => {
-
+function showFeedback(strEDQuesResp) {
     const objQuesResp = JSON.parse(strEDQuesResp);
     const dispPercCorrect = parseFloat(objQuesResp.percCorrect * 100).toFixed(0) + "%";
 
@@ -71,30 +72,33 @@ showFeedback = (strEDQuesResp) => {
 // That means someObj will change as the code is running, and by the time you look at it,
 // it will have the final values. If you want to see the object AT THE TIME the line of code happens,
 // you need to use something like this: console.log("Here's the obj right now:", logObj(theObject) );
-logObj = function (someObj) {
+function logObj(someObj) {
     return JSON.parse(JSON.stringify(someObj));
 }
 
-ansBoxMessages = function (msgKeyToReturn) {
+function ansBoxMessages(msgKeyToReturn) {
     const objAnsBoxMessages = {
         percAsDecimal: "Submit answer as a decimal. E.g., 65.4321% would be 0.654321",
         decimalPlaces0: "Decimals are optional. You can round to nearest integer, though decimals are okay too",
         decimalPlaces2: "Include at least 2 decimal places in your answer",
         decimalPlaces4: "Include at least 4 decimal places in your answer",
         writeOutNums: "Write out numbers. E.g., write 12500000; don't write: '12.5'; '12.5 million'; 12,500,000; etc.",
-        copyPasteFromWord: "Write your response in Word, then copy-paste into here"
+        copyPasteFromWord: "Write your response in Word, then copy-paste into here",
+        ansreminderDefault: "Enter your reponse carefully.", // Default text
     };
-    return objAnsBoxMessages[msgKeyToReturn];
+    // Return the default message if the caller asks for a non-existent key
+    const theKey = msgKeyToReturn in objAnsBoxMessages ? msgKeyToReturn : "ansreminderDefault"
+    return objAnsBoxMessages[theKey];
 }
 
 // Use scientific notation trick to improve rounding accuracy
-uRound = (value, decimals) => Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+function uRound(value, decimals) { return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals) };
 
 // Use "ln" for natural log (log base e). I'm just renaming an existing method here, but it's easier to understand when it's "ln."
-uLn = (value) => Math.log(value);
+function uLn(value) { return Math.log(value) };
 
 // Generate a random number between two numbers
-uRand = function (min, max, step) {
+function uRand(min, max, step) {
     if (arguments.length < 2) { max = min; min = 0; }
     if (!step) { step = 1; }
     // The adjFactor is to account for computers' binary adding problem. It multiplies at first and divides at the end.
@@ -112,14 +116,14 @@ uRand = function (min, max, step) {
     return rand;
 }
 
-countDecimals = function (value) {
+function countDecimals(value) {
     if (Math.floor(value) === value) return 0;
     return value.toString().split(".")[1].length || 0;
 }
 
 // Calculate the nth root of a number (from https://www.w3resource.com/javascript-exercises/javascript-math-exercise-26.php)
 // r^n = x, so the nth root of x is r (n√x = r)
-uthRoot = function (num, nArg, precArg) {
+function uthRoot(num, nArg, precArg) {
     const n = nArg || 2; // defaults to square root
     const prec = precArg || 12; // defaults to 12 places of precision
 
@@ -132,10 +136,10 @@ uthRoot = function (num, nArg, precArg) {
 
 
 // Create a Tex-style fraction for display
-texFrac = (numerator, denominator) => ["\\frac{", numerator, "}{", denominator, "}"].join('')
+function texFrac(numerator, denominator) { return ["\\frac{", numerator, "}{", denominator, "}"].join('') }
 
 // Create a Tex-style nth root for display
-texRoot = (base, root) => ["\\sqrt[", root, "]{", base, "}"].join('')
+function texRoot(base, root) { return ["\\sqrt[", root, "]{", base, "}"].join('') }
 
 
 // As of now (Sept 2020), this just replaces the variables in the text with the values.
@@ -175,20 +179,22 @@ function addPrefix(caller) {
     jQuery.each(caller, function (theKey, theValue) {
         const newKey = strPrefix + theKey;
         objWithPrefixes[newKey] = theValue;
-        //delete callerObj[theKey];
+        //delete caller[theKey];
     });
     return objWithPrefixes;
 }
 
-function createEDVarInScope(varsObject, theScope) {
-    strPrefix = addPrefix(''); // returns just the prefix
-
+function createEDVarInScope(varsObject) {
+    const strPrefix = addPrefix(''); // returns just the prefix
     jQuery.each(varsObject, function (passedKey, passedValue) {
         // Remove the prefix from any keys that have it (change "var_q433z__varA" to "varA")
         const simpleKey = passedKey.replace(strPrefix, '');
-        varsObject[simpleKey] = varsObject[passedKey];
+        if (simpleKey !== passedKey) {
+            // FIX: Code fails under 'use strict' because this will not work for getters like calcTheAns
+            varsObject[simpleKey] = varsObject[passedKey];
+        }
         // Write the variable to scope
-        theScope[simpleKey] = passedValue;
+        window[simpleKey] = passedValue;
     });
 }
 
@@ -197,6 +203,7 @@ function fetchQuesVars(objRandomVars) {
     let objQuesVarsActual = {};
 
     jQuery.each(objRandomVars, function (theKey, randValue) {
+        // FIX: Code fails under 'wse strict' because getEDValue is undefined.
         jQuery.when(getEDValue(theKey)).then(function (edValue) {
             if (edValue) {
                 objQuesVarsActual[theKey] = edValue;
@@ -307,10 +314,10 @@ kx = function (mathToBeRendered, renderingOptions) {
     const mathForKatex = Array.isArray(mathToBeRendered) ? mathToBeRendered.join("") : mathToBeRendered.toString()
     return katex.renderToString(mathForKatex, renderingOptions);
 }
-
+ 
 // I write things like "Solve for x" a lot, so kxx is just shorthand.
 kxx = kx("x");
-
+ 
 // The default displayMode for kx is inline {displayMode:false}.
 // The line below is shorthand for displayMode:true, which makes the katex bigger, centers it, and puts it on its own line.
 kxbig = (mathToBeRendered) => kx(mathToBeRendered, { displayMode: true })

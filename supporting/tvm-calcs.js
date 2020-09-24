@@ -7,8 +7,8 @@
 //  These are modeled on the Excel financial functions.
 //  However, I added variables that are useful to other TVM calcs
 //  and tweaked the functionality where needed. For example...
-//  ..If startper <>1, type is irrelevant
-//  ..If nper is not defined, treat it like a perpetuity
+//  ..If varY <>1, varType is irrelevant
+//  ..If varN is not defined, treat it like a perpetuity
 //  ..The functions accept positive numbers and return positive numbers.
 //
 
@@ -21,29 +21,32 @@
 
 // I'm building this as a pseudo module... because I don't really know how to get modules to work correctly.
 
+// I've added "decimals" as an argument to some of the functions (though it should be on all of them).
+// If that's populated, the function returns the rounded number for display purposes.
+
 
 // Default values
 function fSetLocalVar(tvmPart, curVal) {
     const objTVMDefaults = {
-        "rate": 0, "nper": 0, "pmt": 0, "fv": 0, "pv": 0, "growthrate": 0,
-        "startper": 1, // If startper doesn't exist, we assume that annuity payments start at the end of year 1
-        "type": 0, // If startper is anything OTHER than 1, that means it rules and we should ignore the varType argument.
+        "varRate": 0, "varN": 0, "varPMT": 0, "varFV": 0, "varPV": 0, "varG": 0,
+        "varY": 1, // If varY doesn't exist, we assume that annuity payments start at the end of year 1
+        "varType": 0, // If varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
     }
     return !(curVal === "undefined") ? objTVMDefaults[tvmPart] : curVal;
 }
 
 
-// ##### =PV (rate, nper, pmt, [fv], [type], [growthrate], [startper]) ##### 
+// ##### =PV (varRate, varN, varPMT, [varFV], [varType], [varG], [varY]) ##### 
 function fPresentValue(qv) {
 
-    const rate = qv.rate || fSetLocalVar("rate", qv.varRate);
-    const nper = qv.nper || fSetLocalVar("nper", qv.varN);
-    const pmt = qv.pmt || fSetLocalVar("pmt", qv.varPMT);
-    const fv = qv.fv || fSetLocalVar("fv", qv.varFV);
-    const pv = qv.pv || fSetLocalVar("pv", qv.varPV);
-    const growthrate = qv.growthrate || fSetLocalVar("growthrate", qv.varG);
-    const startper = qv.startper || fSetLocalVar("startper", qv.varY);
-    const type = (startper !== 1) ? 0 : qv.type || fSetLocalVar("type", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
+    const varRate = qv.varRate || fSetLocalVar("varRate", qv.varRate);
+    const varN = qv.varN || fSetLocalVar("varN", qv.varN);
+    const varPMT = qv.varPMT || fSetLocalVar("varPMT", qv.varPMT);
+    const varFV = varFV || fSetLocalVar("varFV", qv.varFV);
+    const varPV = qv.varPV || fSetLocalVar("varPV", qv.varPV);
+    const varG = qv.varG || fSetLocalVar("varG", qv.varG);
+    const varY = qv.varY || fSetLocalVar("varY", qv.varY);
+    const varType = (varY !== 1) ? 0 : varType || fSetLocalVar("varType", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
 
 
 
@@ -53,109 +56,109 @@ function fPresentValue(qv) {
     // but I wanted to be explicit with the variable names to reduce the chance of mistakes.
 
     // Single payment
-    if (pmt == 0 && fv != 0) { return fPVSinglePmt({ rate, nper, fv }); }
+    if (varPMT == 0 && varFV != 0) { return fPVSinglePmt({ varRate, varN, varFV }); }
 
-    // 	Perpetuity (if nper is undefined or 0)
-    if (!nper) {
+    // 	Perpetuity (if varN is undefined or 0)
+    if (!varN) {
         // Store the present value of a standard perpetuity
-        const perpetuityValue = fPVPerpetuityStandard({ rate, pmt, growthrate });
-        return fPVAnnuityTiming({ rate, type, startper, "lumpsum": perpetuityValue });
+        const perpetuityValue = fPVPerpetuityStandard({ varRate, varPMT, varG });
+        return fPVAnnuityTiming({ varRate, varType, varY, "lumpsum": perpetuityValue });
     }
 
     // 	Annuities
-    if (pmt != 0 && fv == 0) {
+    if (varPMT != 0 && varFV == 0) {
 
         // Growing Annuities
-        if (growthrate != 0) {
+        if (varG != 0) {
             // Store the present value of a standard growing annuity
-            const growingAnnuityValue = fPVGrowingAnnuityStandard({ rate, nper, pmt, growthrate });
-            return fPVAnnuityTiming({ rate, type, startper, "lumpsum": growingAnnuityValue });
+            const growingAnnuityValue = fPVGrowingAnnuityStandard({ varRate, varN, varPMT, varG });
+            return fPVAnnuityTiming({ varRate, varType, varY, "lumpsum": growingAnnuityValue });
         }
 
         // Annuities
-        if (growthrate == 0) {
+        if (varG == 0) {
             // Store the present value of a standard annuity
-            const annuityValue = fPVAnnuityStandard({ rate, nper, pmt });
-            return fPVAnnuityTiming({ rate, type, startper, "lumpsum": annuityValue });
+            const annuityValue = fPVAnnuityStandard({ varRate, varN, varPMT });
+            return fPVAnnuityTiming({ varRate, varType, varY, "lumpsum": annuityValue });
         }
 
     }
 
     // Bonds (paid annually)
-    if (pmt != 0 && fv != 0) {
+    if (varPMT != 0 && varFV != 0) {
         // Run the code twice: 1x for the coupon payment and 1x for the lumpsum (par value)
-        const pvCoupons = fPresentValue({ rate, nper, pmt, "fv": 0, type, growthrate, startper });
-        const pvParValue = fPresentValue({ rate, nper, "pmt": 0, fv, type, startper });
+        const pvCoupons = fPresentValue({ varRate, varN, varPMT, "varFV": 0, varType, varG, varY });
+        const pvParValue = fPresentValue({ varRate, varN, "varPMT": 0, varFV, varType, varY });
         return pvCoupons + pvParValue;
     }
 
-    return `The fPresentValue calcs didn't work: (varRate=${rate}, varN=${nper}, varPMT=${pmt}, varFV=${fv}, varType=${type}, varG=${growthrate}, varY=${startper})`;
+    return `The fPresentValue calcs didn't work: (varRate=${varRate}, varN=${varN}, varPMT=${varPMT}, varFV=${varFV}, varType=${varType}, varG=${varG}, varY=${varY})`;
 
 
     // Adjust present value of annuity to account for PV Annuity Due and PV Delayed Annuities
     function fPVAnnuityTiming(tvm) {
-        const rate = tvm.rate, lumpsum = tvm.lumpsum, type = tvm.type, startper = tvm.startper;
+        const varRate = tvm.varRate, lumpsum = tvm.lumpsum, varType = tvm.varType, varY = tvm.varY;
 
         // If this is an Annuity Due (first payment in year 0; type=1), the annuity value returned is in year -1.
         // We use fFVSinglePmt to compound the value forward by 1 year.
-        if (startper == 0 || type == 1) { // Annuity due
-            return fFVSinglePmt({ rate, "nper": 1, "pv": lumpsum });
-        } else if (startper > 1) { // Delayed annuity
-            return fPVSinglePmt({ rate, "nper": startper - 1, "fv": lumpsum });
+        if (varY == 0 || varType == 1) { // Annuity due
+            return fFVSinglePmt({ varRate, "varN": 1, "varPV": lumpsum });
+        } else if (varY > 1) { // Delayed annuity
+            return fPVSinglePmt({ varRate, "varN": varY - 1, "varFV": lumpsum });
         } else {
             return lumpsum;
         }
     }
 }
 
-// ##### =FV (rate, nper, pmt, [pv], [type], [growthrate], [startper]) ##### 
+// ##### =FV (varRate, varN, varPMT, [varPV], [varType], [varG], [varY]) ##### 
 function fFutureValue(qv) {
     //  This works just like the fPresentValue function above, so I omitted the comments here.
 
-    const rate = qv.rate || fSetLocalVar("rate", qv.varRate);
-    const nper = qv.nper || fSetLocalVar("nper", qv.varN);
-    const pmt = qv.pmt || fSetLocalVar("pmt", qv.varPMT);
-    const fv = qv.fv || fSetLocalVar("fv", qv.varFV);
-    const pv = qv.pv || fSetLocalVar("pv", qv.varPV);
-    const growthrate = qv.growthrate || fSetLocalVar("growthrate", qv.varG);
-    const startper = qv.startper || fSetLocalVar("startper", qv.varY);
-    const type = (startper !== 1) ? 0 : qv.type || fSetLocalVar("type", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
+    const varRate = qv.varRate || fSetLocalVar("varRate", qv.varRate);
+    const varN = qv.varN || fSetLocalVar("varN", qv.varN);
+    const varPMT = qv.varPMT || fSetLocalVar("varPMT", qv.varPMT);
+    const varFV = varFV || fSetLocalVar("varFV", qv.varFV);
+    const varPV = qv.varPV || fSetLocalVar("varPV", qv.varPV);
+    const varG = qv.varG || fSetLocalVar("varG", qv.varG);
+    const varY = qv.varY || fSetLocalVar("varY", qv.varY);
+    const varType = (varY !== 1) ? 0 : varType || fSetLocalVar("varType", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
 
 
     // Single payment
-    if (pmt == 0 && pv != 0) { return fFVSinglePmt(rate, nper, pv); }
+    if (varPMT == 0 && varPV != 0) { return fFVSinglePmt(varRate, varN, varPV); }
 
     // Annuities
-    if (pmt != 0 && pv == 0) {
+    if (varPMT != 0 && varPV == 0) {
 
-        if (growthrate != 0) {
-            const growingAnnuityValue = fFVGrowingAnnuity({ rate, nper, pmt, growthrate });
-            return fFVAnnuityTiming({ rate, "lumpsum": growingAnnuityValue, type, startper });
+        if (varG != 0) {
+            const growingAnnuityValue = fFVGrowingAnnuity({ varRate, varN, varPMT, varG });
+            return fFVAnnuityTiming({ varRate, "lumpsum": growingAnnuityValue, varType, varY });
         }
 
-        if (growthrate == 0) {
-            const annuityValue = fFVAnnuityStandard({ rate, nper, pmt });
-            return fFVAnnuityTiming({ rate, "lumpsum": annuityValue, type, startper });
+        if (varG == 0) {
+            const annuityValue = fFVAnnuityStandard({ varRate, varN, varPMT });
+            return fFVAnnuityTiming({ varRate, "lumpsum": annuityValue, varType, varY });
         }
     }
 
     // Bonds (paid annually)
-    if (pmt != 0 && fv != 0) { //Notice that this is FV instead of PV
-        const fvCoupons = fFutureValue({ rate, nper, pmt, "pv": 0, type, growthrate, startper });
-        const fvParValue = fv;
+    if (varPMT != 0 && varFV != 0) { //Notice that this is FV instead of PV
+        const fvCoupons = fFutureValue({ varRate, varN, varPMT, "varPV": 0, varType, varG, varY });
+        const fvParValue = varFV;
         return fvCoupons + fvParValue;
     }
 
-    return `The fFutureValue calcs didn't work: (varRate=${rate}, varN=${nper}, varPMT=${pmt}, varPV=${pv}, varType=${type}, varG=${growthrate}, varY=${startper})`;
+    return `The fFutureValue calcs didn't work: (varRate=${varRate}, varN=${varN}, varPMT=${varPMT}, varPV=${varPV}, varType=${varType}, varG=${varG}, varY=${varY})`;
 }
 
 // Adjust future value of annuity to account for FV Annuity Due
 function fFVAnnuityTiming(tvm) {
-    const rate = tvm.rate, lumpsum = tvm.lumpsum, type = tvm.type, startper = tvm.startper;
+    const varRate = tvm.varRate, lumpsum = tvm.lumpsum, varType = tvm.varType, varY = tvm.varY;
 
     // FV of Annuity due
-    if (startper == 0 || type == 1) {
-        return fFVSinglePmt({ rate, "nper": 1, "pv": lumpsum });
+    if (varY == 0 || varType == 1) {
+        return fFVSinglePmt({ varRate, "varN": 1, "varPV": lumpsum });
     } else {
         // The FV of an annuity formulas return the value in the final year of the annuity,
         // so I don't need to worry about Delayed Annuities vs Standard Annuities.
@@ -180,27 +183,27 @@ function fFVAnnuityTiming(tvm) {
 
 // PV of a single payment
 function fPVSinglePmt(tvm) {
-    const fv = tvm.fv, rate = tvm.rate, nper = tvm.nper;
-    return fv * ftvmPVIF({ rate, nper });
+    const varFV = tvm.varFV, varRate = tvm.varRate, varN = tvm.varN;
+    return varFV * ftvmPVIF({ varRate, varN });
 }
 
 // PV of a standard perpetuity
 function fPVPerpetuityStandard(tvm) {
-    const rate = tvm.rate; pmt = tvm.pmt; growthrate = tvm.growthrate;
-    return pmt / ftvmRateSpreadIntrGrowth({ rate, growthrate });
+    const varRate = tvm.varRate; varPMT = tvm.varPMT; varG = tvm.varG;
+    return varPMT / ftvmRateSpreadIntrGrowth({ varRate, varG });
 }
 
 // PV of a standard annuity
-function fPVAnnuityStandard(tvm) {
-    const rate = tvm.rate, nper = tvm.nper, pmt = tvm.pmt;
-    return pmt * ftvmPVIFA({ rate, nper });
+function fPVAnnuityStandard(tvm, decimals=12) {
+    const varRate = tvm.varRate, varN = tvm.varN, varPMT = tvm.varPMT;
+    return uRound(varPMT * ftvmPVIFA({ varRate, varN }), decimals);
 }
 
 // PV of a growing standard annuity
 function fPVGrowingAnnuityStandard(tvm) {
-    const rate = tvm.rate, nper = tvm.nper, pmt = tvm.pmt, growthrate = tvm.growthrate;
-    const perpetuity = fPVPerpetuityStandard({ rate, pmt, growthrate });
-    const GAPVIF = ftvmPVGrowAnnIntrFact({ rate, nper, growthrate });
+    const varRate = tvm.varRate, varN = tvm.varN, varPMT = tvm.varPMT, varG = tvm.varG;
+    const perpetuity = fPVPerpetuityStandard({ varRate, varPMT, varG });
+    const GAPVIF = ftvmPVGrowAnnIntrFact({ varRate, varN, varG });
     return perpetuity * GAPVIF;
 }
 
@@ -211,20 +214,20 @@ function fPVGrowingAnnuityStandard(tvm) {
 
 // FV of a single payment
 function fFVSinglePmt(tvm) {
-    const rate = tvm.rate, nper = tvm.nper, pv = tvm.pv;
-    return pv * ftvmFVIF(rate, nper);
+    const varRate = tvm.varRate, varN = tvm.varN, varPV = tvm.varPV;
+    return varPV * ftvmFVIF(varRate, varN);
 }
 
 // FV of a standard annuity
 function fFVAnnuityStandard(tvm) {
-    const rate = tvm.rate, nper = tvm.nper, pmt = tvm.pmt;
-    return pmt * ftvmFVIFA({ rate, nper });
+    const varRate = tvm.varRate, varN = tvm.varN, varPMT = tvm.varPMT;
+    return varPMT * ftvmFVIFA({ varRate, varN });
 }
 
 // FV of a growing annuity
 function fFVGrowingAnnuity(tvm) {
-    const rate = tvm.rate, nper = tvm.nper, pmt = tvm.pmt, growthrate = tvm.growthrate;
-    return pmt * ftvmGrowAnnFVIF(rate, nper, growthrate);
+    const varRate = tvm.varRate, varN = tvm.varN, varPMT = tvm.varPMT, varG = tvm.varG;
+    return varPMT * ftvmGrowAnnFVIF(varRate, varN, varG);
 }
 
 
@@ -237,36 +240,36 @@ function fFVGrowingAnnuity(tvm) {
 
 // 1 + i
 function ftvm1Rate(tvm) {
-    const rate = tvm.rate;
-    return 1 + rate;
+    const varRate = tvm.varRate;
+    return 1 + varRate;
 }
 
 // Future value interest factor (FVIF)
 // (1+i)^n
-function ftvmFVIF(tvm) {
-    const rate = tvm.rate, nper = tvm.nper;
-    return ftvm1Rate({ rate }) ** nper;
+function ftvmFVIF(tvm, decimals=12) {
+    const varRate = tvm.varRate, varN = tvm.varN;
+    return uRound(ftvm1Rate({ varRate }) ** varN, decimals);
 }
 
 // Present value interest factor (PVIF)
 // 1 / ((1+i)^n)
-function ftvmPVIF(tvm) {
-    const rate = tvm.rate, nper = tvm.nper;
-    return 1 / ftvmFVIF({ rate, nper });
+function ftvmPVIF(tvm, decimals=12) {
+    const varRate = tvm.varRate, varN = tvm.varN;
+    return uRound(1 / ftvmFVIF({ varRate, varN }), decimals);
 }
 
 // Net numerator? Not sure if there's a name for this.
 // 1 – (1 / ((1+i)^n))
 function ftvmPVANetNumerator(tvm) {
-    const rate = tvm.rate, nper = tvm.nper;
-    return 1 - ftvmPVIF({ rate, nper });
+    const varRate = tvm.varRate, varN = tvm.varN;
+    return 1 - ftvmPVIF({ varRate, varN });
 }
 
 // Present Value Interest Factor Annuity (PVIFA)
 // (1 – (1 / ((1+i)^n))) / i
-function ftvmPVIFA(tvm) {
-    const rate = tvm.rate, nper = tvm.nper;
-    return ftvmPVANetNumerator({ rate, nper }) / rate;
+function ftvmPVIFA(tvm, decimals=12) {
+    const varRate = tvm.varRate, varN = tvm.varN;
+    return uRound(ftvmPVANetNumerator({ varRate, varN }) / varRate, decimals);
 }
 
 
@@ -277,22 +280,22 @@ function ftvmPVIFA(tvm) {
 // Present Value of Growing annuity rate weighting (I made up this name)
 // (1+g)/(1+i)
 function ftvmPVGrowAnnRateRatio(tvm) {
-    const rate = tvm.rate, growthrate = tvm.growthrate;
-    return ftvm1Rate({ "rate": growthrate }) / ftvm1Rate({ rate });
+    const varRate = tvm.varRate, varG = tvm.varG;
+    return ftvm1Rate({ "varRate": varG }) / ftvm1Rate({ varRate });
 }
 
 // Present Value of Growing annuity interest factor (I made up this name)
 // ((1+g)/(1+i))^n
 function ftvmPVGrowAnnIntFactor(tvm) {
-    const rate = tvm.rate, nper = tvm.nper, growthrate = tvm.growthrate;
-    return ftvmPVGrowAnnRateRatio({ rate, growthrate }) ** nper;
+    const varRate = tvm.varRate, varN = tvm.varN, varG = tvm.varG;
+    return ftvmPVGrowAnnRateRatio({ varRate, varG }) ** varN;
 }
 
 // Present Value of Growing annuity interest factor (I made up this name)
 // 1 - ((1+g)/(1+i))^n
 function ftvmPVGrowAnnIntrFact(tvm) {
-    const rate = tvm.rate, nper = tvm.nper, growthrate = tvm.growthrate;
-    return 1 - ftvmPVGrowAnnIntFactor({ rate, nper, growthrate });
+    const varRate = tvm.varRate, varN = tvm.varN, varG = tvm.varG;
+    return 1 - ftvmPVGrowAnnIntFactor({ varRate, varN, varG });
 }
 
 
@@ -302,16 +305,16 @@ function ftvmPVGrowAnnIntrFact(tvm) {
 
 // FV of an annuity net numerator (I made this name up)
 // (1+i)^n - 1
-function ftvmFVANetNumerator(tvm) {
-    const rate = tvm.rate, nper = tvm.nper;
-    return ftvmFVIF({ rate, nper }) - 1;
+function ftvmFVANetNumerator(tvm, decimals=12) {
+    const varRate = tvm.varRate, varN = tvm.varN;
+    return uRound(ftvmFVIF({ varRate, varN }) - 1, decimals);
 }
 
 // Future Value Interest Factor Annuity (FVIFA) (I made this name up)
 // ((1+i)^n - 1)/ i
-function ftvmFVIFA(tvm) {
-    const rate = tvm.rate, nper = tvm.nper;
-    return ftvmFVANetNumerator({ rate, nper }) / rate;
+function ftvmFVIFA(tvm, decimals=12) {
+    const varRate = tvm.varRate, varN = tvm.varN;
+    return uRound(ftvmFVANetNumerator({ varRate, varN }) / varRate, decimals);
 }
 
 
@@ -322,43 +325,43 @@ function ftvmFVIFA(tvm) {
 // FV of growing annuity (i<>g) net numerator (I made this name up)
 // (1+i)^n - (1+g)^n
 function ftvmFVGrowAnnNetNumer(tvm) {
-    const rate = tvm.rate, nper = tvm.nper, growthrate = tvm.growthrate;
-    return ftvmFVIF({ rate, nper }) - ftvmFVIF({ "rate": growthrate, nper });
+    const varRate = tvm.varRate, varN = tvm.varN, varG = tvm.varG;
+    return ftvmFVIF({ varRate, varN }) - ftvmFVIF({ "varRate": varG, varN });
 }
 
 // Rate spread between interest rate and growth rate (used for FV of growing annuity when i<>g)
 // i-g
 function ftvmRateSpreadIntrGrowth(tvm) {
-    const rate = tvm.rate; growthrate = tvm.growthrate;
-    return rate - growthrate;
+    const varRate = tvm.varRate; varG = tvm.varG;
+    return varRate - varG;
 }
 
 // FV of growing annuity interest factor (i<>g) (I made this name up)
 // ( (1+i)^n - (1+g)^n ) / (i-g)
 function ftvmFVGrowAnnIntrFact(tvm) {
-    const rate = tvm.rate, nper = tvm.nper, growthrate = tvm.growthrate;
-    return ftvmFVGrowAnnNetNumer({ rate, nper, growthrate }) / ftvmRateSpreadIntrGrowth({ rate, growthrate });
+    const varRate = tvm.varRate, varN = tvm.varN, varG = tvm.varG;
+    return ftvmFVGrowAnnNetNumer({ varRate, varN, varG }) / ftvmRateSpreadIntrGrowth({ varRate, varG });
 }
 
 // FV Interest Factor 1 year short of n (I made this name up)
 // (1+i) ^ (n-1)
 function ftvmFVIFLess1(tvm) {
-    const rate = tvm.rate, nper = tvm.nper;
-    return (ftvm1Rate({ rate })) ** (nper - 1);
+    const varRate = tvm.varRate, varN = tvm.varN;
+    return (ftvm1Rate({ varRate })) ** (varN - 1);
 }
 
 // FVIFLess1 multiplier  (I made this name up)
 // n * ((1+i)^(n-1))
 function ftvmFVIFLess1Multiplier(tvm) {
-    const rate = tvm.rate, nper = tvm.nper;
-    return nper * ftvmFVIFLess1({ rate, nper });
+    const varRate = tvm.varRate, varN = tvm.varN;
+    return varN * ftvmFVIFLess1({ varRate, varN });
 }
 
 // Growing Annuity Future Value Interest Factor
 // This is the part that gets multiplied by the PMT. It varies depending on i=g or i<>g
 function ftvmGrowAnnFVIF(tvm) {
-    const rate = tvm.rate, nper = tvm.nper, growthrate = tvm.growthrate;
-    if (rate != growthrate) { return ftvmFVGrowAnnIntrFact({ rate, nper, growthrate }) }
-    if (rate == growthrate) { return ftvmFVIFLess1Multiplier({ rate, nper }) }
+    const varRate = tvm.varRate, varN = tvm.varN, varG = tvm.varG;
+    if (varRate != varG) { return ftvmFVGrowAnnIntrFact({ varRate, varN, varG }) }
+    if (varRate == varG) { return ftvmFVIFLess1Multiplier({ varRate, varN }) }
 }
 

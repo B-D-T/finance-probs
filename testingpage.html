@@ -6,6 +6,9 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+    <style>
+
+    </style>
     <!--
         I was trying to force the pulling of the most recent package, but I gave up for now.  
 
@@ -27,7 +30,7 @@
     </script> -->
 
     <!-- ADD THIS LINE TO THE QUALTRICS LOOK AND FEEL SECTION (update to the latest package, of course) -->
-    <!-- <script defer src="https://cdn.jsdelivr.net/npm/finance-probs@0.1.3" crossorigin="anonymous"></script> -->
+    <!-- <script defer src="https://cdn.jsdelivr.net/npm/finance-probs@0.1.6" crossorigin="anonymous"></script> -->
     <script src="main.js"></script>
 
 
@@ -76,64 +79,64 @@
     <!-- -------------------------------------- -->
 
     <!-- <div id="kxAutoRender">
-        <div id="divQues433-stem">q433z-stem</div>
+        <div id="divQues488-stem">q488z-stem</div>
     </div> -->
 
+    <hr>
+
+    <!-- -------------------------------------- -->
+
+    <div id="kxAutoRender">
+        <div id="divQues488-stem">q488z-stem</div>
         <hr>
+        <div id="divQues488-solution">q488z-solution</div>
+        <hr>
+        <div id="divQues488-response">q488z-response</div>
+    </div>
 
-        <!-- -------------------------------------- -->
+    <!-- -------------------------------------- -->
 
-        <div id="kxAutoRender">
-            <div id="divQues433-stem">q433z-stem</div>
-            <hr>
-            <div id="divQues433-solution">q433z-solution</div>
-            <hr>
-            <div id="divQues433-response">q433z-response</div>
-        </div>
+    <script>
+        // Customize objQtrx with anything the custom JS needs.
+        // I don't know that you'll need anything, but it's ready if needed.
 
-        <!-- -------------------------------------- -->
+        // fnName - The main.js code pulls from the 7th character to the end (i.e., it drops 'fnQues' to leave the question number).
+        // isProduction - this is an optional property. If it's set to false, this will pull local files (i.e., from your computer). If omitted or set to true, it pulls the real files.
+        // loadQues() is a function on main.js. It calls this question's JS .
 
-        <script>
-            // Customize objQtrx with anything the custom JS needs.
-            // I don't know that you'll need anything, but it's ready if needed.
+        //Qualtrics.SurveyEngine.addOnload(function () {
+        let strQuesNum = "488";
 
-            // fnName - The main.js code pulls from the 7th character to the end (i.e., it drops 'fnQues' to leave the question number).
-            // isProduction - this is an optional property. If it's set to false, this will pull local files (i.e., from your computer). If omitted or set to true, it pulls the real files.
-            // loadQues() is a function on main.js. It calls this question's JS .
+        let objQtrx = {
+            fnName: "fnQues" + strQuesNum,
+            qtrxQuesInfo: this,
+            isProduction: false
+        };
 
-            //Qualtrics.SurveyEngine.addOnload(function () {
-            let strQuesNum = "433";
+        let getEDValue = x => x;
+        let setEDValue = x => x;
+        if (objQtrx.isProduction) {
+            const eng = Qualtrics.SurveyEngine;
+            getEDValue = (theKey) => eng.getEmbeddedData(theKey);
+            setEDValue = (theKey, theValue) => eng.setEmbeddedData(theKey, theValue);
+        }
+        loadQues(objQtrx, getEDValue, setEDValue);
 
-            let objQtrx = {
-                fnName: "fnQues" + strQuesNum,
-                qtrxQuesInfo: this,
-                isProduction: false
-            };
-
-            let getEDValue = x => x;
-            let setEDValue = x => x;
+        if (!(jQuery("#divQues" + strQuesNum + "-response").length)) {
+            let objRenderQuesResp = {
+                "strQuesNum": strQuesNum
+            }
             if (objQtrx.isProduction) {
-                const eng = Qualtrics.SurveyEngine;
-                getEDValue = (theKey) => eng.getEmbeddedData(theKey);
-                setEDValue = (theKey, theValue) => eng.setEmbeddedData(theKey, theValue);
+                eng.addOnPageSubmit(function (submitType) {
+                    objRenderQuesResp["qtrxQuesID"] = Object.keys(eng.QuestionInfo)[0];
+                    objRenderQuesResp["submitType"] = submitType;
+                    fnQuesResp(objRenderQuesResp);
+                });
+            } else {
+                objRenderQuesResp["qtrxQuesID"] = "QID124"; // This should still throw an error
+                objRenderQuesResp["submitType"] = "next";
             }
-            loadQues(objQtrx, getEDValue, setEDValue);
-
-            if (!(jQuery("#divQues" + strQuesNum + "-response").length)) {
-                let objRenderQuesResp = {
-                    "strQuesNum": strQuesNum
-                }
-                if (objQtrx.isProduction) {
-                    eng.addOnPageSubmit(function (submitType) {
-                        objRenderQuesResp["qtrxQuesID"] = Object.keys(eng.QuestionInfo)[0];
-                        objRenderQuesResp["submitType"] = submitType;
-                        fnQuesResp(objRenderQuesResp);
-                    });
-                } else {
-                    objRenderQuesResp["qtrxQuesID"] = "QID124"; // This should still throw an error
-                    objRenderQuesResp["submitType"] = "next";
-                }
-            }
+        }
 
 
         //});
@@ -147,7 +150,8 @@
 //        });
 
 
-        </script>
+
+    </script>
 
 </body>
 

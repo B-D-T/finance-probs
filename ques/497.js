@@ -9,20 +9,20 @@ fnQues497 = function (objFromMainQues) {
         get varY(){return this.varN} 
     };
 
-    quesVars = addPrefix(quesVars, quesNum(true));
+    quesVars = addPrefix(quesVars, quesNum());
     if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
 
-    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars, windowScope);
+    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars);
         
         let calcVars = {
             calcTheAns: varFV * (1 /((1+varRate)**varN))
         };
-        createEDVarInScope(calcVars, windowScope);
+        createEDVarInScope(calcVars);
 
         let displayVars = {
             dispRatePerc: uRound(varRate * 100, 0)
         };
-        createEDVarInScope(displayVars, windowScope); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
+        createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
     }
 
     function fillPage() {
@@ -32,7 +32,7 @@ fnQues497 = function (objFromMainQues) {
 
         obj.stem = probDisplay(quesVars)`
         <p>
-            You will receive a payment of \$varFV in varN years.
+            You will receive a payment of \$${varFV.toLocaleString('en')} in varN years.
             What is the present value of the payment in today's dollars (at t=0),
             assuming a dispRatePerc% discount rate?
         </p>

@@ -1,5 +1,5 @@
-fnQues460 = function (objFromMainQues) {
-    const windowScope = this; // global var
+
+function fnQues460(objFromMainQues) {
 
     let quesVars = {
         "varA": uRand(2, 4, .01),
@@ -7,16 +7,16 @@ fnQues460 = function (objFromMainQues) {
         "varC": uRand(20, 40, .001)
     };
 
-    quesVars = addPrefix(quesVars, quesNum(true));
+    quesVars = addPrefix(quesVars, quesNum());
     if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
 
-    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars, windowScope);
+    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars);
 
         let calcVars = {
             "calcD": varC - varA,
             get calcTheAns() { return uLn(this.calcD) / uLn(varB) }
         };
-        createEDVarInScope(calcVars, windowScope);
+        createEDVarInScope(calcVars);
 
         let displayVars = {
             "dispD": uRound(calcD, 5),
@@ -24,7 +24,7 @@ fnQues460 = function (objFromMainQues) {
             "dispLNvarD": uRound(uLn(calcD), 5),
             "dispTheAns": uRound(calcTheAns, 5)
         };
-        createEDVarInScope(displayVars, windowScope); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
+        createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
     }
 
     function fillPage() {

@@ -1,56 +1,54 @@
-fnQues503 = function (objFromMainQues) {
+
+function fnQues503 (objFromMainQues) {
     
 //************************ 
 //THIS IS AN EXACT COPY OF 496.JS
 //************************ 
 
+let quesVars = {
+    varPV: uRand(20000, 50000, 1000),
+    varRate: uRand(.05, .25, .01),
+    varN: uRand(5, 10, 1),
+    varY: 0,
+    varFV: "??"
+};
 
+quesVars = addPrefix(quesVars, quesNum());
+if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
 
-    const windowScope = this; // global var (global to this function anyway)
-
-    let quesVars = {
-        varPV: uRand(20000, 50000, 1000),
-        varRate: uRand(.05, .25, .01),
-        varN: uRand(5, 10, 1),
-        varY: 0,
-        varFV: "??"
+function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars);
+    
+    let calcVars = {
+        calcGrowthRate: 1 + varRate,
+        get calcFVIF() {return this.calcGrowthRate ** varN},
+        get calcTheAns() {return varPV * this.calcFVIF}
     };
+    createEDVarInScope(calcVars);
 
-    quesVars = addPrefix(quesVars, quesNum(true));
-    if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
+    let displayVars = {
+        dispRatePerc: uRound(varRate * 100, 0),
+        dispGrowthRate: uRound(calcGrowthRate, 5),
+        dispFVIF: uRound(calcFVIF, 5)
+    };
+    createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
+}
 
-    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars, windowScope);
-        
-        let calcVars = {
-            calcGrowthRate: 1 + varRate,
-            get calcFVIF() {return this.calcGrowthRate ** varN},
-            get calcTheAns() {return varPV * this.calcFVIF}
-        };
-        createEDVarInScope(calcVars, windowScope);
+function fillPage() {
+    let obj = {};
+    
+    obj.ansBoxMessage = ansBoxMessages("writeOutNums");
 
-        let displayVars = {
-            dispRatePerc: uRound(varRate * 100, 0),
-            dispGrowthRate: uRound(calcGrowthRate, 5),
-            dispFVIF: uRound(calcFVIF, 5)
-        };
-        createEDVarInScope(displayVars, windowScope); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
-    }
+    obj.stem = probDisplay(quesVars)`
+        You have \$${varPV.toLocaleString('en')} right now.
+        If we wait varN years, what will the value be of that money,
+        assuming a compounding rate of dispRatePerc%?
+    `;
 
-    function fillPage() {
-        let obj = {};
-        
-        obj.ansBoxMessage = ansBoxMessages("writeOutNums");
+    obj.solution = probDisplay(quesVars)`${explainFVSinglePmt_FV(quesVars)}
 
-        obj.stem = probDisplay(quesVars)`
-            You have \$varPV right now. What is the value of \$varPV, varN years
-            from now, assuming dispRatePerc%?
-        `;
+    `;
 
-        obj.solution = probDisplay(quesVars)`${explainFVSinglePmt_FV(quesVars)}
-
-        `;
-
-        return obj;
-    } // end of fillPage
+    return obj;
+} // end of fillPage
 
 }

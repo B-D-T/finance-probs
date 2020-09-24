@@ -9,10 +9,10 @@ fnQues501 = function (objFromMainQues) {
         varN: "??"
     };
 
-    quesVars = addPrefix(quesVars, quesNum(true));
+    quesVars = addPrefix(quesVars, quesNum());
     if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
 
-    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars, windowScope);
+    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars);
         
         let calcVars = {
             calcGrowthRate: 1 + varRate,
@@ -21,7 +21,7 @@ fnQues501 = function (objFromMainQues) {
             calcLnGrowthRate: uLn(1 + varRate),
             get calcTheAns() {return (this.calcLnFVdivPV)/(this.calcLnGrowthRate)}
         };
-        createEDVarInScope(calcVars, windowScope);
+        createEDVarInScope(calcVars);
 
         let displayVars = {
             dispRatePerc: uRound(varRate*100, 0),
@@ -30,7 +30,7 @@ fnQues501 = function (objFromMainQues) {
             dispFVdivPV: uRound(calcFVdivPV, 5),
             dispLnFVdivPV: uRound(calcLnFVdivPV, 5),
         };
-        createEDVarInScope(displayVars, windowScope); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
+        createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
     }
 
     function fillPage() {
@@ -39,7 +39,7 @@ fnQues501 = function (objFromMainQues) {
         obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
 
         obj.stem = probDisplay(quesVars)`
-            An NBA team's value is currently \$varPV and has been increasing
+            An NBA team's value is currently \$${varPV.toLocaleString('en')} and has been increasing
             at a rate of dispRatePerc% per year over the last 10 years.
             Assuming that trend continues,
             how many years will it be until the team is worth one billion dollars?

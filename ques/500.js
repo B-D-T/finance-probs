@@ -1,5 +1,5 @@
-fnQues500 = function (objFromMainQues) {
-    const windowScope = this; // global var (global to this function anyway)
+
+function fnQues500(objFromMainQues) {
 
     let quesVars = {
         varFVa: uRand(4,8,1),
@@ -8,10 +8,10 @@ fnQues500 = function (objFromMainQues) {
         varNb:  uRand(15, 19, 1)
     };
 
-    quesVars = addPrefix(quesVars, quesNum(true));
+    quesVars = addPrefix(quesVars, quesNum());
     if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
 
-    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars, windowScope);
+    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars);
         
         let calcVars = {
             calcNbMinNa: varNb-varNa,
@@ -21,14 +21,14 @@ fnQues500 = function (objFromMainQues) {
             get calcAnsCheckAInside(){return 1/( (1 + this.calcTheAns)**varNa ) },
             get calcAnsCheckBInside(){return 1/( (1 + this.calcTheAns)**varNb ) }
         };
-        createEDVarInScope(calcVars, windowScope);
+        createEDVarInScope(calcVars);
 
         let displayVars = {
             dispFVbDivFVa: uRound(calcFVbDivFVa, 5),
             dispRootRight: uRound(calcRootRight,5),
             dispTheAns: uRound(calcTheAns,4)
         };
-        createEDVarInScope(displayVars, windowScope); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
+        createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
     }
 
     function fillPage() {
@@ -42,8 +42,8 @@ fnQues500 = function (objFromMainQues) {
             At what <i>rate</i> would the present value of the two choices be equal?
         </p>
         <p>
-            <b>Choice A:</b> Receive a future amount of \$varFVa in varNa years<br />
-            <b>Choice B:</b> Receive a future amount of \$varFVb in varNb years
+            <b>Choice A:</b> Receive a future amount of \$${varFVa.toLocaleString('en')} in varNa years<br />
+            <b>Choice B:</b> Receive a future amount of \$${varFVb.toLocaleString('en')} in varNb years
         </p>
         `;
 

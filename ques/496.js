@@ -1,5 +1,6 @@
-fnQues496 = function (objFromMainQues) {
-    const windowScope = this; // global var (global to this function anyway)
+
+
+function fnQues496(objFromMainQues) {
 
     let quesVars = {
         varPV: uRand(20000, 50000, 1000),
@@ -9,24 +10,24 @@ fnQues496 = function (objFromMainQues) {
         varFV: "??"
     };
 
-    quesVars = addPrefix(quesVars, quesNum(true));
+    quesVars = addPrefix(quesVars, quesNum());
     if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
 
-    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars, windowScope);
+    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars);
         
         let calcVars = {
             calcGrowthRate: 1 + varRate,
             get calcFVIF() {return this.calcGrowthRate ** varN},
             get calcTheAns() {return varPV * this.calcFVIF}
         };
-        createEDVarInScope(calcVars, windowScope);
+        createEDVarInScope(calcVars);
 
         let displayVars = {
             dispRatePerc: uRound(varRate * 100, 0),
             dispGrowthRate: uRound(calcGrowthRate, 5),
             dispFVIF: uRound(calcFVIF, 5)
         };
-        createEDVarInScope(displayVars, windowScope); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
+        createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
     }
 
     function fillPage() {
@@ -35,8 +36,9 @@ fnQues496 = function (objFromMainQues) {
         obj.ansBoxMessage = ansBoxMessages("writeOutNums");
 
         obj.stem = probDisplay(quesVars)`
-            You have \$varPV right now. What is the value of \$varPV, varN years
-            from now, assuming dispRatePerc%?
+            You have \$${varPV.toLocaleString('en')} right now.
+            If we wait varN years, what will the value be of that money,
+            assuming a compounding rate of dispRatePerc%?
         `;
 
         obj.solution = probDisplay(quesVars)`${explainFVSinglePmt_FV(quesVars)}
