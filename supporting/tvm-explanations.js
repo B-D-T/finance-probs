@@ -359,8 +359,8 @@ function timelineAnnuity(qv, tvmType = "pv", annPmts = [], showArrow = true) {
                 if (isGrowingAnn) { ary2Pmts = [varPMT, `C<sub>${varY + 1}</sub>`] }
                 tlPmts.First.push(...[ary2Pmts]);
 
-                tlYears.Mid.push(".");
-                tlPmts.Mid.push(".");
+                tlYears.Mid.push("\u22EF");
+                tlPmts.Mid.push("\u22EF");
 
                 tlYears.Last.push(yn - 2, yn - 1);
                 if (isGrowingAnn) { ary2Pmts = [`C<sub>${yn - 2}</sub>`, `C<sub>${yn - 1}</sub>`] }
@@ -380,7 +380,7 @@ function timelineAnnuity(qv, tvmType = "pv", annPmts = [], showArrow = true) {
                 TESTARRAY.push(`Prefill 1`);
             }
         } else {
-            tlYears.Delayed.push(".", varY - 1);
+            tlYears.Delayed.push("\u22EF", varY - 1);
             tlPmts.Delayed.push(``, ``);
             TESTARRAY.push(`Prefill 2`);
         }
@@ -401,8 +401,8 @@ function timelineAnnuity(qv, tvmType = "pv", annPmts = [], showArrow = true) {
             if (isGrowingAnn) { ary2Pmts = [varPMT, `C<sub>${varY + 1}</sub>`] }
             tlPmts.First.push(...[ary2Pmts]);
             // The dot
-            tlYears.Mid.push(".");
-            tlPmts.Mid.push(".");
+            tlYears.Mid.push("\u22EF");
+            tlPmts.Mid.push("\u22EF");
             // The end
             tlYears.Last.push(yn - 2, yn - 1);
             if (isGrowingAnn) { ary2Pmts = [`C<sub>${yn - 2}</sub>`, `C<sub>${yn - 1}</sub>`] }
@@ -480,7 +480,7 @@ function timelineAnnuity(qv, tvmType = "pv", annPmts = [], showArrow = true) {
     // Arrow showing the value in correct year
     const countAllPmts = TLYearsShown(aryTLYears);
     function TLYearsShown(theArray) {
-        const tempAry = theArray.map(function (item) { return (Number.isInteger(item) || item == ".") ? 1 : 0 });
+        const tempAry = theArray.map(function (item) { return (Number.isInteger(item) || item == "\u22EF") ? 1 : 0 });
         return tempAry.reduce((prev, cur) => prev + cur, 0);
     }
     //    let colSpacerEnd = tlWidths.MaxNumOfCols - countAllPmts + 1;// tlWidths.curNumOfCols + 1;

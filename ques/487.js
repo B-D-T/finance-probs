@@ -101,7 +101,7 @@ function fnQues487(objFromMainQues) {
             but they are <b>not</b> constant or growing at a constant rate.
             Thus, we need to determine the PV of each payment in year 0,
             then add up all those PVs to determine the total contract value.
-            Here are the annual payment amounts on the timeline.
+            Here are the annual payment amounts on the timeline (in millions).
             ${timelineAnnuity(quesVars, "pv", tlYears, false)}
         </p>
         <p>
@@ -115,15 +115,20 @@ function fnQues487(objFromMainQues) {
             in year 0 based on the PVs of the annual amounts.
         </p>
         <p>
-            \$${parseInt(calcTheAns).toLocaleString()} =
-            \$${parseInt(calcPVYr00).toLocaleString()} 
-            + \$${parseInt(calcPVYr01).toLocaleString()}
-            + \$${parseInt(calcPVYr02).toLocaleString()}
-            + \$${parseInt(calcPVYr03).toLocaleString()}
-            + \$${parseInt(calcPVYr04).toLocaleString()}
-            + \$${parseInt(calcPVYr05).toLocaleString()}
+        \\[
+            \\begin{aligned}
+                \\text{Year 0} &= \\$${parseInt(calcPVYr00).toLocaleString()} \\\\
+                \\text{+ Year 1} &= \\$${parseInt(calcPVYr01).toLocaleString()} \\\\
+                \\text{+ Year 2} &= \\$${parseInt(calcPVYr02).toLocaleString()} \\\\
+                \\text{+ Year 3} &= \\$${parseInt(calcPVYr03).toLocaleString()} \\\\
+                \\text{+ Year 4} &= \\$${parseInt(calcPVYr04).toLocaleString()} \\\\
+                \\text{+ Year 5} &= \\$${parseInt(calcPVYr05).toLocaleString()} \\\\
+                \\text{Total } PV_0 \\text{ of the contact} &= \\bold{\\$${parseInt(calcTheAns).toLocaleString()}}
+            \\end{aligned}
+
+        \\]
         </p>
-        <h3>Year 0</h3>
+        <h3 style="margin-top:2em;">Year 0</h3>
         <p>
         This payment is already in the present value,
         so we do not need to do anything with it.
@@ -140,7 +145,7 @@ function fnQues487(objFromMainQues) {
         <h3>Year 4</h3>
         ${solvePVSinglePmt_PV({"varFV": AmtYr04, varN: 4, "varRate":varRate, get varY() {return this.varN}})}
         <h3>Year 5</h3>
-        ${solvePVSinglePmt_PV({"varFV": AmtYr04, varN: 5, "varRate":varRate, get varY() {return this.varN}})}
+        ${solvePVSinglePmt_PV({"varFV": AmtYr05, varN: 5, "varRate":varRate, get varY() {return this.varN}})}
 
         `
         return obj;
