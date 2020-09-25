@@ -25,7 +25,7 @@ const windowScope = this; // global var (global to this function anyway)
         createEDVarInScope(calcVars);
 
         let displayVars = {
-            dispRatePerc: uRound(varRate * 100, 0)
+            dispRatePerc: uRound(varRate * 100, 2)
         };
         createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
     }

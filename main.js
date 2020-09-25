@@ -1,7 +1,7 @@
 
 // main.js
 
-strCurrentPackage = "0.1.18";
+strCurrentPackage = "0.1.27";
 
 // Declare the object that accepts each question's info
 objQuesCaller = { "isProduction": false };
@@ -96,7 +96,7 @@ function writeHTML(obj) {
 		if (!(objQuesCaller.isProduction === false)) {
 			jQuery(divQuesRespName).html(showFeedback(getEDValue("objQuesResp" + strQuesNum)));
 		} else {
-			//console.log("In testing mode");
+			console.log("In testing mode");
 			const strHiddenQuesRespInfo = JSON.stringify({ "respFeedback": { "stuResp": "123123" }, "percCorrect": 0.08 });
 			jQuery(divQuesRespName).html(showFeedback(strHiddenQuesRespInfo));
 		}

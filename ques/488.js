@@ -37,19 +37,13 @@ function fnQues488(objFromMainQues) {
 
         obj.stem = probDisplay(quesVars)`
             An annuity pays \$varPMT in year varY, 
-            and increases that amount by \$${uRound(varG*100,0)}% per year for varN years.
-            Assuming a rate of ${uRound(varRate*100,0)}%, 
+            and increases that amount by \$${uRound(varG*100,2)}% per year for varN years.
+            Assuming a rate of ${uRound(varRate*100,2)}%, 
             what is the present value (value in year 0) of the annuity?
         `
 
-
         obj.solution = probDisplay(quesVars)`
-        <p>
-        <b>Correct answer</b>: \$${calcTheAns.toLocaleString()}
-        </p>
-        <p>
-            Full solution unavailable. Try again later.
-        </p>
+        ${explainPVGrowingAnnuityStand_PV(quesVars)}
         `
         return obj;
 
@@ -57,7 +51,8 @@ function fnQues488(objFromMainQues) {
 }
 
 
-function fnQuesResp(objPageSubmit) { // received from addOnPageSubmit
+// received from addOnPageSubmit
+function fnQuesResp(objPageSubmit) {
     const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
     if (!(jQuery(`${qtrxDivID}-response`).length)) {
         let objRespFeedback = objPageSubmit;

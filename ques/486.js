@@ -33,7 +33,7 @@ function fnQues486 (objFromMainQues) {
 
         obj.stem = probDisplay(quesVars)`
         What is the future value (the value in year varN) of a standard annuity that
-        pays \$${varPMT.toLocaleString()} for varN years at a rate of ${uRound(varRate*100,0)}%?
+        pays \$${varPMT.toLocaleString()} for varN years at a rate of ${uRound(varRate*100,2)}%?
         `
 
         obj.solution = probDisplay(quesVars)`
@@ -44,8 +44,8 @@ function fnQues486 (objFromMainQues) {
     } // end of fillPage
 }
 
-
-function fnQuesResp(objPageSubmit){ // received from addOnPageSubmit
+// received from addOnPageSubmit
+function fnQuesResp(objPageSubmit){
     const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
     if (!(jQuery(`${qtrxDivID}-response`).length)){
         let objRespFeedback = objPageSubmit;

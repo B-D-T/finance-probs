@@ -23,7 +23,7 @@ function fnQues496(objFromMainQues) {
         createEDVarInScope(calcVars);
 
         let displayVars = {
-            dispRatePerc: uRound(varRate * 100, 0),
+            dispRatePerc: uRound(varRate * 100, 2),
             dispGrowthRate: uRound(calcGrowthRate, 5),
             dispFVIF: uRound(calcFVIF, 5)
         };

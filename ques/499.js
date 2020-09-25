@@ -23,7 +23,7 @@ function fnQues499(objFromMainQues) {
         createEDVarInScope(calcVars);
 
         let displayVars = {
-            dispRatePerc: uRound(varRate * 100, 0),
+            dispRatePerc: uRound(varRate * 100, 2),
             dispAnsA: uRound(calcAnsA,0),
             dispAnsB: uRound(calcAnsB,0),
             get dispBestChoice(){

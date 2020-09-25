@@ -42,11 +42,11 @@ function fPresentValue(qv) {
     const varRate = qv.varRate || fSetLocalVar("varRate", qv.varRate);
     const varN = qv.varN || fSetLocalVar("varN", qv.varN);
     const varPMT = qv.varPMT || fSetLocalVar("varPMT", qv.varPMT);
-    const varFV = varFV || fSetLocalVar("varFV", qv.varFV);
+    const varFV = qv.varFV || fSetLocalVar("varFV", qv.varFV);
     const varPV = qv.varPV || fSetLocalVar("varPV", qv.varPV);
     const varG = qv.varG || fSetLocalVar("varG", qv.varG);
     const varY = qv.varY || fSetLocalVar("varY", qv.varY);
-    const varType = (varY !== 1) ? 0 : varType || fSetLocalVar("varType", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
+    const varType = (varY !== 1) ? 0 : varY || fSetLocalVar("varType", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
 
 
 
@@ -68,7 +68,7 @@ function fPresentValue(qv) {
     // 	Annuities
     if (varPMT != 0 && varFV == 0) {
 
-        // Growing Annuities
+        // Growing Annuities // *** FIX: I don't think this works. Use fPVGrowingAnnuityStandard directly for now. ****
         if (varG != 0) {
             // Store the present value of a standard growing annuity
             const growingAnnuityValue = fPVGrowingAnnuityStandard({ varRate, varN, varPMT, varG });
@@ -188,9 +188,9 @@ function fPVSinglePmt(tvm) {
 }
 
 // PV of a standard perpetuity
-function fPVPerpetuityStandard(tvm) {
+function fPVPerpetuityStandard(tvm, decimals=12) {
     const varRate = tvm.varRate; varPMT = tvm.varPMT; varG = tvm.varG;
-    return varPMT / ftvmRateSpreadIntrGrowth({ varRate, varG });
+    return uRound(varPMT / ftvmRateSpreadIntrGrowth({ varRate, varG }), decimals);
 }
 
 // PV of a standard annuity
@@ -215,7 +215,7 @@ function fPVGrowingAnnuityStandard(tvm) {
 // FV of a single payment
 function fFVSinglePmt(tvm) {
     const varRate = tvm.varRate, varN = tvm.varN, varPV = tvm.varPV;
-    return varPV * ftvmFVIF(varRate, varN);
+    return varPV * ftvmFVIF({varRate, varN});
 }
 
 // FV of a standard annuity
@@ -248,6 +248,7 @@ function ftvm1Rate(tvm) {
 // (1+i)^n
 function ftvmFVIF(tvm, decimals=12) {
     const varRate = tvm.varRate, varN = tvm.varN;
+    // console.log(varRate, varN, ftvm1Rate({ varRate }) ** varN);
     return uRound(ftvm1Rate({ varRate }) ** varN, decimals);
 }
 
@@ -279,23 +280,23 @@ function ftvmPVIFA(tvm, decimals=12) {
 
 // Present Value of Growing annuity rate weighting (I made up this name)
 // (1+g)/(1+i)
-function ftvmPVGrowAnnRateRatio(tvm) {
+function ftvmPVGrowAnnRateRatio(tvm, decimals=12) {
     const varRate = tvm.varRate, varG = tvm.varG;
-    return ftvm1Rate({ "varRate": varG }) / ftvm1Rate({ varRate });
+    return uRound(ftvm1Rate({ "varRate": varG }) / ftvm1Rate({ varRate }), decimals);
 }
 
 // Present Value of Growing annuity interest factor (I made up this name)
 // ((1+g)/(1+i))^n
-function ftvmPVGrowAnnIntFactor(tvm) {
+function ftvmPVGrowAnnIntFactor(tvm, decimals=12) {
     const varRate = tvm.varRate, varN = tvm.varN, varG = tvm.varG;
-    return ftvmPVGrowAnnRateRatio({ varRate, varG }) ** varN;
+    return uRound(ftvmPVGrowAnnRateRatio({ varRate, varG }) ** varN, decimals);
 }
 
 // Present Value of Growing annuity interest factor (I made up this name)
 // 1 - ((1+g)/(1+i))^n
-function ftvmPVGrowAnnIntrFact(tvm) {
+function ftvmPVGrowAnnIntrFact(tvm, decimals=12) {
     const varRate = tvm.varRate, varN = tvm.varN, varG = tvm.varG;
-    return 1 - ftvmPVGrowAnnIntFactor({ varRate, varN, varG });
+    return uRound(1 - ftvmPVGrowAnnIntFactor({ varRate, varN, varG }), decimals);
 }
 
 
@@ -331,9 +332,9 @@ function ftvmFVGrowAnnNetNumer(tvm) {
 
 // Rate spread between interest rate and growth rate (used for FV of growing annuity when i<>g)
 // i-g
-function ftvmRateSpreadIntrGrowth(tvm) {
+function ftvmRateSpreadIntrGrowth(tvm, decimals=12) {
     const varRate = tvm.varRate; varG = tvm.varG;
-    return varRate - varG;
+    return uRound(varRate - varG, decimals);
 }
 
 // FV of growing annuity interest factor (i<>g) (I made this name up)

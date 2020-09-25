@@ -56,7 +56,7 @@ function fnQues487(objFromMainQues) {
 
         // Create object with the full value of the variable ready for display
         const dispFull = Object.fromEntries(
-            Object.entries(contractAmt).map( ([key, curVal], idx) => [key, curVal.toLocaleString()] )
+            Object.entries(contractAmt).map( ([key, curVal], idx) => ["AmtYr"+key, `\$`+curVal.toLocaleString()] )
         );
 
         // Create object with the full value of the variable ready for display
@@ -73,7 +73,6 @@ function fnQues487(objFromMainQues) {
             tlYears[0].push(nextTLYear);
             tlYears[1].push(``);
         }
-        console.log(tlYears);
 
         let obj = {};
 
@@ -82,7 +81,7 @@ function fnQues487(objFromMainQues) {
         obj.stem = probDisplay(quesVars)`
         <p>
             What is the present value (in year 0) of the following contract,
-            assuming a rate of ${uRound(varRate * 100, 0)}%?
+            assuming a rate of ${uRound(varRate * 100, 2)}%?
         </p>
         <style>.yearlyContracts li{margin-top:0.5em;}</style>
         <ul class="yearlyContracts">
@@ -149,8 +148,8 @@ function fnQues487(objFromMainQues) {
     } // end of fillPage
 }
 
-
-function fnQuesResp(objPageSubmit) { // received from addOnPageSubmit
+// received from addOnPageSubmit
+function fnQuesResp(objPageSubmit) { 
     const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
     if (!(jQuery(`${qtrxDivID}-response`).length)) {
         let objRespFeedback = objPageSubmit;

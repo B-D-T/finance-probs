@@ -13,10 +13,12 @@ function storeQuesRespVars(theQuesVars, theAns) {
         "correctAns": theAns
     };
     // Write the information to a hidden DIV
-    let strDivQuesRespStorage = "<div id='divQuesRespStorage' style='display:none'>";
+    let strDivQuesRespStorage = "<div id='divQues" + objQuesResp.quesNum + "RespStorage' style='display:none'>";
     strDivQuesRespStorage += JSON.stringify(objQuesResp);
     strDivQuesRespStorage += "</div>";
-    jQuery("body").append(strDivQuesRespStorage);
+
+    jQuery("#Questions").append(strDivQuesRespStorage);
+    //jQuery("body").append(strDivQuesRespStorage);
 }
 
 // The storeQuesRespVars function puts the values in a temporary DIV
@@ -32,7 +34,8 @@ function setEDQuesRespVars(objRespFeedback) {
     objRespFeedback = { "stuResp": stuResp };
 
     // Retrieve stored question information from hidden DIV and convert it to an object
-    const strQuesRespStorage = jQuery("#divQuesRespStorage").text().trim();
+    //const strQuesRespStorage = jQuery("#divQues" + objRespFeedback.strQuesNum + "RespStorage").text(); //.trim();
+    const strQuesRespStorage = document.getElementById("divQues" + objRespFeedback.strQuesNum + "RespStorage").innerText;
     let objQuesResp = JSON.parse(strQuesRespStorage);
 
     // Check answer, then add the score to the QuesResp object
@@ -50,15 +53,26 @@ function setEDQuesRespVars(objRespFeedback) {
 }
 
 function showFeedback(strEDQuesResp) {
-    const objQuesResp = JSON.parse(strEDQuesResp);
-    const dispPercCorrect = parseFloat(objQuesResp.percCorrect * 100).toFixed(0) + "%";
-
-    let resultIcon = dispPercCorrect == "100%"
+    let objQuesResp = JSON.parse(strEDQuesResp);
+    let dispPercCorrect, resultIcon, stuRespLocal;
+    try{
+        dispPercCorrect = parseFloat(objQuesResp.percCorrect * 100).toFixed(0) + "%";
+        resultIcon = dispPercCorrect == "100%"
         ? `<span style="color: green;">&#10004;</span>`
-        : `<span style="color: red;">&#10008;</span>`
+        : `<span style="color: red;">&#10008;</span>`;
+        stuRespLocal = objQuesResp.respFeedback.stuResp;
+    }
+    catch(err){
+        console.log("Error trying to set the dispPercCorrect variable");
+    }
+    finally{
+        stuRespLocal = "The response is stored in the system, but it cannot be retrieved at this time.";
+        dispPercCorrect = "Not available.";
+        resultIcon = "?";
+    }
 
     let dispQuesResp = `
-        Your answer: ${objQuesResp.respFeedback.stuResp}
+        Your answer: ${stuRespLocal}
         <br />
         Score: ${dispPercCorrect}
         ${resultIcon}
