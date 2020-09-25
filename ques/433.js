@@ -1,5 +1,6 @@
-fnQues433 = function (objFromMainQues) {
-    const windowScope = this; // global var (global to this function anyway)
+
+
+function fnQues433 (objFromMainQues) {
 
 
     let quesVars = {
@@ -8,17 +9,17 @@ fnQues433 = function (objFromMainQues) {
         "varC": uRand(20, 40, .001)
     };
 
-    quesVars = addPrefix(quesVars, quesNum(true));
-    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars); }
+    quesVars = addPrefix(quesVars);
+    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
 
     function buildPage(objQuesVars) {
-        quesVars = objQuesVars; createEDVarInScope(quesVars, windowScope);
+        quesVars = objQuesVars; createEDVarInScope(quesVars);
 
         let calcVars = {
             calcD: varC - varA,
             get calcTheAns() { return uLn(this.calcD) / uLn(varB) }
         };
-        createEDVarInScope(calcVars, windowScope);
+        createEDVarInScope(calcVars);
 
         let displayVars = {
             dispD: uRound(calcD, 5),
@@ -26,7 +27,7 @@ fnQues433 = function (objFromMainQues) {
             dispLnD: uRound(uLn(calcD), 5),
             dispTheAns: uRound(calcTheAns, 5)
         };
-        createEDVarInScope(displayVars, windowScope);
+        createEDVarInScope(displayVars);
         
         jQuery.extend(quesVars, calcVars, displayVars);
         storeQuesRespVars(quesVars, calcTheAns);

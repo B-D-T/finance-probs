@@ -1,5 +1,5 @@
-fnQues354 = function (objFromMainQues) {
-    const windowScope = this; // global var (global to this function anyway)
+
+function fnQues354(objFromMainQues) {
 
 
     let quesVars = {
@@ -8,22 +8,22 @@ fnQues354 = function (objFromMainQues) {
         "varC": uRand(60000,80000, 2.1)
     }
     
-    quesVars = addPrefix(quesVars, quesNum(true));
+    quesVars = addPrefix(quesVars, quesNum());
     if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
 
-    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars, windowScope);
+    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars);
 
         let calcVars = {
             calcD: varC / varB,
             get calcTheAns() {return calcD / varA }
         };
-        createEDVarInScope(calcVars, windowScope);
+        createEDVarInScope(calcVars);
 
         let displayVars = {
             dispD: uRound(calcD, 5),
             dispTheAns: uRound(calcTheAns, 5)
         };
-        createEDVarInScope(displayVars, windowScope); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
+        createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
     }
 
     function fillPage() {
@@ -40,7 +40,7 @@ fnQues354 = function (objFromMainQues) {
 
         obj.solution = probDisplay(quesVars)`
             <p>
-                First divide the constants (varC/varB)
+                First divide the constants (varC / varB)
                 which will simplify the fraction and leave
                 an x in the denominator.
             </p>

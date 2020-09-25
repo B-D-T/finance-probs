@@ -7,7 +7,7 @@ fnQues496 = function (objFromMainQues) {
         varN: uRand(5, 10, 1),
         varY: 0
     };
-    quesVars = addPrefix(quesVars, quesNum(true));
+    quesVars = addPrefix(quesVars, quesNum());
 
     if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
 
@@ -15,7 +15,7 @@ fnQues496 = function (objFromMainQues) {
 
         // Overwrite initial quesVars with "official" quesVars
         quesVars = objQuesVars;
-        createEDVarInScope(quesVars, windowScope);
+        createEDVarInScope(quesVars);
 
         // Variables created to calculate values used within the solution
         // They don't need to have "calc" prefixes, 
@@ -26,15 +26,15 @@ fnQues496 = function (objFromMainQues) {
             get calcFVIF() {return this.calcGrowthRate ** varN},
             get calcTheAns() {return varPV * this.calcFVIF}
         };
-        createEDVarInScope(calcVars, windowScope);
+        createEDVarInScope(calcVars);
 
         // Variables created to improve readability when displaying on the website
         const displayVars = {
-            dispRatePerc: uRound(varRate * 100, 0),
+            dispRatePerc: uRound(varRate * 100, 2),
             dispGrowthRate: uRound(calcGrowthRate, 5),
             dispFVIF: uRound(calcFVIF, 5)
         };
-        createEDVarInScope(displayVars, windowScope);
+        createEDVarInScope(displayVars);
 
         // Append the quesVars object to include the variables created for calculation and display purposes
         jQuery.extend(quesVars, calcVars, displayVars);

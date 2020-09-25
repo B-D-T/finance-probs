@@ -1,6 +1,7 @@
-fnQues499 = function (objFromMainQues) {
-    const windowScope = this; // global var (global to this function anyway)
 
+
+function fnQues499(objFromMainQues) {
+    
     let quesVars = {
         varFVa: uRand(6000,10000,1000),
         varFVb: uRand(4000000,5000000,1000000),
@@ -9,27 +10,27 @@ fnQues499 = function (objFromMainQues) {
         varNb: uRand(35, 50, 1)
     };
 
-    quesVars = addPrefix(quesVars, quesNum(true));
+    quesVars = addPrefix(quesVars, quesNum());
     if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
 
-    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars, windowScope);
+    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars);
         
         let calcVars = {
             calcAnsA: varFVa * (1 /((1+varRate)**varNa)),
             calcAnsB: varFVb * (1 /((1+varRate)**varNb)),
             get calcTheAns(){ return Math.max(this.calcAnsA, this.calcAnsB)}
         };
-        createEDVarInScope(calcVars, windowScope);
+        createEDVarInScope(calcVars);
 
         let displayVars = {
-            dispRatePerc: uRound(varRate * 100, 0),
+            dispRatePerc: uRound(varRate * 100, 2),
             dispAnsA: uRound(calcAnsA,0),
             dispAnsB: uRound(calcAnsB,0),
             get dispBestChoice(){
                 return (calcAnsA > calcAnsB) ? "Choice A is larger, so the answer is \$" + calcAnsA : "Choice B is larger, so the answer is \$" + calcAnsB;
             }
         };
-        createEDVarInScope(displayVars, windowScope); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
+        createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
     }
 
     function fillPage() {
@@ -39,16 +40,18 @@ fnQues499 = function (objFromMainQues) {
 
         obj.stem = probDisplay(quesVars)`
         <p>
-            You are given a choice between two offers, 
-            and you want the most money possible.
-            For your answer below, 
-            write the PV (in today's dollars) of the more profitable offer.
+            You do a consulting project for a sports team.
+            As payment, they give you season tickets and 
+            offer you two choices for your cash compensation.
+            You want the choice that gives you the most money
+            in today's dollars. For your answer below, 
+            write the PV (in today's dollars) of the better offer.
             Assume the discount rate is dispRatePerc%,
             and that both alternatives have equal risk.
         </p>
         <p>
-            <b>Choice A:</b> A payment of \$varFVa, varNa years from today<br />
-            <b>Choice B:</b> A payment of \$varFVb, varNb years from today
+            <b>Choice A:</b> In varNa years, they'll pay you \$${varFVa.toLocaleString('en')}.<br />
+            <b>Choice B:</b> In varNb years, they'll pay you \$${varFVb.toLocaleString('en')}.
         </p>
         `;
 

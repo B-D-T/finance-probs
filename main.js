@@ -1,39 +1,60 @@
+
 // main.js
+
+strCurrentPackage = "0.1.29";
 
 // Declare the object that accepts each question's info
 objQuesCaller = { "isProduction": false };
-if (objQuesCaller.isProduction = false) {
+if (objQuesCaller.isProduction == false) {
 	// Do nothing
 } else {
 	let getEDValue = x => x;
 	let setEDValue = x => x;
 }
 
-baseURL = () => objQuesCaller.isProduction ? "https://umassamherst.co1.qualtrics.com/WRQualtricsControlPanel/File.php?F=" : "./";
-//const BASE_URL = 'https://cdn.jsdelivr.net/gh/B-D-T/finance-probs/'; //"./";
+function baseURL() {
+	return (objQuesCaller.isProduction) ? baseURLProduction() : "./"
+
+	function baseURLProduction() {
+		return "https://cdn.jsdelivr.net/npm/finance-probs@" + strCurrentPackage + "/";
+	}
+}
 
 // Returns the question number from my files (e.g., 433 for the algebra exponent question)
-quesNum = () => objQuesCaller.fnName.slice(6)
+function quesNum() { return objQuesCaller.fnName.slice(6) }
 
 // We could pass 3 informational args to the function, but no need. scriptLoaded = function( data, textStatus, jqxhr )
-scriptsLoaded = function () {
-	fnToCall = window[objQuesCaller.fnName];
-	objFromQues = fnToCall(objQuesCaller);
+function scriptsLoaded() {
+	let fnToCall = window[objQuesCaller.fnName];
+	let objFromQues = fnToCall(objQuesCaller);
 	writeHTML(objFromQues);
 	return objFromQues;
 }
 
-jsonLoaded = function (objQuesFileInfo) {
+function jsonLoaded(objQuesFileInfo) {
 
-	const quesScriptLocation = baseURL() + (objQuesCaller.isProduction ? "" : "ques/") + objQuesFileInfo[quesNum()].filename;
-	const udfScriptLocation = objQuesCaller.isProduction ? "https://dl.dropbox.com/s/f8rgqsuc94cn0lf/user-defined-functions.js" : baseURL() + "supporting/user-defined-functions.js"
+	const quesScriptLocation = baseURL() + "ques/" + objQuesFileInfo[quesNum()].filename;
+	const udfScriptLocation = baseURL() + "supporting/user-defined-functions.js";
+	const tvmScriptLocation = baseURL() + "supporting/tvm-explanations.js";
+	const tvmCalcsLocation = baseURL() + "supporting/tvm-calcs.js"
 
-	// scriptLoaded happens ONLY after the external 433.js is loaded.
-	// We also need udfScript to finish loading. 
+
 	// The code below uses nested callbacks, though this risks callback hell if we keep going.
+	// We need udfScript to finish loading before we do anything else.
 	jQuery.getScript(udfScriptLocation, function () {
-		// At this point, the UDF script has been loaded
-		jQuery.getScript(quesScriptLocation, scriptsLoaded);
+		// At this point, the UDF script has been loaded.
+		// Now, we can load other scripts.
+		jQuery.getScript(tvmCalcsLocation, function () {
+			// At this point, the TVM Calcs script has been loaded
+			// The next line loads TVM Explanations, then continues loading scripts.
+			jQuery.getScript(tvmScriptLocation, function () {
+				// At this point, the TVM script has been loaded
+				// The next line loads quesScriptLocation, then it calls the scriptLoaded function.
+				// That is, scriptLoaded happens ONLY after the external 433.js is loaded.
+				jQuery.getScript(quesScriptLocation, scriptsLoaded);
+
+			});
+		});
 	});
 }
 
@@ -43,23 +64,20 @@ function loadQues(paramQuesCaller, funcToGetED, funcToSetED) {
 	jQuery.each(paramQuesCaller, function (theKey, theValue) {
 		objQuesCaller[theKey] = theValue;
 	});
-	let jsonLocation = baseURL() + (objQuesCaller.isProduction ? "F_cZ4KGzL5VCK4Z9j" : "supporting/xx_testing_objQuesFileInfo.json");
+	let jsonLocation = baseURL() + "supporting/objQuesFileInfo.json";
 
 	if (objQuesCaller.isProduction) {
 		// This is where we populate objQuesCaller and getED() so they can be used globally
-		getEDValue = funcToGetED;
-		setEDValue = funcToSetED;
+		var getEDValue = funcToGetED;
+		var setEDValue = funcToSetED;
 	}
-
+	
 	// The first argument fetches objQuesFileInfo.json.
 	// The 1st arg passes the JSON, as an object, the second argument (the callback).
 	// The second argument only runs once it gets objQuesFileInfo from the first argument. 
 	jQuery.getJSON(jsonLocation, jsonLoaded);
 
 }
-
-
-
 
 function writeHTML(obj) {
 	let strQuesNum = quesNum().toString();
@@ -75,10 +93,16 @@ function writeHTML(obj) {
 	// Only run this on questions
 	const divQuesRespName = `${qtrxDivID}-response`;
 	if (jQuery(divQuesRespName).length) {
-		jQuery(divQuesRespName).html( showFeedback( getEDValue("objQuesResp" + strQuesNum) ) );
+		if (!(objQuesCaller.isProduction === false)) {
+			jQuery(divQuesRespName).html(showFeedback(getEDValue("objQuesResp" + strQuesNum)));
+		} else {
+			console.log("In testing mode");
+			const strHiddenQuesRespInfo = JSON.stringify({ "respFeedback": { "stuResp": "123123" }, "percCorrect": 0.08 });
+			jQuery(divQuesRespName).html(showFeedback(strHiddenQuesRespInfo));
+		}
 	}
 
-	renderMathInElement(document.getElementById('kxAutoRender'));
+	renderMathInElement(document.getElementById('kxAutoRender')); // this is a Katex-specific function
 	cleanup();
 }
 
@@ -88,3 +112,5 @@ function cleanup() {
 		delete objQuesCaller[key];
 	});
 }
+
+console.log("main.js loaded from version ", strCurrentPackage);

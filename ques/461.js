@@ -1,81 +1,82 @@
-fnQues461 = function (objFromMainQues) {
+
+
+function fnQues461(objFromMainQues) {
 
 
     let quesVars = {
-        "a": uRand(2,8,1),
-        "b": uRand(1,1.8,.001),
-        "c": uRand(20,60,1),
+        "varA": uRand(2, 8, 1),
+        "varB": uRand(1, 1.8, .001),
+        "varC": uRand(20, 60, 1),
     }
 
-    // Static code
-    let obj = {};
-    obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
-    const windowScope = this; const varPrefix = "var_q" + quesNum() + "z__";
-    jQuery.each(quesVars, function (theKey, theValue) { const newKey = varPrefix + theKey; quesVars[newKey] = [theValue]; delete quesVars[theKey]; });
-    if (objFromMainQues.isProduction) { return createEDVarInScope(fetchQuesVars(quesVars)) } else { return createEDVarInScope(quesVars); }
-    function createEDVarInScope(objEDVars) { jQuery.each(objEDVars, function (edKey, edValue) { const origKey = edKey.replace(varPrefix, ''); quesVars[origKey] = quesVars[edKey]; delete quesVars[edKey]; windowScope[origKey] = edValue; }); return fillPage(); } function fillPage() {
-        // End static code
+    quesVars = addPrefix(quesVars, quesNum());
+    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars); }
 
-        // Calculations
-        const d = uLn(a);
-        const d2 = uRound(uLn(a), 5);
-        const e = uLn(c);
-        const ans = (e/d)-b;
+    function buildPage(objQuesVars) {
+        quesVars = objQuesVars; createEDVarInScope(quesVars);
 
-        // Display
-        const e_round = uRound(e, 5);
-        const d_round = uRound(d, 5);
-        const e2 = uRound(uLn(c), 5);
-        const f = uRound((e2/d2), 5);
-        const ansr = uRound(ans, 5);
+        let calcVars = {
+            calcD: uLn(varA),
+            calcE: uLn(varC),
+            get calcTheAns() { return (this.calcE / this.calcD) - varB }
+        };
+        createEDVarInScope(calcVars);
 
-        obj.stem = `
-        Solve for ${kxx} given:
-        ${kxbig(`${a}^{(x+${b})}=${c}`)}
+        let displayVars = {
+            dispD: uRound(calcD, 5),
+            dispE: uRound(calcE, 5),
+            dispF: uRound((calcE / calcD), 5),
+            dispTheAns: uRound(calcTheAns, 5),
+        }
+        createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
+    }
+
+    function fillPage() {
+        let obj = {};
+        
+        obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
+
+        obj.stem = probDisplay(quesVars)`
+        Solve for \\(x\\) given:
+        \\[
+            varA^{x+varB}=varC
+        \\]
+        
     `
-
-        obj.solution = `
-<<<<<<< HEAD
-        ${kxbig(`${a}^{(x+${b})}=${c}`)}<br />
-=======
->>>>>>> UsingKaTeX
+    obj.solution = probDisplay(quesVars)`
         The variable is in the exponent, so we need to bring it down 
         with the rest of the equation in order to solve for it. 
         To do this, we can use the natural log (ln). When you take 
         the natural log of each side of the equation, the exponent 
-<<<<<<< HEAD
-        term (x+${b}) moves down and is multiplied by the natural log of ${a}.
-=======
-        term (x+${b}) moves down and is multiplied by the ${a}.
->>>>>>> UsingKaTeX
-        ${kxbig(`(x+${b})*ln(${d_round})=ln(${e_round})`)}
-        ${kxbig(`(x+${b})*${d2}=${e2}`)}
+        term (x+varB) moves down and is multiplied by the natural log of varA.
+        \\[
+           \\begin{aligned}
+           ({x+varB})*ln(varA) &= ln(varC) \\\\
+           ({x+varB})*dispD &= dispE
+           \\end{aligned} 
 
+        \\]
         Keeping order of operations in mind, we divide each side by 
-        the coefficient (${d2}), which will leave just x+${b} on the 
+        the coefficient (dispD), which will leave just x+varB on the 
         left.
-        ${kxbig([
-<<<<<<< HEAD
-            texFrac(
-                (
-                    "(x+" + b,")", "*", d2), d2),
-=======
-            texFrac((("x+" + b), "*", d2), d2),
->>>>>>> UsingKaTeX
-            "=",
-            texFrac(e2, d2)
-        ])}
-
-        ${kxbig(["x+", b, "=", f])}
-
-        To solve for x, we subtract ${b} from each side.
-        ${kxbig(["x+", b, "-", b, "=", f, "-", b])}
-
-        ${kxbig(["x + 0=", ansr])}
-
-        ${kxbig(`x = ${ans}`)}
+        \\[
+            \\begin{aligned}
+            \\frac{({x+varB})*dispD}{dispD} &= \\frac{dispE}{dispD} \\\\
+            {} \\\\
+            x+varB &= dispF
+            \\end{aligned} 
+        \\]
+        To solve for x, we subtract varB from each side.
+        \\[
+            \\begin{aligned}
+            x+varB-varB &= dispF-varB \\\\
+            x+0 &=dispTheAns \\\\
+            x &= calcTheAns
+            \\end{aligned} 
+        \\]
+       
     `
-        return obj;
-    }
+    return obj;
 
+} // end of fillPage
 }
