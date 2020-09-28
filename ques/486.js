@@ -46,12 +46,9 @@ function fnQues486 (objFromMainQues) {
 
 // received from addOnPageSubmit
 function fnQuesResp(objPageSubmit){
-    console.log("This is the object sent to fnQuesResp: ", objPageSubmit);
     const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum + "-response";
-    console.log("qtrxDivID", qtrxDivID);
     if (!(jQuery(qtrxDivID).length)){
         let objRespFeedback = objPageSubmit;
         return setEDQuesRespVars(objRespFeedback);
     }
-    console.log("You shouldn't see me.")
 }
