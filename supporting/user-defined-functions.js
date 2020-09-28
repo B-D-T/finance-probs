@@ -3,26 +3,26 @@
 
 
 // Each student sees variables unique to that student (randomly generated)
-// This function writes those to a hidden <div> for temporary storage (like a cookie).
-// When the user leaves the page, those variables will be written into the Qualtrics embedded data.
-// Doing it this way reduces the getED and setED calls.
+// This function writes those embedded data.
+// When the student leaves the page, 
+// the student's answer will be combined with those variables and written as a different variable in the Qualtrics embedded data.
 function storeQuesRespVars(theQuesVars, theAns) {
     let objQuesResp = {
         "quesNum": quesNum(),
         "objQuesVars": theQuesVars, // the property stores an object
         "correctAns": theAns
     };
-    // Write the information to a hidden DIV
-    let strDivQuesRespStorage = "<div id='divQues" + objQuesResp.quesNum + "RespStorage' style='display:none'>";
-    strDivQuesRespStorage += JSON.stringify(objQuesResp);
-    strDivQuesRespStorage += "</div>";
+    let strQuesVarsStorageKey = "strQues" + objQuesResp.quesNum + "VarsStorage";
+    let strQuesVarsStorageVal = JSON.stringify(objQuesResp);
 
-    jQuery("#Questions").append(strDivQuesRespStorage);
-    //jQuery("body").append(strDivQuesRespStorage);
+    if (!(objQuesCaller.isProduction == false)) {
+        setEDValue(strQuesVarsStorageKey, strQuesVarsStorageVal);
+    } else { console.log(strQuesVarsStorageKey + ": " + strQuesVarsStorageVal) }
 }
 
-// The storeQuesRespVars function puts the values in a temporary DIV
-// This function writes them into long-term storage (i.e., Embedded Data)
+
+// This function writes the student-question-specific variables (and student answer)
+// into long-term storage (i.e., Embedded Data)
 function setEDQuesRespVars(objRespFeedback) {
 
     // Read the student's response from the page and add it to the feedback object
@@ -31,45 +31,53 @@ function setEDQuesRespVars(objRespFeedback) {
         stuResp = document.getElementById("QR~" + objRespFeedback.qtrxQuesID).value;
     }
     stuResp = sanitizeInput(stuResp);
-    objRespFeedback = { "stuResp": stuResp };
+    objRespFeedback["stuResp"] = stuResp;
 
-    // Retrieve stored question information from hidden DIV and convert it to an object
-    //const strQuesRespStorage = jQuery("#divQues" + objRespFeedback.strQuesNum + "RespStorage").text(); //.trim();
-    const strQuesRespStorage = document.getElementById("divQues" + objRespFeedback.strQuesNum + "RespStorage").innerText;
-    let objQuesResp = JSON.parse(strQuesRespStorage);
+    // Retrieve stored question information from Embedded data and convert it to an object
+    let strQuesVarsStorageKey = "strQues" + objRespFeedback.strQuesNum + "VarsStorage";
+    jQuery.when(getEDValue(strQuesVarsStorageKey)).then(function (edValue) {
+        
+        let objQuesResp = JSON.parse(edValue);
 
-    // Check answer, then add the score to the QuesResp object
-    objQuesResp["percCorrect"] = respPercCorrect(objRespFeedback.stuResp, objQuesResp.correctAns);
+        // Check answer, then add the score to the QuesResp object
+        objQuesResp["percCorrect"] = respPercCorrect(objRespFeedback.stuResp, objQuesResp.correctAns);
 
-    // Store feedback that will be shown to user when they see the Solution
-    objQuesResp["respFeedback"] = objRespFeedback;
+        // Store feedback that will be shown to user when they see the Solution
+        objQuesResp["respFeedback"] = objRespFeedback;
 
-    const strObjName = "objQuesResp" + objQuesResp.quesNum.toString(); // objRespQues433
-    const strQuesRespED = JSON.stringify(objQuesResp);
+        const strObjName = "objQuesResp" + objQuesResp.quesNum.toString(); // objRespQues433
+        const strQuesRespED = JSON.stringify(objQuesResp);
 
-    // Write quesResp to Embedded Data (assuming we're in production,
-    // although I don't think this function ever gets called during testing anyway).
-    setEDValue(strObjName, strQuesRespED);
+        // Write quesResp to Embedded Data (assuming we're in production,
+        // although I don't think this function ever gets called during testing anyway).
+        setEDValue(strObjName, strQuesRespED);
+
+    });
+
 }
 
 function showFeedback(strEDQuesResp) {
     let objQuesResp = JSON.parse(strEDQuesResp);
     let dispPercCorrect, resultIcon, stuRespLocal;
-    try{
+    
+    try {
         dispPercCorrect = parseFloat(objQuesResp.percCorrect * 100).toFixed(0) + "%";
         resultIcon = dispPercCorrect == "100%"
-        ? `<span style="color: green;">&#10004;</span>`
-        : `<span style="color: red;">&#10008;</span>`;
+            ? `<span style="color: green;">&#10004;</span>`
+            : `<span style="color: red;">&#10008;</span>`;
         stuRespLocal = objQuesResp.respFeedback.stuResp;
     }
-    catch(err){
+    catch (err) {
         console.log("Error trying to set the dispPercCorrect variable");
-    }
-    finally{
         stuRespLocal = "The response is stored in the system, but it cannot be retrieved at this time.";
         dispPercCorrect = "Not available.";
-        resultIcon = "?";
+        resultIcon = "";
     }
+    // finally {
+    //     stuRespLocal = "The response is stored in the system, but it cannot be retrieved at this time.";
+    //     dispPercCorrect = "Not available.";
+    //     resultIcon = "";
+    // }
 
     let dispQuesResp = `
         Your answer: ${stuRespLocal}

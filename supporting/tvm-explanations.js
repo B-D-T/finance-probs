@@ -431,7 +431,7 @@ function timelineAnnuity(qv, tvmType = "pv", annPmts = [], showArrow = true) {
 
 
     let tlWidths = {
-        Total: 500, // The width of the entire timeline div, in pixels
+        Total: 600, // The width of the entire timeline div, in pixels
         MaxNumOfCols: tlMaxCols - 1, // not counting the rowhead
         curNumOfCols: aryTLYears.length, // cols with years, including year 0 (or -1)
         get RowHead() { return 0.15 * this.Total },
