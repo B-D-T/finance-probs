@@ -46,8 +46,8 @@ function fnQues486 (objFromMainQues) {
 
 // received from addOnPageSubmit
 function fnQuesResp(objPageSubmit){
-    const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
-    if (!(jQuery(`${qtrxDivID}-response`).length)){
+    const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum + "-response";
+    if (!(jQuery(qtrxDivID).length)){
         let objRespFeedback = objPageSubmit;
         return setEDQuesRespVars(objRespFeedback);
     }

@@ -248,7 +248,6 @@ function ftvm1Rate(tvm) {
 // (1+i)^n
 function ftvmFVIF(tvm, decimals=12) {
     const varRate = tvm.varRate, varN = tvm.varN;
-    // console.log(varRate, varN, ftvm1Rate({ varRate }) ** varN);
     return uRound(ftvm1Rate({ varRate }) ** varN, decimals);
 }
 

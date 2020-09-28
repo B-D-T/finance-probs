@@ -1,7 +1,7 @@
 
 // main.js
 
-strCurrentPackage = "0.1.29";
+strCurrentPackage = "0.2.0";
 
 // Declare the object that accepts each question's info
 objQuesCaller = { "isProduction": false };
@@ -87,23 +87,29 @@ function writeHTML(obj) {
 	const qtrxQuesID = objQuesCaller.qtrxQuesInfo.questionId; // this is the internal Qualtrics ID
 	jQuery("#" + qtrxQuesID + " .InputText").attr("placeholder", obj.ansBoxMessage);
 
-	jQuery(`${qtrxDivID}-solution`).html(obj.solution);
+	jQuery(qtrxDivID + "-solution").html(obj.solution);
 
 
 	// Only run this on questions
-	const divQuesRespName = `${qtrxDivID}-response`;
+	const divQuesRespName = qtrxDivID + "-response";
 	if (jQuery(divQuesRespName).length) {
 		if (!(objQuesCaller.isProduction === false)) {
-			jQuery(divQuesRespName).html(showFeedback(getEDValue("objQuesResp" + strQuesNum)));
+			jQuery.when(getEDValue("objQuesResp" + strQuesNum)).then(function (edValue) {
+				jQuery(divQuesRespName).html(showFeedback(edValue));
+				finalTouches();
+			});
 		} else {
 			console.log("In testing mode");
 			const strHiddenQuesRespInfo = JSON.stringify({ "respFeedback": { "stuResp": "123123" }, "percCorrect": 0.08 });
 			jQuery(divQuesRespName).html(showFeedback(strHiddenQuesRespInfo));
+			finalTouches();
 		}
 	}
 
-	renderMathInElement(document.getElementById('kxAutoRender')); // this is a Katex-specific function
-	cleanup();
+	function finalTouches(){
+		renderMathInElement(document.getElementById('kxAutoRender')); // this is a Katex-specific function
+		cleanup();
+	}
 }
 
 // This is the last function run before returning to the HTML

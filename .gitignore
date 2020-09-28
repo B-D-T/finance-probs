@@ -1,5 +1,6 @@
 # User-specific configuration
 
+*.code-workspace
 
 # Local links
 *.lnk
