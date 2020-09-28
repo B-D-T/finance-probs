@@ -12,3 +12,4 @@
 # Test workbooks
 *.xlsx
 *.xlsm
+*.code-workspace
