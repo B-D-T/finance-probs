@@ -1,4 +1,25 @@
+/*
 
+I've been manually assigning variables to scope them within each function.
+Use something like this instead (though including the default variable check), 
+which I think you'll need to put inside each function in place of the explicit definitions.
+
+for (let objProp in qv){ if (qv.hasOwnProperty(objProp)) {eval(objProp + " = qv[objProp];");} }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
 
 // -----Input TVM functions------------------------------------------
 //  You'll probably only call either fPresentValue or fFutureValue
@@ -28,7 +49,7 @@
 // Default values
 function fSetLocalVar(tvmPart, curVal) {
     const objTVMDefaults = {
-        "varRate": 0, "varN": 0, "varPMT": 0, "varFV": 0, "varPV": 0, "varG": 0,
+        "varRate": 0, "varN": 0, "varPMT": 0, "varFV": 0, "varPV": 0, "varG": 0, "varReturnInYear": 0,
         "varY": 1, // If varY doesn't exist, we assume that annuity payments start at the end of year 1
         "varType": 0, // If varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
     }
@@ -46,8 +67,8 @@ function fPresentValue(qv) {
     const varPV = qv.varPV || fSetLocalVar("varPV", qv.varPV);
     const varG = qv.varG || fSetLocalVar("varG", qv.varG);
     const varY = qv.varY || fSetLocalVar("varY", qv.varY);
-    const varType = (varY !== 1) ? 0 : varY || fSetLocalVar("varType", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
-
+    const varReturnInYear = qv.varReturnInYear === undefined ? fSetLocalVar("varReturnInYear", qv.varReturnInYear) : qv.varReturnInYear;
+    const varType = (varY !== 1) ? 0 : qv.varType || fSetLocalVar("varType", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
 
 
     // ---Step through the TVM decision tree-------
@@ -118,15 +139,16 @@ function fFutureValue(qv) {
     const varRate = qv.varRate || fSetLocalVar("varRate", qv.varRate);
     const varN = qv.varN || fSetLocalVar("varN", qv.varN);
     const varPMT = qv.varPMT || fSetLocalVar("varPMT", qv.varPMT);
-    const varFV = varFV || fSetLocalVar("varFV", qv.varFV);
+    const varFV = qv.varFV || fSetLocalVar("varFV", qv.varFV);
     const varPV = qv.varPV || fSetLocalVar("varPV", qv.varPV);
     const varG = qv.varG || fSetLocalVar("varG", qv.varG);
     const varY = qv.varY || fSetLocalVar("varY", qv.varY);
-    const varType = (varY !== 1) ? 0 : varType || fSetLocalVar("varType", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
+    const varReturnInYear = qv.varReturnInYear === undefined ? fSetLocalVar("varReturnInYear", qv.varReturnInYear) : qv.varReturnInYear;
+    const varType = (varY !== 1) ? 0 : qv.varType || fSetLocalVar("varType", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
 
 
     // Single payment
-    if (varPMT == 0 && varPV != 0) { return fFVSinglePmt(varRate, varN, varPV); }
+    if (varPMT == 0 && varPV != 0) { return fFVSinglePmt({varRate, varN, varPV}); }
 
     // Annuities
     if (varPMT != 0 && varPV == 0) {
@@ -143,7 +165,7 @@ function fFutureValue(qv) {
     }
 
     // Bonds (paid annually)
-    if (varPMT != 0 && varFV != 0) { //Notice that this is FV instead of PV
+    if (varPMT != 0 && varFV != 0 && varFV.includes("?")==false ) { //Notice that this is FV instead of PV
         const fvCoupons = fFutureValue({ varRate, varN, varPMT, "varPV": 0, varType, varG, varY });
         const fvParValue = varFV;
         return fvCoupons + fvParValue;
@@ -227,7 +249,7 @@ function fFVAnnuityStandard(tvm) {
 // FV of a growing annuity
 function fFVGrowingAnnuity(tvm) {
     const varRate = tvm.varRate, varN = tvm.varN, varPMT = tvm.varPMT, varG = tvm.varG;
-    return varPMT * ftvmGrowAnnFVIF(varRate, varN, varG);
+    return varPMT * ftvmGrowAnnFVIF({varRate, varN, varG});
 }
 
 
@@ -239,9 +261,9 @@ function fFVGrowingAnnuity(tvm) {
 //----------------------------------------
 
 // 1 + i
-function ftvm1Rate(tvm) {
+function ftvm1Rate(tvm, decimals=12) {
     const varRate = tvm.varRate;
-    return 1 + varRate;
+    return uRound(1 + varRate, decimals);
 }
 
 // Future value interest factor (FVIF)

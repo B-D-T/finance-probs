@@ -1,5 +1,3 @@
-
-
 function fnQues498(objFromMainQues) {
 
     let quesVars = {
@@ -10,11 +8,12 @@ function fnQues498(objFromMainQues) {
         get varY(){return this.varN}
     };
 
-    quesVars = addPrefix(quesVars, quesNum());
-    if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
+    quesVars = addPrefix(quesVars);
+    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
 
-    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars);
-        
+    function buildPage(objQuesVars) {
+        quesVars = objQuesVars; createEDVarInScope(quesVars);
+
         let calcVars = {
             calcGrowthRate: 1 + varRate,
             calcPVYear: varY-varN,
@@ -25,13 +24,17 @@ function fnQues498(objFromMainQues) {
         createEDVarInScope(calcVars);
 
         let displayVars = {
-            dispRatePerc: uRound(varRate * 100, 2),
+            dispRatePerc: uRound(varRate * 100, 4),
             dispGrowthRate: uRound(calcGrowthRate, 5),
             dispPVIF: uRound(calcPVIF, 5),
             dispFVIF: uRound(calcFVIF, 5),
             dispTheAns: uRound(calcTheAns, 0)
         };
-        createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
+        createEDVarInScope(displayVars);
+        
+        jQuery.extend(quesVars, calcVars, displayVars);
+        storeQuesRespVars(quesVars, calcTheAns);
+        return fillPage();
     }
 
     function fillPage() {
@@ -48,9 +51,9 @@ function fnQues498(objFromMainQues) {
         obj.solution = probDisplay(quesVars)`${explainPVSinglePmt_PV(quesVars)}
 
         <p>
-            This answer means that we can put \$dispTheAns in an account today (year calcPVYear) and 
+            This answer means that we can put \$${dispTheAns.toLocaleString()} in an account today (year calcPVYear) and 
             it will grow at dispRatePerc% over the next varN years,
-            eventually reaching \$varFV by the time we owe the pension payment.
+            eventually reaching \$${varFV.toLocaleString()} by the time we owe the pension payment.
             
             
         </p>
@@ -58,6 +61,15 @@ function fnQues498(objFromMainQues) {
         `;
 
         return obj;
-    } // end of fillPage
 
+    } // end of fillPage
+}
+
+ // received from addOnPageSubmit
+function fnQuesResp(objPageSubmit){
+    const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
+    if (!(jQuery(`${qtrxDivID}-response`).length)){
+        let objRespFeedback = objPageSubmit;
+        return setEDQuesRespVars(objRespFeedback);
+    }
 }

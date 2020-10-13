@@ -2,51 +2,77 @@ fnQues457 = function (objFromMainQues) {
 
 
     let quesVars = {
-        "a": uRand(10,19,.001),
-        "b": uRand(21,29,.01),
-        "c": uRand(600,750,1)
+        "varA": uRand(10,19,.001),
+        "varB": uRand(21,29,.01),
+        "varC": uRand(600,750,1)
     }
 
+    quesVars = addPrefix(quesVars);
+    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
 
-    // Static code
-    let obj = {};
-    obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
-    const windowScope = this; const varPrefix = "var_q" + quesNum() + "z__";
-    jQuery.each(quesVars, function (theKey, theValue) { const newKey = varPrefix + theKey; quesVars[newKey] = [theValue]; delete quesVars[theKey]; });
-    if (objFromMainQues.isProduction) { return createEDVarInScope(fetchQuesVars(quesVars)) } else { return createEDVarInScope(quesVars); }
-    function createEDVarInScope(objEDVars) { jQuery.each(objEDVars, function (edKey, edValue) { const origKey = edKey.replace(varPrefix, ''); quesVars[origKey] = quesVars[edKey]; delete quesVars[edKey]; windowScope[origKey] = edValue; }); return fillPage(); } function fillPage() {
-    // End static code
+    function buildPage(objQuesVars) {
+        quesVars = objQuesVars; createEDVarInScope(quesVars);
 
-        // Calculations
-        const d = a - b;
-        const ans = c / (a - b)
+        let calcVars = {
+            calcD: varA - varB,
+            calcTheAns: varC/(varA - varB)
+        };
+        createEDVarInScope(calcVars);
 
-        // Display vars
-        const d_round = uRound(d,5);
+        let displayVars = {
+            dispD: uRound(calcD, 5)
+        };
+        createEDVarInScope(displayVars);
+        
+        jQuery.extend(quesVars, calcVars, displayVars);
+        storeQuesRespVars(quesVars, calcTheAns);
+        return fillPage();
+    }
 
-        obj.stem = `
-        Solve for ${kxx} given:
-        ${kxbig([a, "x-", b, "x=", c])}
+    function fillPage() {
+        let obj = {};
+
+        obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
+
+        obj.stem = probDisplay(quesVars)`
+        Solve for \\(x\\) given:
+        \\[
+            varAx-varBx=varC
+        \\]
+        
     `
 
-        obj.solution = `
-        ${kxbig([a, "x-", b, "x=", c])}
-
+        obj.solution = probDisplay(quesVars)`
+        <p>
         The same variable (x) on the left side of the equation is 
         being multiplied by two different coefficients. Therefore, 
         we can simplify the problem by subtracting the coefficients.
-    
-        ${kxbig(`(${a} - ${b})x=${c}`)}
-        
-        ${kxbig([d_round, "x=", c])}
+        </p>
+        <p>
+        Then, to isolate x, divide each side by the coefficient (${dispD}). 
+        </p>
+        \\[
+            \\begin{aligned}
+                (varA-varB)x &= varC \\\\
+                {} \\\\
+                dispDx &= varC \\\\
+                {} \\\\
+                \\frac{dispDx}{dispD} &= \\frac{varC}{dispD} \\\\
+                {} \\\\
+                x &= calcTheAns
+            \\end{aligned}
+        \\]
+        `;
+    return obj;
 
-        To isolate x, divide each side by the coefficient (${d_round}). 
-        ${kxbig([texFrac(d_round+"x", d_round), "=", texFrac(c, d_round)])}
+} // end of fillPage
+}
 
-        ${kxbig(`x = ${ans}`)}
-
-    `
-        return obj;
-
-    }
+// received from addOnPageSubmit
+function fnQuesResp(objPageSubmit){
+const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
+if (!(jQuery(`${qtrxDivID}-response`).length)){
+    let objRespFeedback = objPageSubmit;
+    return setEDQuesRespVars(objRespFeedback);
+}
 }

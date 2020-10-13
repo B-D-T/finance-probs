@@ -30,7 +30,7 @@ fnQues496 = function (objFromMainQues) {
 
         // Variables created to improve readability when displaying on the website
         const displayVars = {
-            dispRatePerc: uRound(varRate * 100, 2),
+            dispRatePerc: uRound(varRate * 100, 4),
             dispGrowthRate: uRound(calcGrowthRate, 5),
             dispFVIF: uRound(calcFVIF, 5)
         };

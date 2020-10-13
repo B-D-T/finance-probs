@@ -56,7 +56,7 @@ function fnQues487(objFromMainQues) {
 
         // Create object with the full value of the variable ready for display
         const dispFull = Object.fromEntries(
-            Object.entries(contractAmt).map( ([key, curVal], idx) => ["AmtYr"+key, `\$`+curVal.toLocaleString()] )
+            Object.entries(contractAmt).map( ([key, curVal], idx) => ["AmtYr"+key, `\$`+curVal.toLocaleString('en')] )
         );
 
         // Create object with the full value of the variable ready for display
@@ -81,7 +81,7 @@ function fnQues487(objFromMainQues) {
         obj.stem = probDisplay(quesVars)`
         <p>
             What is the present value (in year 0) of the following contract,
-            assuming a rate of ${uRound(varRate * 100, 2)}%?
+            assuming a rate of ${uRound(varRate * 100, 4)}%?
         </p>
         <style>.yearlyContracts li{margin-top:0.5em;}</style>
         <ul class="yearlyContracts">
@@ -117,13 +117,13 @@ function fnQues487(objFromMainQues) {
         <p>
         \\[
             \\begin{aligned}
-                \\text{Year 0} &= \\$${parseInt(calcPVYr00).toLocaleString()} \\\\
-                \\text{+ Year 1} &= \\$${parseInt(calcPVYr01).toLocaleString()} \\\\
-                \\text{+ Year 2} &= \\$${parseInt(calcPVYr02).toLocaleString()} \\\\
-                \\text{+ Year 3} &= \\$${parseInt(calcPVYr03).toLocaleString()} \\\\
-                \\text{+ Year 4} &= \\$${parseInt(calcPVYr04).toLocaleString()} \\\\
-                \\text{+ Year 5} &= \\$${parseInt(calcPVYr05).toLocaleString()} \\\\
-                \\text{Total } PV_0 \\text{ of the contact} &= \\bold{\\$${parseInt(calcTheAns).toLocaleString()}}
+                \\text{Year 0} &= \\$${parseInt(calcPVYr00).toLocaleString('en')} \\\\
+                \\text{+ Year 1} &= \\$${parseInt(calcPVYr01).toLocaleString('en')} \\\\
+                \\text{+ Year 2} &= \\$${parseInt(calcPVYr02).toLocaleString('en')} \\\\
+                \\text{+ Year 3} &= \\$${parseInt(calcPVYr03).toLocaleString('en')} \\\\
+                \\text{+ Year 4} &= \\$${parseInt(calcPVYr04).toLocaleString('en')} \\\\
+                \\text{+ Year 5} &= \\$${parseInt(calcPVYr05).toLocaleString('en')} \\\\
+                \\text{Total } PV_0 \\text{ of the contact} &= \\bold{\\$${parseInt(calcTheAns).toLocaleString('en')}}
             \\end{aligned}
 
         \\]

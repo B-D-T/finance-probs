@@ -1,4 +1,3 @@
-
 function fnQues502(objFromMainQues) {
     
 //************************ 
@@ -13,29 +12,34 @@ let quesVars = {
     varFV: "??"
 };
 
-quesVars = addPrefix(quesVars, quesNum());
-if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
+quesVars = addPrefix(quesVars);
+if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
 
-function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars);
-    
+function buildPage(objQuesVars) {
+    quesVars = objQuesVars; createEDVarInScope(quesVars);
+
     let calcVars = {
         calcGrowthRate: 1 + varRate,
-        get calcFVIF() {return this.calcGrowthRate ** varN},
-        get calcTheAns() {return varPV * this.calcFVIF}
+        get calcFVIF() { return this.calcGrowthRate ** varN },
+        get calcTheAns() { return varPV * this.calcFVIF }
     };
     createEDVarInScope(calcVars);
 
     let displayVars = {
-        dispRatePerc: uRound(varRate * 100, 2),
+        dispRatePerc: uRound(varRate * 100, 4),
         dispGrowthRate: uRound(calcGrowthRate, 5),
         dispFVIF: uRound(calcFVIF, 5)
     };
-    createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
+    createEDVarInScope(displayVars);
+
+    jQuery.extend(quesVars, calcVars, displayVars);
+    storeQuesRespVars(quesVars, calcTheAns);
+    return fillPage();
 }
 
 function fillPage() {
     let obj = {};
-    
+
     obj.ansBoxMessage = ansBoxMessages("writeOutNums");
 
     obj.stem = probDisplay(quesVars)`
@@ -49,6 +53,15 @@ function fillPage() {
     `;
 
     return obj;
-} // end of fillPage
 
+} // end of fillPage
+}
+
+// received from addOnPageSubmit
+function fnQuesResp(objPageSubmit) {
+const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
+if (!(jQuery(`${qtrxDivID}-response`).length)) {
+    let objRespFeedback = objPageSubmit;
+    return setEDQuesRespVars(objRespFeedback);
+}
 }

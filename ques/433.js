@@ -99,6 +99,14 @@ function fnQues433 (objFromMainQues) {
     } // end of fillPage
 }
 
+ // received from addOnPageSubmit
+function fnQuesResp(objPageSubmit){
+    const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
+    if (!(jQuery(`${qtrxDivID}-response`).length)){
+        let objRespFeedback = objPageSubmit;
+        return setEDQuesRespVars(objRespFeedback);
+    }
+}
 
 // The question files (like 433.js) will always call this function on click.
 // Most of the time this will only be an intermediary for the sedEDQuesRespVars function,
@@ -109,10 +117,3 @@ function fnQues433 (objFromMainQues) {
 //     const objRespFeedback = { "stuResp": stuResp }
 //     return setEDQuesRespVars(objRespFeedback); 
 // }
-function fnQuesResp(objPageSubmit){ // received from addOnPageSubmit
-    const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
-    if (!(jQuery(`${qtrxDivID}-response`).length)){
-        let objRespFeedback = objPageSubmit;
-        return setEDQuesRespVars(objRespFeedback);
-    }
-}

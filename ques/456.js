@@ -2,77 +2,123 @@ fnQues456 = function (objFromMainQues) {
 
 
     let quesVars = {
-        "a": 1,
-        "b": uRand(6, 10, 1),
-        "c": uRand(3, 20, 1),
-        "d": uRand(2, 4, 1)
+        "varA": 1,
+        "varB": uRand(6, 10, 1),
+        "varC": uRand(3, 20, 1),
+        "varD": uRand(2, 4, 1)
     }
 
-    // Static code
-    let obj = {};
-    obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
-    const windowScope = this; const varPrefix = "var_q" + quesNum() + "z__";
-    jQuery.each(quesVars, function (theKey, theValue) { const newKey = varPrefix + theKey; quesVars[newKey] = [theValue]; delete quesVars[theKey]; });
-    if (objFromMainQues.isProduction) { return createEDVarInScope(fetchQuesVars(quesVars)) } else { return createEDVarInScope(quesVars); }
-    function createEDVarInScope(objEDVars) { jQuery.each(objEDVars, function (edKey, edValue) { const origKey = edKey.replace(varPrefix, ''); quesVars[origKey] = quesVars[edKey]; delete quesVars[edKey]; windowScope[origKey] = edValue; }); return fillPage(); } function fillPage() {
-    // End static code
+    quesVars = addPrefix(quesVars);
+    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
 
-        // Calculations
-        const e = (b - d);
-        const g = uRound(c * (1 / e), 5);
-        const h = (c ** (1 / e)) - 1
+    function buildPage(objQuesVars) {
+        quesVars = objQuesVars; createEDVarInScope(quesVars);
 
-        obj.stem = `
-            Solve for ${kxx} given:
-            ${kxbig([
-            "(",a,
-            "+x)^{"+b+"}",
-            "=",
-            c, "(", a, "+x)^{",d,"}"
-        ])}
+        let calcVars = {
+            calcE: (varB - varD),
+            get calcG(){return varC ** (1 / this.calcE) },
+            get calcTheAns() { return this.calcG - 1 }
+        }
+        createEDVarInScope(calcVars);
+
+        let displayVars = {
+            dispG: uRound(calcG, 5)
+        };
+        createEDVarInScope(displayVars);
+
+        jQuery.extend(quesVars, calcVars, displayVars);
+        storeQuesRespVars(quesVars, calcTheAns);
+        return fillPage();
+    }
+
+    function fillPage() {
+        let obj = {};
+
+        obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
+
+        obj.stem = probDisplay(quesVars)`
+            Solve for \\(x\\) given:
+            \\[
+                (varA+x)^{varB} = varC(varA+x)^{varD}
+            \\]
+            ${ansBoxMessages("usePositiveIfAnsCouldBePosOrNeg")}
         `
 
-        obj.solution = `
-            ${kxbig("("+a+"+x)^{"+b+"} = "+c+"("+a+"+x)^{"+d+"}")}
 
+        obj.solution = probDisplay(quesVars)`
+            <p>
             To get the variables on the same side of the equation, 
-            divide each side by ${kx(["("+a+"+x)^{"+d+"}"])}
-            
-            [It's easiest to divide each side by the term with the smaller 
-            exponent. In this case, ${kx("("+a+"+x)^{"+d+"}")} is smaller 
-            than ${kx("("+a+"+x)^{"+b+"}")}.] This will leave ${c} on the 
-            right side by itself.
+            divide each side by \\( (varA+x)^{varD} \\).
+            </p>
+            <p>            
+            It's easiest to divide each side by the term with the smaller 
+            exponent. In this case, \\( (varA+x)^{varD} \\) is smaller 
+            than \\( (varA+x)^{varB} \\).
+            This will leave ${varC} on the right side by itself.
+            </p>
 
-            ${kxbig([texFrac("("+a+"+x)^{"+b+"}", "("+a+"+x)^{"+d+"}"), "=", c])}
+            \\[
+                \\begin{aligned}
+                \\frac{(varA+x)^{varB}}{(varA+x)^{varD}} &= \\frac{varC(varA+x)^{varD}}{(varA+x)^{varD}}\\\\
+                {}\\\\
+                \\frac{(varA+x)^{varB}}{(varA+x)^{varD}} &= varC
+                \\end{aligned}
+            \\]          
 
+            <p>
             Because we are dividing the same term (1+x) by exponents, 
             we can simplify the problem by just subtracting the exponents.
-            ${kxbig(["("+a+"+x)^{"+b+"-"+d+"}", "=", c])}
+            </p>
+            \\[
+                \\begin{aligned}
+                (varA+x)^{{varB}-{varD}} = varC \\\\
+                {}\\\\
+                (varA+x)^{calcE} = varC \\\\
+                \\end{aligned}
+            \\]
 
-            ${kxbig("("+a+"+x)^{"+(b-d)+"}")}
 
-            In order to isolate the (1+x) term, take the ${e}-root of 
+            <p>
+            In order to isolate the (1+x) term, take the ${calcE}-root of 
             each side.
+            </p>
+            \\[
+                \\begin{aligned}
+                    ${texRoot(`(${varA}+x)^{${calcE}}`, calcE)} &= ${texRoot(varC, calcE)} \\\\
+                    {} \\\\
+                    varA + x &= dispG
+                \\end{aligned}
+            \\]
 
-            ${kxbig([
-                    (texRoot("1+x", e)), "=", (texRoot(c, e))])}
-            
-            ${kxbig("("+a+"+x)"+ "="+ g)}
-            
-            Lastly, subtract 1 from each side to solve for x.
-            ${kxbig(["x=", (g - 1)])}
+            <p>Lastly, subtract varA from each side to solve for x.</p>
+            \\[
+                \\begin{aligned}
+                    varA + x - varA &= dispG - varA \\\\
+                    {} \\\\
+                    x &= calcTheAns
+                \\end{aligned}
+            \\]
 
-            ${kxbig(["x=", h])}
-
+        <p>
             Remember... if your calculator doesn't have a way to 
             specify taking roots other than 2 [i.e., square roots], 
             you can always raise the number to the reciprocal of the 
-            exponent. In this example, taking ${kx([c, "^{", (texFrac(1,e)), "}"])}
-            would give us the same solution as ${kx([texRoot(c,e)])}. 
+            exponent. In this example, taking \\( varC^{\\frac{1}{calcE}} \\)
+            would give us the same solution as \\( ${texRoot(varC,calcE)} \\).
             This is also how you would have to solve the problem if 
             using Excel.
+        </p>
            `
-           
         return obj;
+
+    } // end of fillPage
+}
+
+// received from addOnPageSubmit
+function fnQuesResp(objPageSubmit) {
+    const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
+    if (!(jQuery(`${qtrxDivID}-response`).length)) {
+        let objRespFeedback = objPageSubmit;
+        return setEDQuesRespVars(objRespFeedback);
     }
 }

@@ -9,8 +9,8 @@ function fnQues461(objFromMainQues) {
         "varC": uRand(20, 60, 1),
     }
 
-    quesVars = addPrefix(quesVars, quesNum());
-    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars); }
+    quesVars = addPrefix(quesVars);
+    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
 
     function buildPage(objQuesVars) {
         quesVars = objQuesVars; createEDVarInScope(quesVars);
@@ -28,7 +28,9 @@ function fnQues461(objFromMainQues) {
             dispF: uRound((calcE / calcD), 5),
             dispTheAns: uRound(calcTheAns, 5),
         }
-        createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
+        jQuery.extend(quesVars, calcVars, displayVars);
+        storeQuesRespVars(quesVars, calcTheAns);
+        return fillPage();
     }
 
     function fillPage() {
@@ -79,4 +81,13 @@ function fnQues461(objFromMainQues) {
     return obj;
 
 } // end of fillPage
+}
+
+// received from addOnPageSubmit
+function fnQuesResp(objPageSubmit){
+const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
+if (!(jQuery(`${qtrxDivID}-response`).length)){
+    let objRespFeedback = objPageSubmit;
+    return setEDQuesRespVars(objRespFeedback);
+}
 }

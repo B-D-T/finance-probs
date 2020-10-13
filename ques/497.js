@@ -1,33 +1,37 @@
 fnQues497 = function (objFromMainQues) {
-    const windowScope = this; // global var (global to this function anyway)
 
     let quesVars = {
-        varFV: uRand(20000,50000,1000),
+        varFV: uRand(20000, 50000, 1000),
         varRate: uRand(.08, .20, .01),
         varN: uRand(8, 20, 1),
         varPV: "??",
-        get varY(){return this.varN} 
+        get varY() { return this.varN }
     };
 
-    quesVars = addPrefix(quesVars, quesNum());
-    if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
+    quesVars = addPrefix(quesVars);
+    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
 
-    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars);
-        
+    function buildPage(objQuesVars) {
+        quesVars = objQuesVars; createEDVarInScope(quesVars);
+
         let calcVars = {
-            calcTheAns: varFV * (1 /((1+varRate)**varN))
+            calcTheAns: varFV * (1 / ((1 + varRate) ** varN))
         };
         createEDVarInScope(calcVars);
 
         let displayVars = {
-            dispRatePerc: uRound(varRate * 100, 2)
+            dispRatePerc: uRound(varRate * 100, 4)
         };
-        createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
+        createEDVarInScope(displayVars);
+
+        jQuery.extend(quesVars, calcVars, displayVars);
+        storeQuesRespVars(quesVars, calcTheAns);
+        return fillPage();
     }
 
     function fillPage() {
         let obj = {};
-        
+
         obj.ansBoxMessage = ansBoxMessages("writeOutNums");
 
         obj.stem = probDisplay(quesVars)`
@@ -41,6 +45,15 @@ fnQues497 = function (objFromMainQues) {
         obj.solution = probDisplay(quesVars)`${explainPVSinglePmt_PV(quesVars)}`;
 
         return obj;
-    } // end of fillPage
 
+    } // end of fillPage
+}
+
+// received from addOnPageSubmit
+function fnQuesResp(objPageSubmit) {
+    const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
+    if (!(jQuery(`${qtrxDivID}-response`).length)) {
+        let objRespFeedback = objPageSubmit;
+        return setEDQuesRespVars(objRespFeedback);
+    }
 }

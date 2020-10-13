@@ -17,7 +17,7 @@ function storeQuesRespVars(theQuesVars, theAns) {
 
     if (!(objQuesCaller.isProduction == false)) {
         setEDValue(strQuesVarsStorageKey, strQuesVarsStorageVal);
-    } else { console.log(strQuesVarsStorageKey + ": " + strQuesVarsStorageVal) }
+    } else { console.log("No setEDValue for " + strQuesVarsStorageKey + ": " + strQuesVarsStorageVal) }
 }
 
 
@@ -90,10 +90,10 @@ function showFeedback(strEDQuesResp) {
 }
 
 
-// When you use console.log(someObj), it passes a REFERENCE to someObj.
+// When you use console . log( someObj), it passes a REFERENCE to someObj.
 // That means someObj will change as the code is running, and by the time you look at it,
 // it will have the final values. If you want to see the object AT THE TIME the line of code happens,
-// you need to use something like this: console.log("Here's the obj right now:", logObj(theObject) );
+// you need to use something like this: console . log("Here's the obj right now:", logObj(theObject) );
 function logObj(someObj) {
     return JSON.parse(JSON.stringify(someObj));
 }
@@ -106,7 +106,13 @@ function ansBoxMessages(msgKeyToReturn) {
         decimalPlaces4: "Include at least 4 decimal places in your answer",
         writeOutNums: "Write out numbers. E.g., write 12500000; don't write: '12.5'; '12.5 million'; 12,500,000; etc.",
         copyPasteFromWord: "Write your response in Word, then copy-paste into here",
-        ansreminderDefault: "Enter your reponse carefully.", // Default text
+        usePositiveIfAnsCouldBePosOrNeg: `<p>
+            If the solution could be a positive or negative value,
+            just put the positive number.<br>
+            E.g., \\(x=\\sqrt{9}\\) could be \\(-3\\) or \\(+3\\);
+            your answer should just be \\(3\\).
+            </p>`,
+        ansreminderDefault: "Enter your response carefully.", // Default text
     };
     // Return the default message if the caller asks for a non-existent key
     const theKey = msgKeyToReturn in objAnsBoxMessages ? msgKeyToReturn : "ansreminderDefault"
@@ -147,11 +153,11 @@ function countDecimals(value) {
 // r^n = x, so the nth root of x is r (n√x = r)
 function uthRoot(num, nArg, precArg) {
     const n = nArg || 2; // defaults to square root
-    const prec = precArg || 12; // defaults to 12 places of precision
+    const prec = precArg || 100;
 
     let x = 1; // Initial guess
     for (let i = 0; i < prec; i++) {
-        x = 1 / n * ((n - 1) * x + (num / Math.pow(x, n - 1)));
+        x = (1 / n) * ((n - 1) * x + (num / Math.pow(x, n - 1)));
     }
     return x;
 }
@@ -161,7 +167,14 @@ function uthRoot(num, nArg, precArg) {
 function texFrac(numerator, denominator) { return ["\\frac{", numerator, "}{", denominator, "}"].join('') }
 
 // Create a Tex-style nth root for display
-function texRoot(base, root) { return ["\\sqrt[", root, "]{", base, "}"].join('') }
+// texRoot(9,2) returns the square root of nine: \\sqrt[2]{9}
+// texRoot(9) returns the same, but without the 2: \\sqrt{9}
+function texRoot(base, root) {
+    let strKatex = "\\sqrt";
+    if (root !== undefined) { strKatex += `[${root}]` }
+    strKatex += `{${base}}`
+    return strKatex;// ["
+}
 
 
 // As of now (Sept 2020), this just replaces the variables in the text with the values.

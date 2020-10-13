@@ -2,61 +2,111 @@ fnQues458 = function (objFromMainQues) {
 
 
     let quesVars = {
-        "a": uRand(0.1, .9, .1),
-        "b": uRand(1, 5, 1),
-        "c": uRand(50, 99, 1),
-        "d": uRand(2, 9, 1)
+        "varA": uRand(0.1, .9, .1),
+        "varB": uRand(1, 5, 1),
+        "varC": uRand(50, 99, 1),
+        "varD": uRand(2, 9, 1)
 
     }
 
-    // Static code
-    let obj = {};
-    obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
-    const windowScope = this; const varPrefix = "var_q" + quesNum() + "z__";
-    jQuery.each(quesVars, function (theKey, theValue) { const newKey = varPrefix + theKey; quesVars[newKey] = [theValue]; delete quesVars[theKey]; });
-    if (objFromMainQues.isProduction) { return createEDVarInScope(fetchQuesVars(quesVars)) } else { return createEDVarInScope(quesVars); }
-    function createEDVarInScope(objEDVars) { jQuery.each(objEDVars, function (edKey, edValue) { const origKey = edKey.replace(varPrefix, ''); quesVars[origKey] = quesVars[edKey]; delete quesVars[edKey]; windowScope[origKey] = edValue; }); return fillPage(); } function fillPage() {
-    // End static code
+    quesVars = addPrefix(quesVars);
+    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
 
-        // Calculations
+    function buildPage(objQuesVars) {
+        quesVars = objQuesVars; createEDVarInScope(quesVars);
 
-        const e1 = 1 / d;
-        const e = c * e1;
-        const E = uRound(c * e1, 5);
-        const e2 = e - b;
-        const E2 = uRound(e - b, 5);
-        const ans = e2 / a
+        let calcVars = {
+            calcE: uthRoot(varC, varD),
+            get calcF(){return this.calcE - varB }, 
+            // e1: 1 / varD,
+            // e: c * e1,
+            // E: uRound(c * e1, 5),
+            // e2: e - b,
+            // E2: uRound(e - b, 5),
+            // ans: e2 / a,
 
+            get calcTheAns(){return this.calcF/ varA}
+        };
+        createEDVarInScope(calcVars);
 
-        obj.stem = `
-        Solve for ${kxx} given:
-        ${kxbig(["(", a, "x+)^{"+b+"}", "=", c])}
+        let displayVars = {
+            dispE: uRound(calcE,5),
+            dispF: uRound(calcF,5)
+        };
+        createEDVarInScope(displayVars);
+
+        jQuery.extend(quesVars, calcVars, displayVars);
+        storeQuesRespVars(quesVars, calcTheAns);
+        return fillPage();
+    }
+
+    function fillPage() {
+        let obj = {};
+
+        obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
+
+        obj.stem = probDisplay(quesVars)`
+        Solve for \\(x\\) given:
+        \\[
+            {(varAx + varB)}^{varD} = varC 
+        \\]
+        ${ansBoxMessages("usePositiveIfAnsCouldBePosOrNeg")}
     `
 
-        obj.solution = `
-        ${kxbig([
-            "(", a, 
-            "x+)^{"+b+"}", 
-            "=", c])}
+        obj.solution = probDisplay(quesVars)`
+        
+        <p>
+        In order to isolate the (varAx + varB) term, 
+        take the varD-root of each side.
+        \\[
+            \\begin{aligned}
+            ${texRoot(`{(${varA}x + ${varB})}^{${varD}}`,varD)} &= ${texRoot(varC,varD)} \\\\
+            {}\\\\
+            {varA}x + varB &= dispE\\\\
+            {}\\\\
+            \\end{aligned}
+        \\]
+        <p>
+            Because of the order of operations, we subtract varB from 
+            each side to leave the coefficient & variable on the left.
+        </p>
+        <p>
+            To solve for x, divide each side by the coefficient varA.
+        </p>
+        \\[
+            \\begin{aligned}
+            varAx + varB - varB &= dispE - varB \\\\
+            {} \\\\
+            varAx &= dispF \\\\
+            {} \\\\
+            \\frac{varAx}{varA} &= \\frac{dispF}{varA} \\\\
+            {} \\\\
+            x &= calcTheAns
+            \\end{aligned}
+        \\]
 
-        In order to isolate the (${a} "x+" ${b}) term, 
-        take the ${d}-root of each side.
-        ${kxbig([texRoot(("("+a+"+x)^{"+d+"}"), d),
-            "=", texRoot(c,d)])}
+        `/*
+            
+            ${kxbig([texFrac((a + "x"), a), "=", texFrac(E2, a)])}
+    
+            
+        \\]
 
-        ${kxbig([a, "x=", E2])}
 
-        Because of the order of operations, we subtract ${b} from 
-        each side to leave the coefficient & variable on the left.
-        ${kxbig([a, "x=", E2])}
-
-        To solve for x, divide each side by the coefficient (${a}).
-        ${kxbig([texFrac((a + "x"), a), "=", texFrac(E2, a)])}
 
         ${kxbig(`x = ${ans}`)}
 
-    `
+    `*/
         return obj;
 
+    } // end of fillPage
+}
+
+// received from addOnPageSubmit
+function fnQuesResp(objPageSubmit) {
+    const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
+    if (!(jQuery(`${qtrxDivID}-response`).length)) {
+        let objRespFeedback = objPageSubmit;
+        return setEDQuesRespVars(objRespFeedback);
     }
 }

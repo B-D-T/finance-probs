@@ -1,5 +1,3 @@
-
-
 function fnQues499(objFromMainQues) {
     
     let quesVars = {
@@ -10,11 +8,12 @@ function fnQues499(objFromMainQues) {
         varNb: uRand(35, 50, 1)
     };
 
-    quesVars = addPrefix(quesVars, quesNum());
-    if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
+    quesVars = addPrefix(quesVars);
+    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
 
-    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars);
-        
+    function buildPage(objQuesVars) {
+        quesVars = objQuesVars; createEDVarInScope(quesVars);
+
         let calcVars = {
             calcAnsA: varFVa * (1 /((1+varRate)**varNa)),
             calcAnsB: varFVb * (1 /((1+varRate)**varNb)),
@@ -23,14 +22,18 @@ function fnQues499(objFromMainQues) {
         createEDVarInScope(calcVars);
 
         let displayVars = {
-            dispRatePerc: uRound(varRate * 100, 2),
+            dispRatePerc: uRound(varRate * 100, 4),
             dispAnsA: uRound(calcAnsA,0),
             dispAnsB: uRound(calcAnsB,0),
             get dispBestChoice(){
-                return (calcAnsA > calcAnsB) ? "Choice A is larger, so the answer is \$" + calcAnsA : "Choice B is larger, so the answer is \$" + calcAnsB;
+                return (calcAnsA > calcAnsB) ? "Choice A is larger, so the answer is \$" + calcAnsA.toLocaleString() : "Choice B is larger, so the answer is \$" + calcAnsB.toLocaleString();
             }
         };
-        createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
+        createEDVarInScope(displayVars);
+        
+        jQuery.extend(quesVars, calcVars, displayVars);
+        storeQuesRespVars(quesVars, calcTheAns);
+        return fillPage();
     }
 
     function fillPage() {
@@ -90,8 +93,8 @@ function fnQues499(objFromMainQues) {
             we can choose the one that is larger.
         </p>
         <p>
-            <b>Choice A</b>: \$dispAnsA <br />
-            <b>Choice B</b>: \$dispAnsB 
+            <b>Choice A</b>: \$${dispAnsA.toLocaleString()} <br />
+            <b>Choice B</b>: \$${dispAnsB.toLocaleString()}
         </p>
         <p>
             dispBestChoice
@@ -99,6 +102,15 @@ function fnQues499(objFromMainQues) {
         `;
 
         return obj;
-    } // end of fillPage
 
+    } // end of fillPage
+}
+
+ // received from addOnPageSubmit
+function fnQuesResp(objPageSubmit){
+    const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
+    if (!(jQuery(`${qtrxDivID}-response`).length)){
+        let objRespFeedback = objPageSubmit;
+        return setEDQuesRespVars(objRespFeedback);
+    }
 }

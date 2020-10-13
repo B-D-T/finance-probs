@@ -44,9 +44,19 @@ function explainFVSinglePmt_FV(qvObj) {
         varFV: "black"
     };
 
+    const varRate   = qvObj.varRate === undefined  ? fSetLocalVar("varRate", qvObj.varRate)   : qvObj.varRate
+    const varN      = qvObj.varN === undefined     ? fSetLocalVar("varN", qvObj.varN)         : qvObj.varN
+    const varFV     = "??";
+    const varPV     = qvObj.varPV === undefined    ? fSetLocalVar("varPV", qvObj.varPV)       : qvObj.varPV
+    const varY      = qvObj.varY === undefined     ? fSetLocalVar("varY", qvObj.varY)         : qvObj.varY
+    const varReturnInYear = qvObj.varReturnInYear === undefined ? fSetLocalVar("varReturnInYear", qvObj.varReturnInYear) : qvObj.varReturnInYear
+
+
+    qvObj = { varRate, varN, varFV, varPV, varY };
+
     let myStr = `
         <p>
-            You have a lump sum (\$varPV) in year varY,
+            You have a lump sum (\$${varPV.toLocaleString('en')}) in year ${varY},
             and you want to know what it is worth in year ${varY + varN}.
             Let's see this on a timeline:
             ${timelineFVSinglePmt(qvObj)}
@@ -77,7 +87,8 @@ function explainFVSinglePmt_N(qvObj) {
 
     let myStr = `
         <p>
-            You know PV<sub>varY</sub> (\$${varPV.toLocaleString('en')}) and FV<sub>??</sub> (\$${varFV.toLocaleString('en')}),
+            You know PV<sub>varY</sub> (\$${varPV.toLocaleString('en')})
+            and FV<sub>??</sub> (\$${varFV.toLocaleString('en')}),
             but you don't know how long it will take for the
             PV to grow to the FV amount.
             Let's see this on a timeline:
@@ -98,7 +109,7 @@ function explainFVSinglePmt_N(qvObj) {
     return fStrReplaceVarsWithVals(myStr, qvObj);
 }
 
-function explainPVAnnuityStand_PV(qv) {
+function explainPVAnnuityConst_PV(qv) {
     // Right now I'm just using black because I found the colors distracting. But I'll leave the code in case I change my mind down the road.
     let objColors = {
         varY: "black",
@@ -108,14 +119,15 @@ function explainPVAnnuityStand_PV(qv) {
         varFV: "black"
     };
 
-    const varRate = qv.varRate || fSetLocalVar("varRate", qv.varRate);
-    const varN = qv.varN || fSetLocalVar("varN", qv.varN);
-    const varPMT = qv.varPMT || fSetLocalVar("varPMT", qv.varPMT);
-    const varFV = qv.varFV || fSetLocalVar("varFV", qv.varFV);
-    const varPV = qv.varPV || fSetLocalVar("varPV", qv.varPV);
-    const varG = qv.varG || fSetLocalVar("varG", qv.varG);
-    const varY = qv.varY || fSetLocalVar("varY", qv.varY);
-    const varType = (varY !== 1) ? 0 : qv.varType || fSetLocalVar("type", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
+    const varRate   = qv.varRate === undefined  ? fSetLocalVar("varRate", qv.varRate)   : qv.varRate
+    const varN      = qv.varN === undefined     ? fSetLocalVar("varN", qv.varN)         : qv.varN
+    const varPMT    = qv.varPMT === undefined   ? fSetLocalVar("varPMT", qv.varPMT)     : qv.varPMT
+    const varFV     = qv.varFV === undefined    ? fSetLocalVar("varFV", qv.varFV)       : qv.varFV
+    const varPV     = qv.varPV === undefined    ? fSetLocalVar("varPV", qv.varPV)       : qv.varPV
+    const varG      = qv.varG === undefined     ? fSetLocalVar("varG", qv.varG)         : qv.varG
+    const varY      = qv.varY === undefined     ? fSetLocalVar("varY", qv.varY)         : qv.varY
+    const varReturnInYear = qv.varReturnInYear === undefined ? fSetLocalVar("varReturnInYear", qv.varReturnInYear) : qv.varReturnInYear
+    const varType   = (varY !== 1) ? 0 : qv.varType || fSetLocalVar("type", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
 
     const qvObj = { varRate, varN, varPMT, varFV, varPV, varG, varY, varType };
 
@@ -139,8 +151,41 @@ function explainPVAnnuityStand_PV(qv) {
             ${solvePVAnnuityConstant_PV(qvObj, objColors)}
         </p>
     `;
+    let theAns = fPresentValue({varRate, varPMT, varN});
+  
+    let strToReturn = fStrReplaceVarsWithVals(myStr, qvObj);
+    if (varY == 1){
+        // Do nothing
+    } else {
+        strToReturn += `
+        <p>
+            <br>*****************************<br><br>
+            The steps above gave us the PV in Year ${varY-1},
+            but we want PV<sub>0</sub> (the Present Value of the payments in Year 0).
+            At this point, we can (and should)
+            <i>completely forget about
+            the original ${varN} payments of \$${varPMT.toLocaleString('en')} --
+            they are irrelevant now!</i>
+            We've collapsed those payments into a single value.
+            Essentially, we have an entirely new problem now, with "new" variables:</p>
+            <p style="margin-left:30px;">
+            "What is the value in Year 0 of a lump sum payment of
+            \$${theAns.toLocaleString('en')}
+            happening in year ${varY-1}, assuming a rate of ${uRound(varRate*100,4)}%?"
+            </p>
+            <p>
+            With that, we can walk through the steps necessary to determine
+            ${varY <= 0 ? "FV" : "PV"}<sub>0</sub> of a single payment happening in ${varY-1}:
+            </p>
+        </p>
+        `;
+        strToReturn += (varY <= 0 )
+            ? explainFVSinglePmt_FV({"varPV":theAns, varRate, "varY":varY-1, "varN":-1 * (varY-1)})
+            : explainPVSinglePmt_PV({"varFV":theAns, varRate, "varN":varY-1});
+    }
 
-    return fStrReplaceVarsWithVals(myStr, qvObj);
+
+    return strToReturn;
 }
 
 function explainPVGrowingAnnuityStand_PV(qv) {
@@ -153,13 +198,14 @@ function explainPVGrowingAnnuityStand_PV(qv) {
         varFV: "black"
     };
 
-    const varRate = qv.varRate || fSetLocalVar("varRate", qv.varRate);
-    const varN = qv.varN || fSetLocalVar("varN", qv.varN);
-    const varPMT = qv.varPMT || fSetLocalVar("varPMT", qv.varPMT);
-    const varFV = qv.varFV || fSetLocalVar("varFV", qv.varFV);
-    const varPV = qv.varPV || fSetLocalVar("varPV", qv.varPV);
-    const varG = qv.varG || fSetLocalVar("varG", qv.varG);
-    const varY = qv.varY || fSetLocalVar("varY", qv.varY);
+    const varRate   = qv.varRate === undefined  ? fSetLocalVar("varRate", qv.varRate)   : qv.varRate
+    const varN      = qv.varN === undefined     ? fSetLocalVar("varN", qv.varN)         : qv.varN
+    const varPMT    = qv.varPMT === undefined   ? fSetLocalVar("varPMT", qv.varPMT)     : qv.varPMT
+    const varFV     = qv.varFV === undefined    ? fSetLocalVar("varFV", qv.varFV)       : qv.varFV
+    const varPV     = qv.varPV === undefined    ? fSetLocalVar("varPV", qv.varPV)       : qv.varPV
+    const varG      = qv.varG === undefined     ? fSetLocalVar("varG", qv.varG)         : qv.varG
+    const varY      = qv.varY === undefined     ? fSetLocalVar("varY", qv.varY)         : qv.varY
+    const varReturnInYear = qv.varReturnInYear === undefined ? fSetLocalVar("varReturnInYear", qv.varReturnInYear) : qv.varReturnInYear
     const varType = (varY !== 1) ? 0 : qv.varType || fSetLocalVar("type", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
 
     const qvObj = { varRate, varN, varPMT, varFV, varPV, varG, varY, varType };
@@ -168,8 +214,8 @@ function explainPVGrowingAnnuityStand_PV(qv) {
         `
         <p>
             There is a series of varN payments.
-            The first payment (in year varY) is \$${varPMT.toLocaleString()},
-            and the payment amount changes each year at a rate of ${uRound(varG * 100, 2)}%.
+            The first payment (in year varY) is \$${varPMT.toLocaleString('en')},
+            and the payment amount changes each year at a rate of ${uRound(varG * 100, 4)}%.
             Let's see these on a timeline:
             ${timelineAnnuity(qvObj, "pv")}
         </p>
@@ -201,14 +247,16 @@ function explainFVAnnuityStand_FV(qv) {
         varFV: "black"
     };
 
-    const varRate = qv.varRate || fSetLocalVar("varRate", qv.varRate);
-    const varN = qv.varN || fSetLocalVar("varN", qv.varN);
-    const varPMT = qv.varPMT || fSetLocalVar("varPMT", qv.varPMT);
-    const varFV = "??";// qv.varFV || fSetLocalVar("varFV", qv.varFV);
-    const varPV = qv.varPV || fSetLocalVar("varPV", qv.varPV);
-    const varG = qv.varG || fSetLocalVar("varG", qv.varG);
-    const varY = qv.varY || fSetLocalVar("varY", qv.varY);
+    const varRate   = qv.varRate === undefined  ? fSetLocalVar("varRate", qv.varRate)   : qv.varRate
+    const varN      = qv.varN === undefined     ? fSetLocalVar("varN", qv.varN)         : qv.varN
+    const varPMT    = qv.varPMT === undefined   ? fSetLocalVar("varPMT", qv.varPMT)     : qv.varPMT
+    const varFV     = qv.varFV === undefined    ? fSetLocalVar("varFV", qv.varFV)       : qv.varFV
+//    const varFV = "??";// qv.varFV || fSetLocalVar("varFV", qv.varFV);
+    const varPV     = qv.varPV === undefined    ? fSetLocalVar("varPV", qv.varPV)       : qv.varPV
+    const varG      = qv.varG === undefined     ? fSetLocalVar("varG", qv.varG)         : qv.varG
+    const varY      = qv.varY === undefined     ? fSetLocalVar("varY", qv.varY)         : qv.varY
     const varType = (varY !== 1) ? 0 : qv.varType || fSetLocalVar("type", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
+    const varReturnInYear = qv.varReturnInYear === undefined ? fSetLocalVar("varReturnInYear", qv.varReturnInYear) : qv.varReturnInYear
 
     const qvObj = { varRate, varN, varPMT, varFV, varPV, varG, varY, varType };
 
@@ -234,6 +282,54 @@ function explainFVAnnuityStand_FV(qv) {
     `;
 
     return fStrReplaceVarsWithVals(myStr, qvObj);
+}
+
+function explainFVGrowingAnn_FV(qv) {
+    // Right now I'm just using black because I found the colors distracting. But I'll leave the code in case I change my mind down the road.
+    let objColors = {
+        varY: "black",
+        varN: "black",
+        varPV: "black",
+        varRate: "black",
+        varFV: "black"
+    };
+
+    const varRate   = qv.varRate === undefined  ? fSetLocalVar("varRate", qv.varRate)   : qv.varRate
+    const varN      = qv.varN === undefined     ? fSetLocalVar("varN", qv.varN)         : qv.varN
+    const varPMT    = qv.varPMT === undefined   ? fSetLocalVar("varPMT", qv.varPMT)     : qv.varPMT
+    const varFV     = qv.varFV === undefined    ? fSetLocalVar("varFV", qv.varFV)       : qv.varFV
+//    const varFV = "??";// qv.varFV || fSetLocalVar("varFV", qv.varFV);
+    const varPV     = qv.varPV === undefined    ? fSetLocalVar("varPV", qv.varPV)       : qv.varPV
+    const varG      = qv.varG === undefined     ? fSetLocalVar("varG", qv.varG)         : qv.varG
+    const varY      = qv.varY === undefined     ? fSetLocalVar("varY", qv.varY)         : qv.varY
+    const varType = (varY !== 1) ? 0 : qv.varType || fSetLocalVar("type", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
+    const varReturnInYear = qv.varReturnInYear === undefined ? fSetLocalVar("varReturnInYear", qv.varReturnInYear) : qv.varReturnInYear
+
+    const qvObj = { varRate, varN, varPMT, varFV, varPV, varG, varY, varType };
+
+    /*let myStr = `
+        <p>
+            There are varN payments of the same amount that start in Year varY.
+            Let's see this on a timeline:
+            ${timelineAnnuity(qvObj, "fv")}
+        </p>
+        <p>
+            To find the value of all those payments in Year ${varY + varN - 1},
+            we could compound each one individually for the correct number of years,
+            but that would be a hassle and take too long.
+            Instead, we can treat this as an annuity, as shown on the Decision Tree.
+            ${tvmtreeFVAnnuityStand(qvObj, objColors)}
+        </p>
+        <p>
+            ${identifyFVVarsAnn(qvObj, objColors)}
+        </p>
+        <p>
+            ${solveFVAnnuityConstant_FV(qvObj, objColors)}
+        </p>
+    `;*/
+
+    return `Step-by-step solution not available at this time.
+    The correct answer is ${uRound(fFutureValue(qvObj),5)}` ;// fStrReplaceVarsWithVals(myStr, qvObj);
 }
 
 // ################################
@@ -266,20 +362,22 @@ function timelinePVSinglePmt(qv) {
 }
 
 function timelineFVSinglePmt(qv) {
+    const dispPV = (qv.varPV.toString()).includes("?") ? "??" : (qv.varPV).toLocaleString('en');
+    const dispFV = (qv.varFV.toString()).includes("?") ? "??" : (qv.varFV).toLocaleString('en');
     let myStr = `
     <div style="width:350px;text-align: center; margin:25px;">
         <div style="display:flex; justify-content:center; font-weight:bold;">
             <div style="width:15%;">Year</div>
-            <div style="width:20%;">varY</div>
+            <div style="width:20%;">${qv.varY}</div>
             <div style="width:45%;"></div>
-            <div style="width:20%;">varN</div>
+            <div style="width:20%;">${qv.varY + qv.varN}</div>
         </div>
         <div><hr /></div>
         <div style="display:flex; justify-content:center;">
             <div style="width:15%; font-weight:bold;">Amt</div>
-            <div style="width:20%;">${varPV.toLocaleString('en')}</div>
+            <div style="width:20%;">${dispPV}</div>
             <div style="width:45%;"></div>
-            <div style="width:20%;">${varFV.toLocaleString('en')}</div>
+            <div style="width:20%;">${dispFV}</div>
         </div>
         <div style="margin-left:15%;">
             \\( \\overrightarrow{\\text{To the future}} \\)
@@ -295,7 +393,7 @@ function timelineAnnuity(qv, tvmType = "pv", annPmts = [], showArrow = true) {
     // e.g., [ [0,1,2,3,4,5,9,7,8], [0,0,0,450,450,450,450,0,0] ]
     // It MUST be <=9 elements. The code will quit on anything more than that.
 
-    const varY = qv.varY, varN = qv.varN;
+    let varY = qv.varY, varN = qv.varN;
     let varPMT = qv.varPMT;
 
     // If a payment timeline (annPmts) is passed, that's used instead of the qv values.
@@ -320,6 +418,9 @@ function timelineAnnuity(qv, tvmType = "pv", annPmts = [], showArrow = true) {
         tlYears.Start = annPmts[0];
         tlPmts.Start = annPmts[1];
         yn = tlYears.length + 1;
+        // Find the year of the first payment
+        const indexOfVarY = annPmts[1].findIndex(val=>val[0] > 0 || val[1] > 0);
+        varY = annPmts[indexOfVarY]; console.log("CUSTOM ARRAY. varY changed to ", varY);
     } else {
         fBuildTimeline();
     }
@@ -491,9 +592,9 @@ function timelineAnnuity(qv, tvmType = "pv", annPmts = [], showArrow = true) {
         // In order to put the arrow in the correct place, we need to know the flex box
         // column on the timeline that is one year before the first payment is made (y-1).
         // Normally that's column 1, but for delayed annuities it's 2 or 3 [Year 0, ..., y-1]
-        let returnsPVInColumn = useCallerTL ? 0 : varY - 1; //FIX: Won't work for delayed annuities
-        arrowBoxCols = countAllPmts - 0.5 - returnsPVInColumn - 2; // All years - taper adjustment - empty years at start - empty last years
-        startGapCols = returnsPVInColumn + 1 + 0.5; // +0.5 to create a longer, more tapered pointer
+        let returnsPVInColumn = varY - 1; //FIX: Won't work for delayed annuities??
+        arrowBoxCols = countAllPmts - 0.5 - (varY===0 ? 0 : returnsPVInColumn) - 2; // All years - taper adjustment - empty years at start - empty last years
+        startGapCols = (varY===0 ? 0 : returnsPVInColumn) + 1 + 0.5; // +0.5 to create a longer, more tapered pointer
         arrowBoxText = `Returns value<br>in year ${useCallerTL ? 0 : varY - 1}`;
     } else if (tvmType == "fv") {
         const returnsFVInColumn = countAllPmts - 1;
@@ -641,16 +742,47 @@ function tvmtreePVAnnuityStand(qv, objColors) {
             <p style="margin-left:20px; margin-top:4px;">
                 Do the payments start in year 0, year 1, or some later year?
                 <i>They start in Year ${qv.varY}.</i> 
-            </p>
+            </p>`;
+    
+    let tvmFormulaNameShort = "PVAnnuityDelayed";
+    let tvmFormulaNameFull = "Present Value of a Delayed Annuity";
+    switch (qv.varY) {
+        case 0:
+            tvmFormulaNameShort = "PVAnnuityDue";
+            tvmFormulaNameFull = "Present Value of an Annuity Due";
+            break;
+        case 1:
+            tvmFormulaNameShort = "PVAnnuityStand";
+            tvmFormulaNameFull = "Present Value of a Standard Annuity";
+        default:
+            break;
+    }
+    myStr += `
             <p>
                 <!-- show img of chart with paths drawn -->
-            </p>
+            </p>`;
+    let strPVTiming="";
+    if (qv.varY == 1){
+        strPVTiming=`
             <p>
-                This leads us to the formula for the <b>Present Value of a Standard Annuity</b>.
-                The formula gives us the PV of the series of payments one year before the first
-                payment is made. Since the first payment is in Year ${qv.varY},
-                this returns the value of the annuity in Year ${qv.varY - 1}.
-            </p>
+            This leads us to the formula for the <b>Present Value of a Standard Annuity</b>.
+            The formula gives us the PV of the series of payments one year before the first
+            payment is made. Since the first payment is in Year ${qv.varY},
+            this returns the value of the annuity in Year ${qv.varY - 1}.
+            </p>`;
+    } else {
+        strPVTiming=`
+            <p>
+            The first payment is <i>not</i> in year 1,
+            so we need to solve this problem using two steps.
+            First, we use the <b>Present Value of a Standard Annuity formula</b>
+            to determine the PV of the series of payments one year before the first
+            payment is made (i.e., <b>PV<sub>${qv.varY - 1}</sub></b>).
+            </p>;
+        `
+    }
+    myStr += strPVTiming;
+    myStr +=`
             \\[
                 varPV_{varY-1}={varPMT}_{varY} \\left( 
                     \\frac{ 1- \\frac{1}{(1+varRate)^varN} }{varRate}
@@ -665,6 +797,7 @@ function tvmtreePVAnnuityStand(qv, objColors) {
             </p>
         </div>
     `;
+
     myStr = addColorToVars(myStr, objColors);
     return fStrReplaceVarsWithVals(myStr, formulaVars);
 }
@@ -818,8 +951,8 @@ function tvmtreeFVAnnuityStand(qv, objColors) {
 
 // Returns HTML for variables in the Present Value of a single payment formula
 function identifyPVVars(qv, objColors) {
-    const isAnnuity = (qv.varPMT != 0);
-    const isGrowingAnnuity = (qv.varG != 0);
+    const isAnnuity = (qv.varPMT != undefined && qv.varPMT != 0);
+    const isGrowingAnnuity = (qv.varG != undefined && qv.varG != 0);
     let myStr = `List the variables in the formula and write what is known and unknown.`;
     if (isAnnuity) {
         if (isGrowingAnnuity) {
@@ -926,9 +1059,13 @@ function solvePVSinglePmt_PV(qv, objColors) {
     \\[
         \\begin{aligned}
             PV_{varY-varN} &= varFV \\left( \\frac{1}{(1+{varRate})^{varN}} \\right) \\\\
+            {} \\\\
             PV_${calcPVYear} &= varFV \\left( \\frac{1}{(${dispGrowthRate})^{varN}} \\right) \\\\
+            {} \\\\
             PV_${calcPVYear} &= varFV \\left( \\frac{1}{${dispFVIF}} \\right) \\\\
+            {} \\\\
             PV_${calcPVYear} &= varFV \\left( ${dispPVIF} \\right) \\\\
+            {} \\\\
             PV_${calcPVYear} &= ${calcTheAns}
         \\end{aligned}
     \\]
@@ -970,7 +1107,7 @@ function solvePVAnnuityConstant_PV(qv, objColors) {
     <p>
         This can be interpreted as follows:
         The value in Year ${varY - 1} of ${varN} payments of \$${varPMT} each, starting in year ${varY},
-        is the same as a lump sum of \$${uRound(theAns, 2).toLocaleString()} in year ${varY - 1}.
+        is the same as a lump sum of \$${uRound(theAns, 2).toLocaleString('en')} in year ${varY - 1}.
     </p>
 `;
     myStr = addColorToVars(myStr, objColors);
@@ -1021,9 +1158,9 @@ function solvePVAnnuityGrowing_PV(qv, objColors) {
 
     <p>
         This can be interpreted as follows:
-        The value in Year ${varY - 1} of an annuity growing at ${uRound(varG*100,2)}% over ${varN} payments,
+        The value in Year ${varY - 1} of an annuity growing at ${uRound(varG*100,4)}% over ${varN} payments,
         where the first payment of \$${varPMT} is in year ${varY},
-        is the same as a lump sum of \$${uRound(theAns, 2).toLocaleString()} in year ${varY - 1}.
+        is the same as a lump sum of \$${uRound(theAns, 2).toLocaleString('en')} in year ${varY - 1}.
     </p>
 `;
     myStr = addColorToVars(myStr, objColors);
@@ -1032,14 +1169,24 @@ function solvePVAnnuityGrowing_PV(qv, objColors) {
 
 
 function solveFVSinglePmt_FV(qv, objColors) {
+    const dispPV = uRound(qv.varPV,5);
+    const varN = qv.varN;
+    const varRate = qv.varRate;
+    const varY = qv.varY;
+
+    const calcFVYear = varY + varN;
+    const dispGrowthRate = ftvm1Rate(qv, 5);
+    const dispFVIF = ftvmFVIF(qv, 5);
+    const calcTheAns = fFVSinglePmt(qv);   
+
     let myStr = `
     Plug the variables into the formula and solve for the unknown term.
     \\[
         \\begin{aligned}
-        FV_{varY+varN} &= varPV(1+varRate)^{varN} \\\\
-        FV_{${varY + varN}} &= varPV({dispGrowthRate})^{varN} \\\\
-        FV_{${varY + varN}} &= varPV({dispFVIF}) \\\\
-        FV_{${varY + varN}} &= calcTheAns
+        FV_{varY+varN} &= ${dispPV}(1+${varRate})^{${varN}} \\\\
+        FV_{${calcFVYear}} &= ${dispPV}(${dispGrowthRate})^{varN} \\\\
+        FV_{${calcFVYear}} &= ${dispPV}(${dispFVIF}) \\\\
+        FV_{${calcFVYear}} &= ${calcTheAns}
         \\end{aligned}
     \\]
     `;
@@ -1126,7 +1273,7 @@ function solveFVAnnuityConstant_FV(qv, objColors) {
     <p>
         This can be interpreted as follows:
         The value in year ${fvInYear} of ${varN} payments of \$${varPMT} each
-        is the same as a lump sum of \$${uRound(theAns, 2).toLocaleString()} in year ${fvInYear}.
+        is the same as a lump sum of \$${uRound(theAns, 2).toLocaleString('en')} in year ${fvInYear}.
     </p>
 `;
     myStr = addColorToVars(myStr, objColors);

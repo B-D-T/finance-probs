@@ -2,134 +2,152 @@ fnQues454 = function (objFromMainQues) {
 
 
     let quesVars = {
-        "a": uRand(2, 9, 1),
-        "b": uRand(2, 10, 1),
+        "varA": uRand(2, 9, 1),
+        "varB": uRand(2, 10, 1),
     }
 
-    // Static code
-    let obj = {};
-    obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
-    const windowScope = this; const varPrefix = "var_q" + quesNum() + "z__";
-    jQuery.each(quesVars, function (theKey, theValue) { const newKey = varPrefix + theKey; quesVars[newKey] = [theValue]; delete quesVars[theKey]; });
-    if (objFromMainQues.isProduction) { return createEDVarInScope(fetchQuesVars(quesVars)) } else { return createEDVarInScope(quesVars); }
-    function createEDVarInScope(objEDVars) { jQuery.each(objEDVars, function (edKey, edValue) { const origKey = edKey.replace(varPrefix, ''); quesVars[origKey] = quesVars[edKey]; delete quesVars[edKey]; windowScope[origKey] = edValue; }); return fillPage(); } function fillPage() {
-    // End static code
+    quesVars = addPrefix(quesVars);
+    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
 
-        // Calculations
-        const ans = Math.sqrt(b / a);
-        const ansr = uRound(Math.sqrt(b / a), 5);
+    function buildPage(objQuesVars) {
+        quesVars = objQuesVars; createEDVarInScope(quesVars);
 
+        let calcVars = {
+            calcTheAns: Math.sqrt(varB / varA)
+        }
+        createEDVarInScope(calcVars);
 
-        obj.stem = `
-        Solve for ${kxx} given:
-        ${kxbig([a, "x=", texFrac(b, "x")])}
+        let displayVars = {};
+        createEDVarInScope(displayVars);
+        
+        jQuery.extend(quesVars, calcVars, displayVars);
+        storeQuesRespVars(quesVars, calcTheAns);
+        return fillPage();
+    }
+
+    function fillPage() {
+        let obj = {};
+
+        obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
+
+        obj.stem = probDisplay(quesVars)`
+        Solve for \\(x\\) given:
+        \\[
+            {varA}x=\\frac{varB}{x}
+        \\]
+        ${ansBoxMessages("usePositiveIfAnsCouldBePosOrNeg")}
     `
 
-        obj.solution = [`
+        obj.solution = probDisplay(quesVars)`
+        <p>
         There are a few approaches you can use to solve this problem.  
-        We'll look at two possible ways.`,
+        We'll look at two possible ways.
+        </p>
 
-            `
-        Approach A:`,
-            `
+        <h3>Approach A:</h3>
+        <p>
         First, we have to get the x variable out of the denominator. 
         To do this, multiply each side by the reciprocal of the term 
         on the right.
-    
-        ${kxbig([
-                (texFrac(a + "x", 1)), "*", (texFrac("x", b)),
-                "=",
-                (texFrac(b, "x")), "*", (texFrac("x", b))
-            ])}
+        </p>
+        \\[
+            \\begin{aligned}
+                \\frac{varAx}{1} * \\frac{x}{varB}
+                & =
+                \\frac{varB}{x} * \\frac{x}{varB} \\\\
+                {} \\\\
+                
+                \\frac{varAx^2}{varB} &= \\frac{varBx}{varBx}\\\\
+                {} \\\\
 
-        ${kxbig([
-                (texFrac(a + "x^2"), b),
-                "=",
-                (texFrac(b + "x"))
-            ])}
-
-        ${kxbig([
-                (texFrac(a + "x^2"), b),
-                "=",
-                1
-            ])}
-            
+                \\frac{varAx^2}{varB} &= 1
+            \\end{aligned}
+        \\]
+         
+        <p>
         By rewriting the left side, we can separate the variable 
         from the number.
-
-        ${kxbig([
-                (texFrac(a, b)), "*", (texFrac("x^2", 1)),
-                "=",
-                1
-            ])}
-
         Then, multiply each side by the reciprocal.
+        </p>
 
-        ${kxbig([
-                (texFrac(b, a)), "*", (texFrac(a, b) + "*x^2"),
-                "=",
-                "1*" + (texFrac(b, a))
-            ])}
+        \\[
+            \\begin{aligned}
+                \\frac{varA}{varB} * \\frac{x^2}{1} &= \\frac{1}{1} \\\\
+                {}\\\\
 
-        ${kxbig([
-                "x^2=",
-                texFrac(b, a)
-            ])}
-
-        Finally, take the square root of each side to figure out x.
+                \\frac{varB}{varA} * \\frac{varA}{varB}*\\frac{x^2}{1} &= \\frac{1}{1}*\\frac{varB}{varA} \\\\
+                {}\\\\
     
-        ${kxbig([
-                texRoot("x^2"),
-                "=",
-                texRoot((texFrac(b, a)))
-            ])}
+                x^2 &= \\frac{varB}{varA}
+            \\end{aligned}
+        \\]
+                
+        <p>
+        Finally, take the square root of each side to figure out x.
+        </p>
+        \\[
+            \\begin{aligned}
+                ${texRoot("x^2",2)} &= ${texRoot(`\\frac{${varB}}{${varA}}`,2)} \\\\
+                {}\\\\
+                x &= calcTheAns
+            \\end{aligned}
+        \\]
 
-        ${kxbig(`x = ${ans}`)}
-        
-        Approach B:
+        <h3>
+        Approach B:</h3>
+        <p>
         A faster way to solve this problem is to cross multiply in 
         the first step. To see how this works, it helps to write the 
         original problem in fractions.
+        </p>
+        \\[
+            \\frac{${varA}x}{1}=\\frac{${varB}}{x}
+            
+        \\]
 
-        ${kxbig([
-                (texFrac(a + "*x"), 1),
-                "=",
-                texFrac(b, "x")
-            ])}
-
-        Cross multiply by mutiplying the left-side numerator & 
+        <p>
+        Cross multiply by multiplying the left-side numerator & 
         right-side denominator and the right-side numerator & left-side 
         denominator.
+        </p>
+        \\[
+            varAx*x = varB*1 \\\\
+            {}\\\\
+            varAx^2 = varB
+            
+        \\]
 
-        ${kxbig([
-                ((a + "x") + "*x"),
-                "=",
-                b + "*1"
-            ])}
+        <p>
+        Separate the variable from the number by dividing each side by varA.
+        </p>
+        \\[
+            \\frac{varAx^2}{varA} = \\frac{varB}{varA} \\\\
+            {}\\\\
+            x^2 = \\frac{varB}{varA} 
+        \\]
 
-        ${kxbig([a, "x^2=", b])}
-
-        Separate the variable from the number by dividing each side by $a.
-        ${kxbig([
-                texFrac(a + "x^2", a),
-                "=",
-                texFrac(b, a)
-            ])}
-
-        ${kxbig([
-                "x^2=", texFrac(b, a)
-            ])}
-
+        <p>
         Finally, take the square root of each side to figure out x.
-        ${kxbig([
-                texRoot("x^2"), "=", texRoot(texFrac(b, a))
-            ])}
-
-        ${kxbig(`x = ${ans}`)}
-        
-        `].join("\n");
+        </p>
+        \\[
+            \\begin{aligned}
+                ${texRoot("x^2",2)} &= ${texRoot(`\\frac{${varB}}{${varA}}`,2)} \\\\
+                {}\\\\
+                x &= calcTheAns
+            \\end{aligned}
+        \\]
+        `
 
         return obj;
 
+    } // end of fillPage
+}
+
+ // received from addOnPageSubmit
+function fnQuesResp(objPageSubmit){
+    const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
+    if (!(jQuery(`${qtrxDivID}-response`).length)){
+        let objRespFeedback = objPageSubmit;
+        return setEDQuesRespVars(objRespFeedback);
     }
 }

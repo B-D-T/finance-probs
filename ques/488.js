@@ -37,8 +37,8 @@ function fnQues488(objFromMainQues) {
 
         obj.stem = probDisplay(quesVars)`
             An annuity pays \$varPMT in year varY, 
-            and increases that amount by \$${uRound(varG*100,2)}% per year for varN years.
-            Assuming a rate of ${uRound(varRate*100,2)}%, 
+            and increases that amount by \$${uRound(varG*100,4)}% per year for varN years.
+            Assuming a rate of ${uRound(varRate*100,4)}%, 
             what is the present value (value in year 0) of the annuity?
         `
 

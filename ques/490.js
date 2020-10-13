@@ -1,12 +1,14 @@
-fnQues455 = function (objFromMainQues) {
+function fnQues490 (objFromMainQues) {
 
 
     let quesVars = {
-        "varA": uRand(2, 8, 1),
-        "varB": uRand(10, 29, 1),
-        "varC": uRand(30, 50, 2)
-    }
-
+        "varPMT": uRand(400, 600, 10),
+        "varRate": uRand(.04, .08, .005),
+        "varN": uRand(3, 10, 1),
+        "varReturnInYear": 0,
+        get varY() {return uRand(11, this.varN + 9, 1) },
+        "varPV": "??"
+    };
 
     quesVars = addPrefix(quesVars);
     if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
@@ -15,9 +17,8 @@ fnQues455 = function (objFromMainQues) {
         quesVars = objQuesVars; createEDVarInScope(quesVars);
 
         let calcVars = {
-            calcD: varC - varB,
-            calcTheAns: ((varC - varB) / varA)
-        }
+            calcTheAns: fPresentValue(quesVars)
+        };
         createEDVarInScope(calcVars);
 
         let displayVars = {};
@@ -31,32 +32,24 @@ fnQues455 = function (objFromMainQues) {
     function fillPage() {
         let obj = {};
 
-        obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
+        const dispPMT = uRound(varPMT,4).toLocaleString('en');
+        const dispRatePerc = uRound(varRate*100,4);
 
+        obj.ansBoxMessage = ansBoxMessages("writeOutNums");
+        
         obj.stem = probDisplay(quesVars)`
-        Solve for \\(x\\) given:
-        \\[ varAx + varB = varC \\]
+        <p>
+        What is the value in year ${varReturnInYear.toString()} of an annuity
+        that pays \$${dispPMT} per year,
+        for ${varN} years, at a rate of ${dispRatePerc}%, 
+        with the first payment being made in year ${varY.toString()}?
+        </p>
         `;
 
         obj.solution = probDisplay(quesVars)`
-        <p>
-        Subtract ${varB} from each side. That will leave ${varA}x on the left side.
-        Then, divide each side by ${varA} to isolate the variable
-        </p>
-
-        \\[
-            \\begin{aligned}
-            varAx + varB - varB &= varC - varB \\\\
-            {} \\\\
-            varAx &= calcD \\\\
-            {} \\\\
-            \\frac{varAx}{varA} &= \\frac{calcD}{varA} \\\\
-            {}\\\\
-            x &= calcTheAns
-            \\end{aligned}
-        \\] 
-
-        `;
+        Step-by-step solution unavailable at this time.
+        The correct answer is \$${calcTheAns.toLocaleString('en')}.`;
+    //    ${explainPVAnnuityConst_PV(quesVars)}
         return obj;
 
     } // end of fillPage

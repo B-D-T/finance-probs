@@ -1,5 +1,5 @@
 
-function fnQues205 (objFromMainQues) {
+function fnQues205(objFromMainQues) {
 
     let quesVars = {
         "varA": uRand(15, 20, 1),
@@ -7,33 +7,39 @@ function fnQues205 (objFromMainQues) {
         "varC": uRand(10, 14, 1)
     };
 
-    quesVars = addPrefix(quesVars, quesNum());
-    if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
+    quesVars = addPrefix(quesVars);
+    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
 
-    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars);
+    function buildPage(objQuesVars) {
+        quesVars = objQuesVars; createEDVarInScope(quesVars);
 
         let calcVars = {
             calcD: varA - varC,
-            get calcTheAns() {return uthRoot(varB, this.calcD) }
+            get calcTheAns() { return uthRoot(varB, this.calcD) }
         };
         createEDVarInScope(calcVars);
 
         let displayVars = {
             dispTheAns: uRound(varB ** (1 / calcD), 5)
         };
-        createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
+        createEDVarInScope(displayVars);
+
+        jQuery.extend(quesVars, calcVars, displayVars);
+        storeQuesRespVars(quesVars, calcTheAns);
+        return fillPage();
     }
 
     function fillPage() {
         let obj = {};
-        
+
         obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
 
         obj.stem = probDisplay(quesVars)`
-            Solve for \\(x\\) given:
+            <p>Solve for \\(x\\) given:</p>
             \\[
                 x^{varA} = {varB}x^{varC}
             \\]
+            ${ansBoxMessages("usePositiveIfAnsCouldBePosOrNeg")}
         `
 
         obj.solution = probDisplay(quesVars)`
@@ -81,4 +87,13 @@ function fnQues205 (objFromMainQues) {
         return obj;
 
     } // end of fillPage
+}
+
+// received from addOnPageSubmit
+function fnQuesResp(objPageSubmit) {
+    const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
+    if (!(jQuery(`${qtrxDivID}-response`).length)) {
+        let objRespFeedback = objPageSubmit;
+        return setEDQuesRespVars(objRespFeedback);
+    }
 }

@@ -2,29 +2,31 @@
 function fnQues460(objFromMainQues) {
 
     let quesVars = {
-        "varA": uRand(2, 4, .01),
-        "varB": uRand(10, 30, 1),
-        "varC": uRand(20, 40, .001)
+        "varA": uRand(2, 9, 1),
+        "varB": uRand(2, 7, 1),
+        "varC": uRand(10, 40, 1)
     };
 
-    quesVars = addPrefix(quesVars, quesNum());
-    if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
+    quesVars = addPrefix(quesVars);
+    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
 
-    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars);
+    function buildPage(objQuesVars) {
+        quesVars = objQuesVars; createEDVarInScope(quesVars);
 
         let calcVars = {
-            "calcD": varC - varA,
-            get calcTheAns() { return uLn(this.calcD) / uLn(varB) }
+            "calcD": varC/ varA,
+            get calcTheAns() { return this.calcD ** varB }
         };
         createEDVarInScope(calcVars);
 
         let displayVars = {
-            "dispD": uRound(calcD, 5),
-            "dispLNvarB": uRound(uLn(varB), 5),
-            "dispLNvarD": uRound(uLn(calcD), 5),
-            "dispTheAns": uRound(calcTheAns, 5)
+            "dispD": uRound(calcD, 5)
         };
-        createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
+        createEDVarInScope(displayVars);
+        
+        jQuery.extend(quesVars, calcVars, displayVars);
+        storeQuesRespVars(quesVars, calcTheAns);
+        return fillPage();
     }
 
     function fillPage() {
@@ -52,7 +54,11 @@ function fnQues460(objFromMainQues) {
             </p>
             \\[
                 \\begin{aligned}
-                    \\frac{ {varA}x ^{\\frac{1}{varB}} }{varA} &= \\frac{varC}{varA} \\\\
+                    \\frac{
+                        {varA}x ^ { 
+                            \\frac{1}{varB}
+                        }
+                    }{varA} &= \\frac{varC}{varA} \\\\
                     {} \\\\
                     x^{\\frac{1}{varB}} &= {dispD}
                 \\end{aligned}
@@ -63,7 +69,7 @@ function fnQues460(objFromMainQues) {
                 which is this case is <sup>varB</sup>/<sub>1</sub>.
             </p>
             <p>
-                When you raise and exponent to an exponent, you multiply the exponents.
+                When you raise an exponent to an exponent, you multiply the exponents.
                 Our exponents are both fractions, so we multiply the numerators by each other (1 * varB)
                 and the denominators by each other (varB * 1).
                 That leaves <sup>varB</sup>/<sub>varB</sub> on the left side,
@@ -75,14 +81,23 @@ function fnQues460(objFromMainQues) {
                     {} \\\\
                     x^{\\frac{1}{varB}}*^{\\frac{varB}{1}} &= {dispD}^{varB}
                     {} \\\\
-                    x^{\\frac{varB}{varB}} &= dispTheAns
+                    x^{\\frac{varB}{varB}} &= ${calcTheAns}
                     {} \\\\
-                    x &= calcTheAns
+                    x &= ${calcTheAns}
                 \\end{aligned}
             \\]
             `
 
-        return obj;
+            return obj;
 
-    } // end of fillPage
-}
+        } // end of fillPage
+    }
+    
+     // received from addOnPageSubmit
+    function fnQuesResp(objPageSubmit){
+        const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
+        if (!(jQuery(`${qtrxDivID}-response`).length)){
+            let objRespFeedback = objPageSubmit;
+            return setEDQuesRespVars(objRespFeedback);
+        }
+    }

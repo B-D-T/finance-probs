@@ -1,7 +1,7 @@
 
 // main.js
 
-strCurrentPackage = "0.2.0";
+strCurrentPackage = "0.2.5";
 
 // Declare the object that accepts each question's info
 objQuesCaller = { "isProduction": false };
@@ -90,26 +90,29 @@ function writeHTML(obj) {
 	jQuery(qtrxDivID + "-solution").html(obj.solution);
 
 
+
 	// Only run this on questions
 	const divQuesRespName = qtrxDivID + "-response";
 	if (jQuery(divQuesRespName).length) {
 		if (!(objQuesCaller.isProduction === false)) {
 			jQuery.when(getEDValue("objQuesResp" + strQuesNum)).then(function (edValue) {
 				jQuery(divQuesRespName).html(showFeedback(edValue));
-				finalTouches();
 			});
 		} else {
 			console.log("In testing mode");
 			const strHiddenQuesRespInfo = JSON.stringify({ "respFeedback": { "stuResp": "123123" }, "percCorrect": 0.08 });
 			jQuery(divQuesRespName).html(showFeedback(strHiddenQuesRespInfo));
-			finalTouches();
 		}
 	}
+
+	finalTouches();
 
 	function finalTouches(){
 		renderMathInElement(document.getElementById('kxAutoRender')); // this is a Katex-specific function
 		cleanup();
 	}
+
+	
 }
 
 // This is the last function run before returning to the HTML
