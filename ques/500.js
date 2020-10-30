@@ -1,8 +1,6 @@
 
 function fnQues500(objFromMainQues) {
-
-    console.log("500 loaded");
-    
+   
     let quesVars = {
         varFVa: uRand(4,8,1),
         varFVb: uRand(15,20,1),
@@ -49,8 +47,8 @@ function fnQues500(objFromMainQues) {
             At what <i>rate</i> would the present value of the two choices be equal?
         </p>
         <p>
-            <b>Choice A:</b> Receive a future amount of \$${varFVa.toLocaleString('en')} in varNa years<br />
-            <b>Choice B:</b> Receive a future amount of \$${varFVb.toLocaleString('en')} in varNb years
+            <b>Choice A:</b> Receive a future amount of \$${varFVa.toLocaleString('en')} in varNa years.<br />
+            <b>Choice B:</b> Receive a future amount of \$${varFVb.toLocaleString('en')} in varNb years.
         </p>
         `;
 
