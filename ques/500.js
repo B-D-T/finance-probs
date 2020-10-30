@@ -1,6 +1,8 @@
 
 function fnQues500(objFromMainQues) {
 
+    console.log("500 loaded");
+    
     let quesVars = {
         varFVa: uRand(4,8,1),
         varFVb: uRand(15,20,1),
