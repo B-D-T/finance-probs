@@ -1,7 +1,7 @@
 
 // main.js
 
-strCurrentPackage = "0.2.5";
+strCurrentPackage = "0.2.6";
 
 // Declare the object that accepts each question's info
 objQuesCaller = { "isProduction": false };
@@ -16,7 +16,8 @@ function baseURL() {
 	return (objQuesCaller.isProduction) ? baseURLProduction() : "./"
 
 	function baseURLProduction() {
-		return "https://cdn.jsdelivr.net/npm/finance-probs@" + strCurrentPackage + "/";
+		//return "https://cdn.jsdelivr.net/npm/finance-probs@" + strCurrentPackage + "/";
+		return "https://b-d-t.github.io/finance-probs/";
 	}
 }
 

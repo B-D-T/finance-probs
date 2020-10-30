@@ -6,7 +6,7 @@ function fnQues461(objFromMainQues) {
     let quesVars = {
         "varA": uRand(2, 8, 1),
         "varB": uRand(1, 1.8, .001),
-        "varC": uRand(20, 60, 1),
+        "varC": uRand(20, 60, 1)
     }
 
     quesVars = addPrefix(quesVars);
