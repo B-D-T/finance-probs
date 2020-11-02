@@ -332,6 +332,381 @@ function explainFVGrowingAnn_FV(qv) {
     The correct answer is ${uRound(fFutureValue(qvObj),5)}` ;// fStrReplaceVarsWithVals(myStr, qvObj);
 }
 
+function explainPVBondLevelAnnual_PV(qv){
+    // Right now I'm just using black because I found the colors distracting. But I'll leave the code in case I change my mind down the road.
+    let objColors = {
+        varY: "black",
+        varN: "black",
+        varPV: "black",
+        varRate: "black",
+        varFV: "black"
+    };
+
+    // Students are provided either the coupon RATE or the coupon PMT amount, but usually not both.
+    // The coupon PMT should ALWAYS be sent from the calling code (as varPMT, even if it's calculated),
+    // The coupon RATE is only needed for display purposes, so we might need to create that here.
+    const varCouponRate = qv.questextIncludesCouponRate ? qv.varCouponRate : qv.varPMT/qv.varFV
+
+
+    const varRate   = qv.varRate === undefined  ? fSetLocalVar("varRate", qv.varRate)   : qv.varRate
+    const varN      = qv.varN === undefined     ? fSetLocalVar("varN", qv.varN)         : qv.varN
+    const varPMT    = qv.varPMT === undefined   ? fSetLocalVar("varPMT", qv.varPMT)     : qv.varPMT
+    const varFV     = qv.varFV === undefined    ? fSetLocalVar("varFV", qv.varFV)       : qv.varFV
+    const varPV     = qv.varPV === undefined    ? fSetLocalVar("varPV", qv.varPV)       : qv.varPV
+    const varG      = qv.varG === undefined     ? fSetLocalVar("varG", qv.varG)         : qv.varG
+    const varY      = qv.varY === undefined     ? fSetLocalVar("varY", qv.varY)         : qv.varY
+    const varReturnInYear = qv.varReturnInYear === undefined ? fSetLocalVar("varReturnInYear", qv.varReturnInYear) : qv.varReturnInYear
+    const varType   = (varY !== 1) ? 0 : qv.varType || fSetLocalVar("type", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
+    
+
+    const qvObj = { varRate, varN, varPMT, varFV, varPV, varG, varY, varType };
+    const
+        dispCouponRatePerc = uRound(varCouponRate*100,4),
+        dispPMT = qv.dispPMT,
+        dispFV = qv.varFV,
+        strStyleCoupons = 'background-color:teal;color:white; padding-left:1px;padding-right:1px;',
+        strStylePV = 'background-color:#ff8c00;color:white; padding-left:1px;padding-right:1px;',
+        strAddBackTogether = 'background-color:black;color:white; padding-left:1px;padding-right:1px;'
+    ;
+
+    let compareYTMtoCouponRate = '';
+    if ( uRound(varRate,5) == uRound(varCouponRate,5) ){ compareYTMtoCouponRate = "parbond" };
+    if ( uRound(varRate,5) < uRound(varCouponRate,5) ){ compareYTMtoCouponRate = "premiumbond" };
+    if ( uRound(varRate,5) > uRound(varCouponRate,5) ){ compareYTMtoCouponRate = "discountbond" };
+
+    let myStr = ``;
+
+    // Introduction
+    myStr += `
+        <div>
+            <p style="margin-bottom:0px;">
+                During the life of the bond,
+                the owner of a bond receives income from the bond's
+                <span style="${strStyleCoupons}">coupon payments</span>.
+                These are annual payments of \$${dispPMT}.
+            </p>
+    `;
+    // If the students did not receive the Coupon payment as part of the problem,
+    // include additional text to explain where that came from.
+    if (!qv.questextIncludesCouponPMT){
+        myStr +=`
+        <p style="margin-top:2px; font-size:0.8em;">
+            Remember that 
+            coupon payment amount = coupon rate * the par value:<br />
+            \$${dispPMT} = ${dispCouponRatePerc}% * \$${dispFV}
+        </p>
+        `;
+    }
+    myStr += `
+            <p>
+                In the year that the bond matures
+                (year varN),
+                the bond owner receives the
+                <span style="${strStyleCoupons}">coupon payment</span>
+                for that year
+                (the \$${dispPMT} captured in the payment stream noted already)
+                <i>and</i>
+                receives a lump sum payment of \$${dispFV}
+                (i.e., the
+                <span style="${strStylePV}">par value</span>
+                of the bond).
+            </p>
+            <p>
+                The value of the bond today is determined by the
+                discounted PV of all future cash flows
+                (<span style="${strStyleCoupons}">coupons</span>
+                +
+                <span style="${strStylePV}">par</span>).
+                Thus, to determine the price
+                (i.e., the present value),
+                we can treat the bond's payments as two separate problems:
+                the
+                <span style="${strStyleCoupons}">coupon payments</span>
+                are an annuity,
+                and the
+                <span style="${strStylePV}">par value</span>
+                is a single payment.
+                The solution below shows how to solve both components.
+            </p>
+        </div>
+    `;
+    
+    // Pre-check for range of possible answers
+    myStr += `
+        <div>
+            <h3>
+                Pre-check for bond value
+            </h3>
+    `;
+    myStr += `
+            <p style="margin-bottom:0px;">
+                Before going through the steps to determine the PV of the bond,
+                we first compare the YTM (${qv.dispRatePerc}%, our discount rate)
+                to the coupon rate (${dispCouponRatePerc}%).
+            </p>
+    `;
+    // If the students did not receive the Coupon Rate as part of the problem,
+    // include additional text to explain where that came from.
+            if (!qv.questextIncludesCouponRate){
+                myStr +=`
+                <p style="margin-top:2px; font-size:0.8em;">
+                    Remember that 
+                    coupon payment amount = coupon rate * the par value.
+                    To determine coupon rate,
+                    we just divide coupon payment amount by the par value:<br />
+                    ${dispCouponRatePerc}% = \$${dispPMT} / \$${dispFV}
+                </p>
+                `;
+            }
+
+    // Par value = Bond price
+    if (compareYTMtoCouponRate=="parbond"){
+        myStr += `
+            <p>
+            The rates are the same:
+            ${qv.dispRatePerc}% = ${dispCouponRatePerc}%.
+            That means the annual coupon payments are going offset the amount lost annually due to discounting,
+            thus the current price of the bond is equal to the par value.
+            </p>
+            <p>
+            Great! We saved ourselves a lot of time and effort just by looking at these variables.
+            But if you want to confirm your answer,
+            you can see the work done out below.
+            </p>
+        `;
+    }
+    // Premium bond
+    if ( compareYTMtoCouponRate=="premiumbond"){
+        myStr += `
+            <p>
+                The YTM is less than the coupon rate:
+                ${qv.dispRatePerc}% = ${dispCouponRatePerc}%.
+                That means investors will pay more for such an investment because the
+                annual coupon payments are paying off at a better rate than what's 
+                available elsewhere in the market, assuming the same amount of risk.
+                That makes this a <b>premium bond</b>,
+                and we know that the bond price is going to be more than the par value.
+            </p>
+            <p>
+                Thus, our final answer is going to be
+                <i>greater than \$${dispFV}</i>.
+                If we get any number that's less than \$${dispFV},
+                that tells us that we've made a mistake somewhere in our calculations.
+            </p>
+        `;
+    }
+    // Discount bond
+    if ( compareYTMtoCouponRate=="discountbond"){
+        myStr += `
+            <p>
+                The YTM is greater than the coupon rate:
+                ${qv.dispRatePerc}% > ${dispCouponRatePerc}%.
+                That means investors will not pay as much for such an investment because the
+                annual coupon payments are lower than what's
+                available elsewhere in the market, assuming the same amount of risk.
+                That makes this a <b>discount bond</b>,
+                and we know that the bond price is going to be less than the par value.
+            </p>
+            <p>
+                Thus, our final answer is going to be
+                <i>less than \$${dispFV}</i>.
+                If we get any number that's greater than \$${dispFV},
+                that tells us that we've made a mistake somewhere in our calculations.
+            </p>
+        `;
+    }
+    myStr += `              
+        </div>
+    `;
+
+    // Coupon payments
+    myStr += `
+        <div>
+            <h2 style="${strStyleCoupons}">
+                Part A: PV of the coupon payments
+            </h2>
+    `;
+    // If the students did not receive the Coupon Payments as part of the problem,
+    // include additional text to explain where those came from.
+    if (!qv.questextIncludesCouponPMT){
+        myStr +=`
+        <p>
+            To draw the coupon payment amounts on our timeline,
+            we first need to figure out what they are by multiplying the coupon rate and the par value:
+        <p>
+        <p>
+            \\[
+                \\begin{aligned}
+                    \\text{Coupon rate} * \\text{Par value} &= \\text{Coupon payment amount} \\\\
+                    ${dispCouponRatePerc}\\% * \\$${dispFV} &= \\$${dispPMT}
+                \\end{aligned}
+            \\]
+        </p>
+            Now that we have the coupon <i>payment</i> amount,
+            we can forget about the ${dispCouponRatePerc}% (the coupon <i>rate</i>).
+            We don't need that again for any calculations.
+        </p>
+        `;
+    };
+    myStr += `
+            <p>
+                There are varN coupon payments of the same amount that start in Year varY.
+                Let's see this on a timeline:
+                ${timelineAnnuity(qvObj, "pv")}
+            </p>
+            <p>
+                The quickest way to find the value of
+                all the coupon payments in Year ${varY - 1}
+                is to treat this as an annuity,
+                as shown on the Decision Tree.
+                ${tvmtreePVAnnuityStand(qvObj, objColors)}
+            </p>
+            <p>
+                ${identifyPVVars(qvObj, objColors)}
+            </p>
+            <p>
+                ${solvePVAnnuityConstant_PV(qvObj, objColors)}
+            </p>
+        </div>
+    `;
+
+    // Lump sum
+    // When the display code (e.g., timeline) sees the first year (varY) as not equal to the number of periods,
+    // it assumes this is an annuity being brought back to year Y-1.
+    // We need to trick it into seeing this as a simple FV of Single Payment problem.
+    const qvObjForBonds = {varFV, varRate, varN, "varY":varN};
+    myStr += `
+        <div>
+            <h2 style="${strStylePV}">
+                Part B: PV of the single payment
+            </h2>
+
+            <p>
+                The par value (\$varFV) is just a lump sum
+                in the future (year varN).
+                ${timelinePVSinglePmt(qvObjForBonds)}
+            </p>
+            <p>
+                We want to know what the par value is 
+                worth in year ${qvObjForBonds.varY - qvObjForBonds.varN}.
+                Through using the decision tree,
+                we see that we can treat this as a single payment.
+                ${tvmtreePVSinglePmt(qvObjForBonds, objColors)}
+            </p>
+            <p>
+                ${identifyPVVars(qvObjForBonds, objColors)}
+            </p>
+            <p>
+                ${solvePVSinglePmt_PV(qvObjForBonds, objColors)}
+            </p>
+
+        </div>
+    `;
+
+    // Add them back together
+    const dispTheAns = uRound(qv.calcTheAns,4).toLocaleString('en');
+    myStr+= `
+        <div>
+            <h2 style="${strAddBackTogether}">
+                Add PV of coupon payments to PV of par value
+            </h2>
+            <p>
+                Now that we know the PV of the bond's
+                <span style="${strStyleCoupons}">coupons</span>
+                and the PV of its
+                <span style="${strStylePV}">par value</span> at maturity,
+                we can just add those two values together
+                to determine the total present value of the future cash flows from the bond.
+            </p>
+            <p>
+                \\[
+                    \\begin{aligned}
+                        ${calcPVCoupons} \\\\
+                        + ${calcPVPar} \\\\
+                        = ${calcTheAns}
+                    \\end{aligned}
+                \\]
+            </p>
+            <p>
+                Thus, the price of the bond is <b>\$${dispTheAns}</b>.
+                If anyone pays more than that in today's dollars,
+                they will not break even on their investment due to the
+                discounting effect over time (assuming i=${qv.dispRatePerc}%).
+            </p>
+        </div>
+    `;
+
+    // Compare again with pre-check
+    if (compareYTMtoCouponRate=="parbond"){
+        myStr += `
+            <div>
+                <p>
+                    We can compare our answer to we knew from the pre-check process.
+                    As expected, the price of the bond is equal to the par value:<br />
+                    \$${uRound(dispTheAns,0)} = \$${dispFV}
+                </p>
+            </div>
+        `;
+    }
+    if (compareYTMtoCouponRate=="premiumbond"){
+        myStr += `
+            <div>
+                <p>
+                    We can compare our answer to we knew from the pre-check process.
+                    As expected, the price of the bond is greater than the par value:<br />
+                    \$${uRound(dispTheAns,0)} > \$${dispFV}
+                </p>
+            </div>
+        `;
+    }
+    if (compareYTMtoCouponRate=="discountbond"){
+        myStr += `
+            <div>
+                <p>
+                    We can compare our answer to we knew from the pre-check process.
+                    As expected, the price of the bond is less than the par value:<br />
+                    \$${uRound(dispTheAns,0)} < \$${dispFV}
+                </p>
+            </div>
+        `;
+    }
+    let theAns = fPresentValue({varRate, varPMT, varFV, varN});
+  
+    let strToReturn = fStrReplaceVarsWithVals(myStr, qvObj);
+    if (varY == 1){
+        // Do nothing
+    } else {
+        strToReturn += `
+        <p>
+            <br>*****************************<br><br>
+            The steps above gave us the PV in Year ${varY-1},
+            but we want PV<sub>0</sub> (the Present Value of the payments in Year 0).
+            At this point, we can (and should)
+            <i>completely forget about
+            the original ${varN} payments of \$${varPMT.toLocaleString('en')} --
+            they are irrelevant now!</i>
+            We've collapsed those payments into a single value.
+            Essentially, we have an entirely new problem now, with "new" variables:</p>
+            <p style="margin-left:30px;">
+            "What is the value in Year 0 of a lump sum payment of
+            \$${theAns.toLocaleString('en')}
+            happening in year ${varY-1}, assuming a rate of ${uRound(varRate*100,4)}%?"
+            </p>
+            <p>
+            With that, we can walk through the steps necessary to determine
+            ${varY <= 0 ? "FV" : "PV"}<sub>0</sub> of a single payment happening in ${varY-1}:
+            </p>
+        </p>
+        `;
+        strToReturn += (varY <= 0 )
+            ? explainFVSinglePmt_FV({"varPV":theAns, varRate, "varY":varY-1, "varN":-1 * (varY-1)})
+            : explainPVSinglePmt_PV({"varFV":theAns, varRate, "varN":varY-1});
+    }
+
+
+    return strToReturn;
+}
+
 // ################################
 // BUILD TIMELINES
 // ################################
@@ -539,9 +914,7 @@ function timelineAnnuity(qv, tvmType = "pv", annPmts = [], showArrow = true) {
         get MainTL() { return this.Total - this.RowHead },
         get OneYear() { return Math.floor(this.MainTL / this.curNumOfCols) }
     }
-    lastPmtYears = []; lastPmts = [];
-
-
+    
     function timelineDrawMult(paramAry) {
         let strTLRow = ``;
         jQuery.each(paramAry, function (index, theEntry) {
@@ -656,7 +1029,7 @@ function timelineAnnuity(qv, tvmType = "pv", annPmts = [], showArrow = true) {
             styleAnnuityArrowBefore["border-right"] = `1px solid transparent`;
         }
 
-        fConcatCSS = (id, cssObj) => {
+        function fConcatCSS(id, cssObj) {
             let theStr = id + '{';
             jQuery.each(cssObj, function (k, v) { theStr += (k + ":" + v + ";"); })
             return theStr + '}';
@@ -954,6 +1327,8 @@ function identifyPVVars(qv, objColors) {
     const isAnnuity = (qv.varPMT != undefined && qv.varPMT != 0);
     const isGrowingAnnuity = (qv.varG != undefined && qv.varG != 0);
     let myStr = `List the variables in the formula and write what is known and unknown.`;
+    const dispRate = uRound(qv.varRate, 5);
+    const dispG = uRound(qv.varG, 5);
     if (isAnnuity) {
         if (isGrowingAnnuity) {
             // PV of a growing annuity
@@ -962,8 +1337,8 @@ function identifyPVVars(qv, objColors) {
                 \\begin{aligned}
                     PV_{varY-1} &= \\text{??} \\\\
                     C_{varY} &= {varPMT} \\\\
-                    i &= varRate \\\\
-                    g &= varG \\\\
+                    i &= ${dispRate} \\\\
+                    g &= ${dispG} \\\\
                     n &= varN \\\\
                     y &= varY
                 \\end{aligned}
@@ -976,7 +1351,7 @@ function identifyPVVars(qv, objColors) {
                 \\begin{aligned}
                     C_{varY} &= {varPMT} \\\\
                     PV_{varY-1} &= {varPV} \\\\
-                    i &= varRate \\\\
+                    i &= ${dispRate} \\\\
                     n &= varN \\\\
                     y &= varY
                 \\end{aligned}
@@ -990,7 +1365,7 @@ function identifyPVVars(qv, objColors) {
             \\begin{aligned}
                 C_{varN} &= {varFV} \\\\
                 PV_{varY-varN} &= {varPV} \\\\
-                i &= varRate \\\\
+                i &= ${dispRate} \\\\
                 n &= varN \\\\
                 y &= varY
             \\end{aligned}
@@ -1002,13 +1377,15 @@ function identifyPVVars(qv, objColors) {
 }
 // Returns HTML for variables in the Future Value of a single payment formula
 function identifyFVVars(qv, objColors) {
+    const dispRate = uRound(qv.varRate, 5);
+    const dispG = uRound(qv.varG, 5);
     let myStr = `
     List the variables in the formula and write what is known and unknown.
     \\[
         \\begin{aligned}
             FV_{varY+varN} &= {varFV} \\\\
             PV_{varY} &= {varPV} \\\\
-            i &= varRate \\\\
+            i &= ${dispRate} \\\\
             n &= varN \\\\
             y &= varY
         \\end{aligned}
@@ -1019,13 +1396,14 @@ function identifyFVVars(qv, objColors) {
 }
 // Returns HTML for variables in the Future Value of a standard annuity
 function identifyFVVarsAnn(qv, objColors) {
+    const dispRate = uRound(qv.varRate, 5);
     let myStr = `
     List the variables in the formula and write what is known and unknown.
     \\[
         \\begin{aligned}
             FV_{varY+varN -1} &= {varFV} \\\\
             C_{varY} &= {varPMT} \\\\
-            i &= varRate \\\\
+            i &= ${dispRate} \\\\
             n &= varN \\\\
             y &= varY
         \\end{aligned}
@@ -1049,6 +1427,7 @@ function solvePVSinglePmt_PV(qv, objColors) {
     const calcPVYear = varY - varN;
     const calcFVIF = (1 + varRate) ** varN;
     const calcPVIF = 1 / calcFVIF;
+    const dispRate = uRound(1 + varRate, 4);
     const dispGrowthRate = uRound(1 + varRate, 4);
     const dispFVIF = uRound(calcFVIF, 5);
     const dispPVIF = uRound(calcPVIF, 5);
@@ -1058,7 +1437,7 @@ function solvePVSinglePmt_PV(qv, objColors) {
     Plug the variables into the formula and solve for the unknown term.
     \\[
         \\begin{aligned}
-            PV_{varY-varN} &= varFV \\left( \\frac{1}{(1+{varRate})^{varN}} \\right) \\\\
+            PV_{varY-varN} &= varFV \\left( \\frac{1}{(1+{${dispRate}})^{varN}} \\right) \\\\
             {} \\\\
             PV_${calcPVYear} &= varFV \\left( \\frac{1}{(${dispGrowthRate})^{varN}} \\right) \\\\
             {} \\\\
@@ -1079,6 +1458,7 @@ function solvePVAnnuityConstant_PV(qv, objColors) {
     const varFV = qv.varFV;
     const varN = qv.varN;
     const varRate = qv.varRate;
+    const dispRate = uRound(varRate, 4);
     const varY = qv.varY;
     const varPMT = qv.varPMT;
     const varG = qv.varG;
@@ -1092,11 +1472,11 @@ function solvePVAnnuityConstant_PV(qv, objColors) {
 
     \\[
         \\begin{aligned}
-        PV_{varY-1} &= {varPMT} \\left( \\frac{ 1- \\frac{1}{(1+varRate)^{varN}} }{varRate} \\right) \\\\
+        PV_{varY-1} &= {varPMT} \\left( \\frac{ 1- \\frac{1}{(1+${dispRate})^{varN}} }{${dispRate}} \\right) \\\\
         {} \\\\
-        PV_{${varY - 1}} &= {varPMT} \\left( \\frac{ 1- \\frac{1}{${ftvm1Rate(qv)}^{varN}} }{varRate} \\right) \\\\
+        PV_{${varY - 1}} &= {varPMT} \\left( \\frac{ 1- \\frac{1}{${ftvm1Rate(qv)}^{varN}} }{${dispRate}} \\right) \\\\
         {} \\\\
-        PV_{${varY - 1}} &= {varPMT} \\left( \\frac{ 1- ${ftvmPVIF(qv, 5)} }{varRate} \\right) \\\\
+        PV_{${varY - 1}} &= {varPMT} \\left( \\frac{ 1- ${ftvmPVIF(qv, 5)} }{${dispRate}} \\right) \\\\
         {} \\\\
         PV_{${varY - 1}} &= {varPMT} \\left( ${ftvmPVIFA(qv, 5)}  \\right) \\\\
         {} \\\\
@@ -1119,9 +1499,11 @@ function solvePVAnnuityGrowing_PV(qv, objColors) {
     const varFV = qv.varFV;
     const varN = qv.varN;
     const varRate = qv.varRate;
+    const dispRate = uRound(varRate, 4);
     const varY = qv.varY;
     const varPMT = qv.varPMT;
     const varG = qv.varG;
+    const dispG = uRound(varG, 4);
     const varType = qv.varType;
     const theAns = fPVGrowingAnnuityStandard(qv);
 
@@ -1133,8 +1515,8 @@ function solvePVAnnuityGrowing_PV(qv, objColors) {
     \\[
         \\begin{aligned}
             PV_{varY-1} &= 
-            \\frac{{varPMT} }{varRate - varG}
-            \\left( 1 -  {\\left( \\frac{1 + varG}{1 + varRate} \\right)} ^ varN \\right) \\\\
+            \\frac{{varPMT} }{${dispRate} - ${dispG}}
+            \\left( 1 -  {\\left( \\frac{1 + ${dispG}}{1 + ${dispRate}} \\right)} ^ varN \\right) \\\\
             {} \\\\
             PV_{${varY-1}} &= 
             \\frac{{varPMT} }{${ftvmRateSpreadIntrGrowth({varRate, varG}, 5)}}
@@ -1172,6 +1554,7 @@ function solveFVSinglePmt_FV(qv, objColors) {
     const dispPV = uRound(qv.varPV,5);
     const varN = qv.varN;
     const varRate = qv.varRate;
+    const dispRate = uRound(varRate,4);
     const varY = qv.varY;
 
     const calcFVYear = varY + varN;
@@ -1195,11 +1578,12 @@ function solveFVSinglePmt_FV(qv, objColors) {
 }
 
 function solveFVSinglePmt_N(qv, objColors) {
+    const dispRate = uRound(qv.varRate, 4);
     let myStr = `
     Plug the variables into the formula and solve for the unknown term.
     \\[
         \\begin{aligned}
-            varFV &= varPV(1+varRate)^n \\\\
+            varFV &= varPV(1+${dispRate})^n \\\\
             {}  \\\\
             \\frac{varFV}{varPV} &= {dispGrowthRate}^n \\\\
             {}  \\\\
@@ -1232,9 +1616,11 @@ function solveFVAnnuityConstant_FV(qv, objColors) {
     const varFV = "FV";
     const varN = qv.varN;
     const varRate = qv.varRate;
+    const dispRate = uRound(varRate, 4);
     const varY = qv.varY;
     const varPMT = qv.varPMT;
     const varG = qv.varG;
+    const dispG = uRound(varG, 4);
     const varType = qv.varType;
     const theAns = fFVAnnuityStandard(qv);
     const fvInYear = varN + varY - 1;
@@ -1247,19 +1633,19 @@ function solveFVAnnuityConstant_FV(qv, objColors) {
     \\[
         \\begin{aligned}
             FV_{varY + varN - 1} &= {varPMT} \\left( 
-                \\frac{ {(1+varRate)}^varN - 1}{varRate}
+                \\frac{ {(1+${dispRate})}^varN - 1}{${dispRate}}
             \\right) \\\\
             {} \\\\
             FV_{${fvInYear}} &= {varPMT} \\left( 
-                \\frac{ ${ftvm1Rate(qv)}^varN - 1}{varRate}
+                \\frac{ ${ftvm1Rate(qv)}^varN - 1}{${dispRate}}
             \\right) \\\\
             {} \\\\
             FV_{${fvInYear}} &= {varPMT} \\left( 
-                \\frac{ ${ftvmFVIF(qv, 5)} - 1}{varRate}
+                \\frac{ ${ftvmFVIF(qv, 5)} - 1}{${dispRate}}
             \\right) \\\\
             {} \\\\
             FV_{${fvInYear}} &= {varPMT} \\left( 
-                \\frac{ ${ftvmFVANetNumerator(qv, 5)} }{varRate}
+                \\frac{ ${ftvmFVANetNumerator(qv, 5)} }{${dispRate}}
             \\right) \\\\
             {} \\\\
             FV_{${fvInYear}} &= {varPMT} \\left( 
