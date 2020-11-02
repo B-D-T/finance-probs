@@ -1,6 +1,6 @@
 {
   "name": "finance-probs",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Code used with sport finance problem sets (formerly Webwork)",
   "main": "main.js",
   "scripts": {
