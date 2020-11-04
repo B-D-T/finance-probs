@@ -59,7 +59,7 @@ function fnQues476(objFromMainQues) {
             the dividend payment in year 1 
             (written generically as C<sub>1</sub>).
         </p>
-            ${solvePVPerpetuityStand_PMT(quesVars)};
+            ${solvePVPerpetuityStand_PMT(quesVars)}
         <p>
             We now have the dividend in year 1 (\$${calcDiv1.toFixed(2)}),
             and we know that the dividend grows at ${dispRateG}% per year.

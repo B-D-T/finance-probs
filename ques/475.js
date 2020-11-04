@@ -28,12 +28,12 @@ function fnQues475(objFromMainQues) {
         };
         const pvPartA = fPresentValue(mapVarsPartA);
 
-        // FV of a single payment
+        // FV of a single payment to bring the dividend forward
         mapVarsPartBDiv = {"varPV": varDiv1, "varRate":varG1, "varN":varY2-varY1 };
         const partBDiv =fFutureValue(mapVarsPartBDiv);
 
-        // Get value in year Y2-1 of Part B (PV of a perpetuity)
-        mapVarsPartBStep1 = {
+        // Get value in year 0 of Part B (PV of a perpetuity)
+        mapVarsPartB = {
             "varG": varG2,
             "varN": 0,
             "varPMT": partBDiv,
@@ -41,27 +41,15 @@ function fnQues475(objFromMainQues) {
             varPV,
             varRate
         };
-        const pvPartBStep1 = fPresentValue(mapVarsPartBStep1);
+        const pvPartB = fPresentValue(mapVarsPartB);
         
-        // For getting the value in year 0 of Part B (PV of a single payment)
-        mapVarsPartBStep2 = {
-            "varN": varY2 - 1,
-            "varFV": pvPartBStep1,
-            varRate,
-            "varY": varY2-1,
-            "varPV": "??"
-        };
-        const pvPartB = fPresentValue(mapVarsPartBStep2);
-
         let calcVars = {
             calcPartA: pvPartA,
             calcPartBDiv: partBDiv,
-            calcPartBStep1: pvPartBStep1,
             calcPartB: pvPartB,
             calcTheAns: pvPartA + pvPartB
         };
         createEDVarInScope(calcVars);
-        console.log("calcPartA",calcPartA);
 
         let displayVars = {
             dispDiv1: varDiv1.toFixed(2).toLocaleString('en'),
@@ -182,7 +170,7 @@ function fnQues475(objFromMainQues) {
                         Now that we have D<sub>${varY2}</sub> (\$${dispPartBDiv}),
                         we can go back and plug values into the perpetuity formula.
                     </p>
-                    ${explainPVPerpetuityConst_PV(mapVarsPartBStep1)}
+                    ${explainPVPerpetuityConst_PV(mapVarsPartB)}
                 </div>
             </div>
 

@@ -35,7 +35,7 @@ function fnQues478(objFromMainQues) {
     function fillPage() {
         let obj = {};
 
-        obj.ansBoxMessage = ansBoxMessages("writeOutNums");
+        obj.ansBoxMessage = ansBoxMessages("percAsDecimal");
 
         obj.stem = probDisplay(quesVars)`
             <p>
@@ -47,6 +47,7 @@ function fnQues478(objFromMainQues) {
             </p>
         `;
 
+        const colorRightAns = `#228B22`;
         obj.solution = probDisplay(quesVars)`
             <p>
             The prompt tells us the D<sub>1</sub> is ${dispPMT}.
@@ -57,17 +58,17 @@ function fnQues478(objFromMainQues) {
             ${solvePVPerpetuityStand_Rate(quesVars)}
 
             <p>
-            Since we knew the current price at the outset (dispPV),
+            Since we knew the current price at the outset (\$dispPV),
             we can check our answer (dispTheAns%)
             by putting it back into the perpetuity formula:
             </p>
             \\[
                 \\begin{aligned}
-                ${dispPV} &{${" \u225F "}} \\frac{${dispPMT}}{${dispTheAns}-${dispGPerc}} \\\\
+                \\textcolor{${colorRightAns}}{${dispPV}} &{${" \u225F "}} \\frac{${dispPMT}}{${dispTheAns}-${dispGPerc}} \\\\
                 {} \\\\
-                ${dispPV} &{${" \u225F "}} \\frac{${dispPMT}}{${uRound(calcTheAns-varG,4)}} \\\\
+                \\textcolor{${colorRightAns}}{${dispPV}} &{${" \u225F "}} \\frac{${dispPMT}}{${uRound(calcTheAns-varG,4)}} \\\\
                 {} \\\\
-                ${dispPV} &= ${(varPMT/(calcTheAns-varG)).toFixed(2)}
+                \\textcolor{${colorRightAns}}{${dispPV}} &{=} \\textcolor{${colorRightAns}}{${(varPMT/(calcTheAns-varG)).toFixed(2)} }
                 \\end{aligned}
 
             \\]

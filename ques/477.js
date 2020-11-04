@@ -32,7 +32,6 @@ function fnQues477(objFromMainQues) {
             get calcTheAns(){return fPresentValue(this.calcMapVarsTheAns) }
         };
         createEDVarInScope(calcVars);
-        console.log(calcTheAns);
 
         let displayVars = {
             dispRatePerc: uRound(varRate * 100, 4), // per

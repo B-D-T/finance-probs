@@ -22,7 +22,7 @@ function fnQues473(objFromMainQues) {
 
         let displayVars = {
             dispRatePerc: uRound(varRate * 100, 4), // perr
-            dispGPerc: uRound(varRate * 100, 4), // perg
+            dispGPerc: uRound(varG * 100, 4), // perg
             dispPMT: varPMT.toFixed(2).toLocaleString('en') //$D
         };
         createEDVarInScope(displayVars);
