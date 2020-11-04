@@ -13,12 +13,13 @@ function explainPVSinglePmt_PV(qvObj) {
         varFV: "black"
     };
 
+    const dispFV = qvObj.varFV.toFixed(2).toLocaleString('en');
     let myStr = `
         <p>
-            There is a lump sum (\$varFV) in the future (year varN),
+            There is a lump sum (\$${dispFV}) in the future (year varN),
             and you want to know what it is going to be worth in year ${qvObj.varY - qvObj.varN}.
             Let's see this on a timeline:
-            ${timelinePVSinglePmt(qvObj)}
+            ${timelinePVSinglePmt({"varFV":dispFV, "varN":qvObj.varN, "varY":qvObj.varY, "varPV":"??"})}
         </p>
         <p>
             ${tvmtreePVSinglePmt(qvObj, objColors)}
@@ -131,9 +132,10 @@ function explainPVAnnuityConst_PV(qv) {
 
     const qvObj = { varRate, varN, varPMT, varFV, varPV, varG, varY, varType };
 
+    let dispN = !varN ? "infinite" : varN
     let myStr = `
         <p>
-            There are varN payments of the same amount that start in Year varY.
+            There are ${dispN} payments of the same amount that start in Year varY.
             Let's see this on a timeline:
             ${timelineAnnuity(qvObj, "pv")}
         </p>
@@ -235,6 +237,101 @@ function explainPVGrowingAnnuityStand_PV(qv) {
     `;
 
     return fStrReplaceVarsWithVals(myStr, qvObj);
+}
+
+function explainPVPerpetuityConst_PV(qv) {
+    // Right now I'm just using black because I found the colors distracting. But I'll leave the code in case I change my mind down the road.
+    let objColors = {
+        varY: "black",
+        varN: "black",
+        varPV: "black",
+        varRate: "black",
+        varFV: "black"
+    };
+
+    const varRate   = qv.varRate === undefined  ? fSetLocalVar("varRate", qv.varRate)   : qv.varRate
+    const varN      = qv.varN === undefined     ? fSetLocalVar("varN", qv.varN)         : qv.varN // will set it to 0
+    const varPMT    = qv.varPMT === undefined   ? fSetLocalVar("varPMT", qv.varPMT)     : qv.varPMT
+    const varFV     = qv.varFV === undefined    ? fSetLocalVar("varFV", qv.varFV)       : qv.varFV
+    const varPV     = qv.varPV === undefined    ? fSetLocalVar("varPV", qv.varPV)       : qv.varPV
+    const varG      = qv.varG === undefined     ? fSetLocalVar("varG", qv.varG)         : qv.varG
+    const varY      = qv.varY === undefined     ? fSetLocalVar("varY", qv.varY)         : qv.varY
+    const varReturnInYear = qv.varReturnInYear === undefined ? fSetLocalVar("varReturnInYear", qv.varReturnInYear) : qv.varReturnInYear
+    const varType = (varY !== 1) ? 0 : qv.varType || fSetLocalVar("type", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
+
+    const qvObj = { varRate, varN, varPMT, varFV, varPV, varG, varY, varType };
+
+    let myStr =
+        `
+        <p>
+            This is a series of payments that go on forever, with
+            the first payment of \$${varPMT.toLocaleString('en')}
+            happening in year varY.
+    `;
+
+    if (varG != 0) {
+    myStr += `
+            That payment amount changes each year at a rate of ${uRound(varG * 100, 4)}%.
+        `;
+    }
+    // FIX: The perpetuity timelines only work for y=1 (and even those aren't perfect yet)
+    if (varY==1){
+        myStr += `
+                Let's see these on a timeline:
+                ${timelineAnnuity(qvObj, "pv")}
+        `;
+    } else {
+        myStr += `</p>`;
+    }
+    myStr += `<p>
+            It is impossible (in the true sense of the word)
+            to figure out each of the payments,
+            but as we see on the Decision Tree,
+            the formula to handle these types of problems is fairly straightforward.
+            ${tvmtreePVPerpetuityStand(qvObj, objColors)}
+        </p>
+        <p>
+            ${identifyPVVars(qvObj, objColors)}
+        </p>
+        <p>
+            ${solvePVPerpetuityStand_PV(qvObj, objColors)}
+        </p>
+    `;
+
+    let theAns = fPresentValue({varRate, varPMT, varG, "varY":1});
+    let strToReturn = fStrReplaceVarsWithVals(myStr, qvObj);
+
+    if (varY == 1){
+        // Do nothing
+    } else {
+        strToReturn += `
+        <p>
+            <br>*****************************<br><br>
+            The steps above gave us the PV in Year ${varY-1},
+            but we want PV<sub>0</sub> (the Present Value of the payments in Year 0).
+            At this point, we can (and should)
+            <i>completely forget about
+            the original perpetuity --
+            it is irrelevant now!</i>
+            We've collapsed those payments into a single value.
+            Essentially, we have an entirely new problem now, with "new" variables:</p>
+            <p style="margin-left:30px;">
+            "What is the value in Year 0 of a lump sum payment of
+            \$${theAns.toFixed(2).toLocaleString('en')}
+            happening in year ${varY-1}, assuming a rate of ${uRound(varRate*100,4)}%?"
+            </p>
+            <p>
+            With that, we can walk through the steps necessary to determine
+            ${varY <= 0 ? "FV" : "PV"}<sub>0</sub> of a single payment happening in ${varY-1}:
+            </p>
+        </p>
+        `;
+        strToReturn += (varY <= 0 )
+            ? explainFVSinglePmt_FV({"varPV":theAns, varRate, "varY":varY-1, "varN":-1 * (varY-1), "varFV":"??"})
+            : explainPVSinglePmt_PV({"varFV":theAns, varRate, "varY":varY-1, "varN":varY-1, "varPV":"??"});
+        
+    }
+    return strToReturn;
 }
 
 function explainFVAnnuityStand_FV(qv) {
@@ -765,11 +862,19 @@ function timelineFVSinglePmt(qv) {
 // Returns HTML with code for the timeline
 function timelineAnnuity(qv, tvmType = "pv", annPmts = [], showArrow = true) {
     // annPmts is a array of two arrays. First is 9 "year" values, next is 9 pmt values.
-    // e.g., [ [0,1,2,3,4,5,9,7,8], [0,0,0,450,450,450,450,0,0] ]
+    // e.g., [ [0,1,2,3,4,5,6,7,8], [0,0,0,450,450,450,450,0,0] ]
     // It MUST be <=9 elements. The code will quit on anything more than that.
 
-    let varY = qv.varY, varN = qv.varN;
-    let varPMT = qv.varPMT;
+    // Timeline must have one column empty before(year 0) and one empty after(to show no payment there)
+    // Since the max is 9, that means we can show a max of 7 payments.
+    const tlMaxCols = 9;
+    const isPerpetuity = !qv.varN;
+    // FIX!!! This doesn't really work for perpetuities yet. I got it "good enough" for y=1, but it needs some help.
+
+    let
+        varN = isPerpetuity ? tlMaxCols-2 : qv.varN,
+        varY = qv.varY,
+        varPMT = qv.varPMT.toFixed(2).toLocaleString('en');
 
     // If a payment timeline (annPmts) is passed, that's used instead of the qv values.
     let useCallerTL = false;
@@ -780,9 +885,6 @@ function timelineAnnuity(qv, tvmType = "pv", annPmts = [], showArrow = true) {
     // Creates an array of length varN, starting in year varY. e.g., [3, 4, 5, 6]
     //annYears = Array(qv.varN). fill(). map((_, idx) => varY + idx);
 
-    // Timeline must have one column empty before(year 0) and one empty after(to show no payment there)
-    // Since the max is 9, that means we can show a max of 7 payments.
-    const tlMaxCols = 9;
     let yn = varY + varN;
     const tlSecOrder = ["Start", "Delayed", "First", "Mid", "Last", "Fillers"];
     let tlYears = { "Start": [], "Delayed": [], "First": [], "Mid": [], "Last": [], "Fillers": [], };
@@ -818,8 +920,8 @@ function timelineAnnuity(qv, tvmType = "pv", annPmts = [], showArrow = true) {
         // This if block takes care of all the varY<=1 timelines
         if (varY <= 1) {
             if (varN <= 7) {
-                // Show all payments then skip to the end          
-                for (let nCount = varY; nCount <= yn - 1; nCount++) {
+                // Show all payments then skip to the end 
+                for (let nCount = varY; nCount <= yn-1 ; nCount++) {
                     tlYears.First.push(nCount);
                     if (isGrowingAnn) { varPMT = nCount == varY ? varPMT : `C<sub>${nCount}</sub>` }
                     tlPmts.First.push(varPMT);
@@ -900,8 +1002,13 @@ function timelineAnnuity(qv, tvmType = "pv", annPmts = [], showArrow = true) {
     for (let colCount = aryTLYears.length; colCount < tlMaxCols; colCount++) {
         let mostRecTLYear = mostRecentYear(aryTLYears);
         const nextTLYear = (mostRecTLYear == yn - 1) ? mostRecTLYear + 1 : ``;
-        aryTLYears.push(nextTLYear);
-        aryTLPmts.push(``);
+        if (isPerpetuity && colCount == tlMaxCols-1){
+            aryTLYears.push("\u221E");
+            aryTLPmts.push("C<sub>\u221E</sub>");
+        } else {
+            aryTLYears.push(nextTLYear);
+            aryTLPmts.push(``);
+        }
         TESTARRAY.push(`filler`);
     }
 
@@ -1175,6 +1282,56 @@ function tvmtreePVAnnuityStand(qv, objColors) {
     return fStrReplaceVarsWithVals(myStr, formulaVars);
 }
 
+function tvmtreePVPerpetuityStand(qv, objColors) {
+    const formulaVars = {
+        varY: "y",
+        varRate: "i",
+        varPV: "PV",
+        varPMT: "C",
+        varG: "g"
+    };
+    let myStr = `
+        <div>
+            <p style="margin-bottom:4px;">
+                We're discounting a value back (i.e., to the left on the timeline),
+                so we'll start on the <b>Present Value</b> side of the TVM Decision Tree and start asking questions:
+            </p>
+            <p style="margin-left:20px; margin-top:4px;">
+                Are we looking at one amount at two different points in time?
+                Or is there a series of payments?
+                <i>There is a series of payments.</i> 
+            </p>
+            <p style="margin-left:20px; margin-top:4px;">
+                Do the payments go on forever?
+                Or do they stop after a certain number of payments?
+                <i>They go on forever.</i> 
+            </p>
+            <p>
+                <!-- show img of chart with paths drawn -->
+            </p>
+            <p>
+                This leads us to the formula for the <b>Present Value of a Perpetuity</b>.
+                The formula gives us the PV of an infinite series of payments one year before the first
+                payment is made. Since the first payment is in Year ${qv.varY},
+                this returns the value of the perpetuity in Year ${qv.varY - 1}.
+            </p>
+            \\[
+                varPV_{varY-1} = 
+                \\frac{{varPMT}_{varY} }{varRate - varG}
+            \\]
+            <p>
+                In case you skimmed over the line above, it's worth reiterating:
+                <span style="color: red; font-weight:bold"><br />
+                The perpetuity formula returns the PV of the series of payments 
+                one year before the first payment is made.</span> <br />
+                (First payment: Year ${qv.varY}. Formula returns: PV<sub>${qv.varY - 1}</sub>.)
+            </p>
+        </div>
+    `;
+    myStr = addColorToVars(myStr, objColors);
+    return fStrReplaceVarsWithVals(myStr, formulaVars);
+}
+
 function tvmtreePVGrowingAnnuityStand(qv, objColors) {
     const formulaVars = {
         varY: "y",
@@ -1326,37 +1483,55 @@ function tvmtreeFVAnnuityStand(qv, objColors) {
 function identifyPVVars(qv, objColors) {
     const isAnnuity = (qv.varPMT != undefined && qv.varPMT != 0);
     const isGrowingAnnuity = (qv.varG != undefined && qv.varG != 0);
+    const isPerpetuity = (qv.varN == undefined || qv.varN == 0);
     let myStr = `List the variables in the formula and write what is known and unknown.`;
-    const dispRate = uRound(qv.varRate, 5);
-    const dispG = uRound(qv.varG, 5);
+    const
+        dispRate = uRound(qv.varRate, 5),
+        dispG = uRound(qv.varG, 5),
+        dispPMT = uRound(qv.varPMT,9);
     if (isAnnuity) {
-        if (isGrowingAnnuity) {
-            // PV of a growing annuity
-            myStr += `
-            \\[
-                \\begin{aligned}
-                    PV_{varY-1} &= \\text{??} \\\\
-                    C_{varY} &= {varPMT} \\\\
-                    i &= ${dispRate} \\\\
-                    g &= ${dispG} \\\\
-                    n &= varN \\\\
-                    y &= varY
-                \\end{aligned}
-            \\]
-            `;    
+        if (isPerpetuity){
+                // PV of a perpetuity (whether it's growing or not)
+                myStr += `
+                \\[
+                    \\begin{aligned}
+                        PV_{varY-1} &= \\text{??} \\\\
+                        C_{varY} &= ${dispPMT} \\\\
+                        i &= ${dispRate} \\\\
+                        g &= ${dispG} \\\\
+                        y &= varY
+                    \\end{aligned}
+                \\]
+                `;
         } else {
-            // PV of a constant annuity
-            myStr += `
-            \\[
-                \\begin{aligned}
-                    C_{varY} &= {varPMT} \\\\
-                    PV_{varY-1} &= {varPV} \\\\
-                    i &= ${dispRate} \\\\
-                    n &= varN \\\\
-                    y &= varY
-                \\end{aligned}
-            \\]
-            `;    
+            if (isGrowingAnnuity) {
+                // PV of a growing annuity
+                myStr += `
+                \\[
+                    \\begin{aligned}
+                        PV_{varY-1} &= \\text{??} \\\\
+                        C_{varY} &= ${dispPMT} \\\\
+                        i &= ${dispRate} \\\\
+                        g &= ${dispG} \\\\
+                        n &= varN \\\\
+                        y &= varY
+                    \\end{aligned}
+                \\]
+                `;    
+            } else {
+                // PV of a constant annuity
+                myStr += `
+                \\[
+                    \\begin{aligned}
+                        C_{varY} &= ${dispPMT} \\\\
+                        PV_{varY-1} &= {varPV} \\\\
+                        i &= ${dispRate} \\\\
+                        n &= varN \\\\
+                        y &= varY
+                    \\end{aligned}
+                \\]
+                `;    
+            }
         }
     } else {
         // PV of a single payment
@@ -1427,6 +1602,7 @@ function solvePVSinglePmt_PV(qv, objColors) {
     const calcPVYear = varY - varN;
     const calcFVIF = (1 + varRate) ** varN;
     const calcPVIF = 1 / calcFVIF;
+    const dispFV = uRound(varFV, 5);
     const dispRate = uRound(1 + varRate, 4);
     const dispGrowthRate = uRound(1 + varRate, 4);
     const dispFVIF = uRound(calcFVIF, 5);
@@ -1437,13 +1613,13 @@ function solvePVSinglePmt_PV(qv, objColors) {
     Plug the variables into the formula and solve for the unknown term.
     \\[
         \\begin{aligned}
-            PV_{varY-varN} &= varFV \\left( \\frac{1}{(1+{${dispRate}})^{varN}} \\right) \\\\
+            PV_{varY-varN} &= ${dispFV} \\left( \\frac{1}{(1+{${dispRate}})^{varN}} \\right) \\\\
             {} \\\\
-            PV_${calcPVYear} &= varFV \\left( \\frac{1}{(${dispGrowthRate})^{varN}} \\right) \\\\
+            PV_${calcPVYear} &= ${dispFV} \\left( \\frac{1}{(${dispGrowthRate})^{varN}} \\right) \\\\
             {} \\\\
-            PV_${calcPVYear} &= varFV \\left( \\frac{1}{${dispFVIF}} \\right) \\\\
+            PV_${calcPVYear} &= ${dispFV} \\left( \\frac{1}{${dispFVIF}} \\right) \\\\
             {} \\\\
-            PV_${calcPVYear} &= varFV \\left( ${dispPVIF} \\right) \\\\
+            PV_${calcPVYear} &= ${dispFV} \\left( ${dispPVIF} \\right) \\\\
             {} \\\\
             PV_${calcPVYear} &= ${calcTheAns}
         \\end{aligned}
@@ -1550,6 +1726,125 @@ function solvePVAnnuityGrowing_PV(qv, objColors) {
 }
 
 
+function solvePVPerpetuityStand_PV(qv, objColors) {
+    const
+        varPV = "PV",
+        varRate = qv.varRate,
+        varY = qv.varY,
+        varPMT = qv.varPMT,
+        varG = qv.varG,
+        dispRate = uRound(varRate, 4),
+        dispPMT = uRound(varPMT,5),
+        dispG = uRound(varG, 4),
+        theAns = fPresentValue({varRate, varG, "varY":1, varPMT});
+
+    let myStr = `
+    <p>
+        Plug the variables into the formula and solve for the present value.
+    </p>
+
+    \\[
+        \\begin{aligned}
+            PV_{varY-1} &= 
+            \\frac{${dispPMT} }{${dispRate} - ${dispG}} \\\\
+            {} \\\\
+            PV_{${varY-1}} &= 
+            \\frac{${dispPMT} }{${ftvmRateSpreadIntrGrowth({varRate, varG}, 5)}} \\\\
+            {} \\\\
+            PV_{${varY-1}} &= ${theAns}
+        \\end{aligned}
+    \\]
+
+    <p>
+        This can be interpreted as follows:
+        The value in Year ${varY - 1} of a perpetuity growing at ${uRound(varG*100,4)}% indefinitely,
+        where the first payment of \$${varPMT.toFixed(2)} is in year ${varY},
+        is the same as a lump sum of \$${theAns.toFixed(2).toLocaleString('en')} in year ${varY - 1}.
+    </p>
+`;
+    myStr = addColorToVars(myStr, objColors);
+    return fStrReplaceVarsWithVals(myStr, qv);
+}
+
+function solvePVPerpetuityStand_PMT(qv, objColors) {
+    const
+        varPV = qv.varPV,
+        dispPV = uRound(varPV, 4),
+        varRate = qv.varRate,
+        dispRate = uRound(varRate, 4),
+        varY = qv.varY,
+        dispPMT = `C_${varY}`,
+        varG = qv.varG,
+        dispG = uRound(varG, 4),
+        theAns = varPV * (varRate - varG),
+        dispTheAns = uRound(theAns,5);
+
+    let myStr = `
+    <p>
+        Plug the variables into the formula and
+        solve for the first payment (C<sub>${varY}</sub>)
+        by cross-multiplying.
+    </p>
+
+    \\[
+        \\begin{aligned}
+            ${dispPV} &= 
+            \\frac{${dispPMT}}{${dispRate} - ${dispG}} \\\\
+            {} \\\\
+            ${dispPMT} &= ${dispPV}({${dispRate} - ${dispG}}) \\\\
+            {} \\\\
+            ${dispPMT} &= ${dispPV}(${ftvmRateSpreadIntrGrowth({varRate, varG}, 5)}) \\\\
+            {} \\\\
+            ${dispPMT} &= ${dispTheAns}
+            {} \\\\
+        \\end{aligned}
+    \\]
+    `;
+
+    myStr = addColorToVars(myStr, objColors);
+    return fStrReplaceVarsWithVals(myStr, qv);
+}
+
+function solvePVPerpetuityStand_Rate(qv, objColors) {
+    const
+        varPV = qv.varPV,
+        varY = qv.varY,
+        varPMT = qv.varPMT,
+        varG = qv.varG,
+        theAns = varPMT/varPV + varG,
+        dispPV = uRound(varPV, 4),
+        dispRate = `i`,
+        dispPMT = uRound(varPMT, 4),
+        dispG = uRound(varG, 4),
+        dispTheAns = uRound(theAns,5);
+
+    let myStr = `
+    <p>
+        Plug the variables into the formula and
+        solve for the rate.
+    </p>
+
+    \\[
+        \\begin{aligned}
+            ${dispPV} &= 
+            \\frac{${dispPMT}}{${dispRate} - ${dispG}} \\\\
+            {} \\\\
+            ${dispPV}({${dispRate} - ${dispG}}) &= ${dispPMT} \\\\
+            {} \\\\
+            ${dispRate} - ${dispG} &= \\frac{${dispPMT}}{${dispPV}} \\\\
+            {} \\\\
+            ${dispRate} &= ${uRound(dispPMT/dispPV,5)} + ${dispG}  \\\\
+            {} \\\\
+            ${dispRate} &= ${uRound((dispPMT/dispPV) + dispG,9) }
+        \\end{aligned}
+    \\]
+    `;
+
+    myStr = addColorToVars(myStr, objColors);
+    return fStrReplaceVarsWithVals(myStr, qv);
+}
+
+
 function solveFVSinglePmt_FV(qv, objColors) {
     const dispPV = uRound(qv.varPV,5);
     const varN = qv.varN;
@@ -1557,10 +1852,12 @@ function solveFVSinglePmt_FV(qv, objColors) {
     const dispRate = uRound(varRate,4);
     const varY = qv.varY;
 
-    const calcFVYear = varY + varN;
-    const dispGrowthRate = ftvm1Rate(qv, 5);
-    const dispFVIF = ftvmFVIF(qv, 5);
-    const calcTheAns = fFVSinglePmt(qv);   
+    const 
+        calcFVYear = varY + varN,
+        dispGrowthRate = ftvm1Rate(qv, 5),
+        dispFVIF = ftvmFVIF(qv, 5),
+        calcTheAns = fFVSinglePmt(qv),
+        dispTheAns = uRound(calcTheAns,9);
 
     let myStr = `
     Plug the variables into the formula and solve for the unknown term.
@@ -1569,7 +1866,7 @@ function solveFVSinglePmt_FV(qv, objColors) {
         FV_{varY+varN} &= ${dispPV}(1+${varRate})^{${varN}} \\\\
         FV_{${calcFVYear}} &= ${dispPV}(${dispGrowthRate})^{varN} \\\\
         FV_{${calcFVYear}} &= ${dispPV}(${dispFVIF}) \\\\
-        FV_{${calcFVYear}} &= ${calcTheAns}
+        FV_{${calcFVYear}} &= ${dispTheAns}
         \\end{aligned}
     \\]
     `;
