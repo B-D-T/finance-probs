@@ -27,11 +27,11 @@ function quesNumGlobal() {
 function mainFunc($) {
     "use strict";
     const self = this;
-    console.log("Here I am", IS_PRODUCTION , IS_QUES_PAGE);
+    console.log("Here I am", IS_PRODUCTION, IS_QUES_PAGE);
 
     self.quesNum = quesNumGlobal(); // FIX: I need a better way to do the quesNum. 
 
-    if (typeof IS_QUES_PAGE === 'undefined' || IS_QUES_PAGE === false) {return "Cancelling all code"};
+    if (typeof IS_QUES_PAGE === 'undefined' || IS_QUES_PAGE === false) { return "Cancelling all code" };
 
 
     let udf, tvmcalc, tvmexpl, capbudg, ques, Finance; // classes
@@ -46,7 +46,7 @@ function mainFunc($) {
         $(divRoot + '-stem').html(objContent.stem);
         $(divRoot + '-solution').html(objContent.solution);
         $(divRoot + '-response').html(objContent.response);
-        $("#FakeDIV").html('Poodles are poodles, so why should it be?');
+
 
         // // received from addOnPageSubmit
         // function fnQuesResp(objPageSubmit){
@@ -150,83 +150,83 @@ function mainFunc($) {
 
     // Load each of the scripts in order using async-await Promises.
     async function loadJSFiles() {
-        // This file begins by invoking itself and loading any of the other necessary files. 
-        // The UDF script loads first. ONLY ONCE THAT IS LOADED does it try to load the next script.
-        // Only once that script is loaded does it try to load the following, and so on.
-        // At the end, once all the necessary supporting scripts are loaded, it loads ques (the actual script for the given question).
-        // Once that final script is loaded (i.e., ONLY after the external 433.js is loaded),
-        // it calls the function to start doing the rest of the work.
-        const jsPaths = () => {
-            const baseURL = IS_PRODUCTION ? "https://b-d-t.github.io/finance-probs/" : "./"
-            let jsPaths = {
-                udf: "supporting/v3user-defined-functions.js",
-                tvmexpl: "supporting/v3tvm-explanations.js",
-                tvmcalc: "supporting/v3tvm-calcs.js",
-                capbudg: "supporting/v3capbudg.js",
-                ques: ''
-            };
-            return new Promise(resolve => {
-                // Find the location for the JSON that has all the file names for each question and add it to the jsLocation object
-                $.when($.getJSON(baseURL + "supporting/objQuesFileInfo.json", resp => jsPaths.ques = 'ques/' + resp[self.quesNum].filename))
-                    // Prepend each file in the jsPaths object with the baseURL
-                    .then(() => $.each(jsPaths, (key, value) => jsPaths[key] = baseURL + value))
-                    .done(() => resolve(jsPaths));
+            // This file begins by invoking itself and loading any of the other necessary files. 
+            // The UDF script loads first. ONLY ONCE THAT IS LOADED does it try to load the next script.
+            // Only once that script is loaded does it try to load the following, and so on.
+            // At the end, once all the necessary supporting scripts are loaded, it loads ques (the actual script for the given question).
+            // Once that final script is loaded (i.e., ONLY after the external 433.js is loaded),
+            // it calls the function to start doing the rest of the work.
+            const jsPaths = () => {
+                const baseURL = IS_PRODUCTION ? "https://b-d-t.github.io/finance-probs/" : "./"
+                let objJSPaths = {
+                    udf: "supporting/v3user-defined-functions.js",
+                    tvmexpl: "supporting/v3tvm-explanations.js",
+                    tvmcalc: "supporting/v3tvm-calcs.js",
+                    capbudg: "supporting/v3capbudg.js",
+                    ques: ''
+                };
+                return new Promise((resolve) => {
+                    // Find the location for the JSON that has all the file names for each question and add it to the jsLocation object
+                    $.when($.getJSON(baseURL + "supporting/objQuesFileInfo.json", resp => objJSPaths.ques = 'ques/' + resp[self.quesNum].filename))
+                        // Prepend each file in the objJSPaths object with the baseURL
+                        .then((resp) => $.each(objJSPaths, (key, value) => objJSPaths[key] = baseURL + value))
+                        .done((resp) => resolve(objJSPaths) );
+                });
+            }
+
+            let objJS = { "IS_PRODUCTION": IS_PRODUCTION };
+            const udfLoad = () => new Promise(resolve => $.getScript(jsInfo.udf, () => {
+                objJS.udf = new UDFClass($, objJS);
+                return resolve(objJS.udf);
+            }));
+            const financeLoad = () => new Promise(resolve => {
+                objJS.Finance = new udf.financejs; // this is already loaded as part of UDF, so the class here is more like a shortcut
+                return resolve(objJS.Finance);
             });
-        }
+            const tvmcalcLoad = () => new Promise(resolve => $.getScript(jsInfo.tvmcalc, () => {
+                objJS.tvmcalc = new TVMCalcsClass($, objJS);
+                return resolve(objJS.tvmcalc);
+            }));
+            const tvmexplLoad = () => new Promise(resolve => $.getScript(jsInfo.tvmexpl, () => {
+                objJS.tvmexpl = new TVMExplanation($, objJS);
+                return resolve(objJS.tvmexpl);
+            }));
+            const capbudgLoad = () => new Promise(resolve => $.getScript(jsInfo.capbudg, () => {
+                objJS.capbudg = new CapitalBudgeting($, objJS);
+                return resolve(objJS.capbudg)
+            }));
+            const quesLoad = () => new Promise(resolve => $.getScript(jsInfo.ques, (jsText) => {
+                const regex = new RegExp("(function)\\s(fnQues\\d*)\\s*\\("); // Assumes question file starts with `function fnQues470 (objFromMainQues) {`
+                const quesFunction = jsText.split(regex)[2]; // returns fnQues470
+                // Creates constructor based on that finance question (e.g., function fnQues470)
+                // Also passes all the JS files to the question, received as objFromMain. The question then chooses which ones to use.
+                // const objToQues = { "IS_PRODUCTION": IS_PRODUCTION, "udf": udf, "tvmexpl": tvmexpl, "tvmcalc": tvmcalc, "capbudg": capbudg, "Finance":new udf.financejs };
+                objJS[quesFunction] = new window[quesFunction]($, objJS);
+                return resolve(objJS[quesFunction]);
+            }));
 
-        let objJS = { "IS_PRODUCTION": IS_PRODUCTION };
-        const udfLoad = () => new Promise(resolve => $.getScript(jsInfo.udf, () => {
-            objJS.udf = new UDFClass($, objJS);
-            return resolve(objJS.udf);
-        }));
-        const financeLoad = () => new Promise(resolve => {
-            objJS.Finance = new udf.financejs; // this is already loaded as part of UDF, so the class here is more like a shortcut
-            return resolve(objJS.Finance);
-        });
-        const tvmcalcLoad = () => new Promise(resolve => $.getScript(jsInfo.tvmcalc, () => {
-            objJS.tvmcalc = new TVMCalcsClass($, objJS);
-            return resolve(objJS.tvmcalc);
-        }));
-        const tvmexplLoad = () => new Promise(resolve => $.getScript(jsInfo.tvmexpl, () => {
-            objJS.tvmexpl = new TVMExplanation($, objJS);
-            return resolve(objJS.tvmexpl);
-        }));
-        const capbudgLoad = () => new Promise(resolve => $.getScript(jsInfo.capbudg, () => {
-            objJS.capbudg = new CapitalBudgeting($, objJS);
-            return resolve(objJS.capbudg)
-        }));
-        const quesLoad = () => new Promise(resolve => $.getScript(jsInfo.ques, (jsText) => {
-            const regex = new RegExp("(function)\\s(fnQues\\d*)\\s*\\("); // Assumes question file starts with `function fnQues470 (objFromMainQues) {`
-            const quesFunction = jsText.split(regex)[2]; // returns fnQues470
-            // Creates constructor based on that finance question (e.g., function fnQues470)
-            // Also passes all the JS files to the question, received as objFromMain. The question then chooses which ones to use.
-            // const objToQues = { "IS_PRODUCTION": IS_PRODUCTION, "udf": udf, "tvmexpl": tvmexpl, "tvmcalc": tvmcalc, "capbudg": capbudg, "Finance":new udf.financejs };
-            objJS[quesFunction] = new window[quesFunction]($, objJS);
-            return resolve(objJS[quesFunction]);
-        }));
-
-        jsInfo = await jsPaths();
-        udf = await udfLoad();
-        Finance = await financeLoad();
-        tvmcalc = await tvmcalcLoad();
-        tvmexpl = await tvmexplLoad();
-        capbudg = await capbudgLoad();
-        ques = await quesLoad();
-        return { "quesNum": self.quesNum, "status": "loadJSFiles complete" };
+            jsInfo = await jsPaths();
+            udf = await udfLoad();
+            Finance = await financeLoad();
+            tvmcalc = await tvmcalcLoad();
+            tvmexpl = await tvmexplLoad();
+            capbudg = await capbudgLoad();
+            ques = await quesLoad();
+            return jsInfo;
+        };
     }
-}
 
-if (IS_PRODUCTION) {
-    console.log("bottom");
-    Qualtrics.SurveyEngine.addOnload(function () {
+    if (IS_PRODUCTION) {
+        console.log("bottom");
+        Qualtrics.SurveyEngine.addOnload(function () {
+            // Self-invokes the file. Putting .bind allows me to use self=this inside the function, which wouldn't have worked otherwise in strict mode
+            jQuery(document).ready(() => {
+                mainFunc.bind(mainFunc, jQuery)();
+            });
+        });
+    } else {
         // Self-invokes the file. Putting .bind allows me to use self=this inside the function, which wouldn't have worked otherwise in strict mode
         jQuery(document).ready(() => {
             mainFunc.bind(mainFunc, jQuery)();
         });
-    });
-} else {
-    // Self-invokes the file. Putting .bind allows me to use self=this inside the function, which wouldn't have worked otherwise in strict mode
-    jQuery(document).ready(() => {
-        mainFunc.bind(mainFunc, jQuery)();
-    });
-}
+    }
