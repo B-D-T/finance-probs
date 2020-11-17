@@ -70,6 +70,7 @@ function mainFunc($) {
     $.when(loadJSFiles())
         // Then get the variables from the question
         .then((respObj) => {
+            console.log(`Apparently, I'm done with loadJSFiles. Here's the response:`, respObj);
             const origVars = ques.defineVariables();
             return (IS_PRODUCTION) ? fetchQuesVars(origVars, respObj["quesNum"]) : origVars;
         })
@@ -161,8 +162,8 @@ function mainFunc($) {
                 udf: "supporting/v3user-defined-functions.js",
                 tvmexpl: "supporting/v3tvm-explanations.js",
                 tvmcalc: "supporting/v3tvm-calcs.js",
-                capbudg: "supporting/v3capbudg.js"
-                // ques: ''
+                capbudg: "supporting/v3capbudg.js",
+                ques: ''
             };
             return new Promise(resolve => {
                 // Find the location for the JSON that has all the file names for each question and add it to the jsLocation object
