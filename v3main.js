@@ -3,15 +3,15 @@
 // GLOBAL
 
 if (typeof IS_PRODUCTION == 'undefined') {
-    let IS_PRODUCTION=true;
+    var IS_PRODUCTION = true;
 }
 IS_PRODUCTION = !window.Qualtrics === false;
 
 if (typeof IS_QUES_PAGE == 'undefined') {
-    let IS_QUES_PAGE=true;
+    var IS_QUES_PAGE = true;
 }
 
-function quesNumGlobal() { 
+function quesNumGlobal() {
     // reads 'divQues470-stem' and returns 470
     const divID = jQuery("#kxAutoRender>div").attr('id');
     if (!divID) {
@@ -19,15 +19,16 @@ function quesNumGlobal() {
         return undefined;
     } else {
         const regexMatch = divID.match(/(divQues)(\d*)(\-*)/);
-        return parseInt(regexMatch[2]);    
+        return parseInt(regexMatch[2]);
     }
 }
 
 function mainFunc($) {
     "use strict";
     const self = this;
+    console.log("Here I am", IS_PRODUCTION , IS_QUES_PAGE);
 
-    if (IS_QUES_PAGE===false) {return "Cancelling all code"};
+    if (typeof IS_QUES_PAGE === 'undefined' || IS_QUES_PAGE === false) {return "Cancelling all code"};
 
     self.quesNum = quesNumGlobal(); // FIX: I need a better way to do the quesNum. 
 
@@ -65,12 +66,12 @@ function mainFunc($) {
     // THIS RUNS FIRST
     // Load all the JS files
     $.when(loadJSFiles())
-    // Then get the variables from the question
-    .then((respObj) => {
-        const origVars = ques.defineVariables();
-        return (IS_PRODUCTION) ? fetchQuesVars(origVars, respObj["quesNum"]) : origVars;
-    })
-    .then((varsObj) => buildPage(varsObj));
+        // Then get the variables from the question
+        .then((respObj) => {
+            const origVars = ques.defineVariables();
+            return (IS_PRODUCTION) ? fetchQuesVars(origVars, respObj["quesNum"]) : origVars;
+        })
+        .then((varsObj) => buildPage(varsObj));
 
 
     // If the variable is already in the embedded data, we'll use that. Otherwise, the code stores the variable in the embedded data based on our definition.
@@ -170,7 +171,7 @@ function mainFunc($) {
             });
         }
 
-        let objJS = {"IS_PRODUCTION": IS_PRODUCTION};
+        let objJS = { "IS_PRODUCTION": IS_PRODUCTION };
         const udfLoad = () => new Promise(resolve => $.getScript(jsInfo.udf, () => {
             objJS.udf = new UDFClass($, objJS);
             return resolve(objJS.udf);
@@ -212,8 +213,17 @@ function mainFunc($) {
     }
 }
 
-// Self-invokes the file. Putting .bind allows me to use self=this inside the function, which wouldn't have worked otherwise in strict mode
-jQuery( document ).ready(()=>{
-    mainFunc.bind(mainFunc, jQuery)();
-});
-
+if (IS_PRODUCTION) {
+    console.log("bottom");
+    Qualtrics.SurveyEngine.addOnload(function () {
+        // Self-invokes the file. Putting .bind allows me to use self=this inside the function, which wouldn't have worked otherwise in strict mode
+        jQuery(document).ready(() => {
+            mainFunc.bind(mainFunc, jQuery)();
+        });
+    });
+} else {
+    // Self-invokes the file. Putting .bind allows me to use self=this inside the function, which wouldn't have worked otherwise in strict mode
+    jQuery(document).ready(() => {
+        mainFunc.bind(mainFunc, jQuery)();
+    });
+}
