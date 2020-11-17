@@ -214,15 +214,15 @@ function mainFunc($) {
         }));
 
         
-        jsInfo = await jsPaths(),
-        udf = await udfLoad(),
-        Finance = await financeLoad(),
-        tvmcalc = await tvmcalcLoad(),
-        tvmexpl = await tvmexplLoad(),
-        capbudg = await capbudgLoad(),
-        ques = await quesLoad()
+        jsInfo = await jsPaths();
+        udf = await udfLoad();
+        Finance = await financeLoad();
+        tvmcalc = await tvmcalcLoad();
+        tvmexpl = await tvmexplLoad();
+        capbudg = await capbudgLoad();
+        ques = await quesLoad();
         
-        return jsPaths();
+        return jsInfo;
         
     };
 } // end of mainFunc
