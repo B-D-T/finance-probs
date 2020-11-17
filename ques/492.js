@@ -44,7 +44,7 @@ function fnQues492(objFromMainQues) {
         obj.solution = probDisplay(quesVars)`
         Step-by-step solution unavailable at this time.<br />
         In short, you need to determine the FV of the annuity in year ${varReturnInYear}.<br/>
-        FV<sub>${varReturnInYear}</sub> = \$${calcTheAns.toLocaleString('en')}.`;
+        FV<sub>${varReturnInYear}</sub> = \$${calcTheAns.toLocaleString('en-US')}.`;
 
         return obj;
     } // end of fillPage

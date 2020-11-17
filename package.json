@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/B-D-T/finance-probs#readme",
   "dependencies": {
+    "financejs": "^4.1.0",
     "katex": "^0.12.0"
   }
 }

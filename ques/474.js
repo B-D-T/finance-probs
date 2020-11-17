@@ -25,7 +25,7 @@ function fnQues474(objFromMainQues) {
             dispDivYear0: divYear0.toFixed(2),//$D
             dispGPerc: uRound(varG * 100, 4), // perr
             dispRatePerc: uRound(varRate * 100, 4), // pere
-            dispPMT: varPMT.toFixed(2).toLocaleString('en') 
+            dispPMT: varPMT.toFixed(2).toLocaleString('en-US') 
         };
         createEDVarInScope(displayVars);
 

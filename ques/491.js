@@ -37,7 +37,7 @@ function fnQues491 (objFromMainQues) {
     function fillPage() {
         let obj = {};
 
-        // const dispPMT = uRound(varPMT,4).toLocaleString('en');
+        // const dispPMT = uRound(varPMT,4).toLocaleString('en-US');
         const dispRatePerc = uRound(varRate*100,4);
 
         obj.ansBoxMessage = ansBoxMessages("writeOutNums");
@@ -70,7 +70,7 @@ function fnQues491 (objFromMainQues) {
         using the PV formula once gives you the value in year ${varAnn2Y-1};
         once you have that, you need to discount it again to get to year 0.</p>
         <p>
-        The correct answer is \$${calcTheAns.toLocaleString('en')}.</p>`;
+        The correct answer is \$${calcTheAns.toLocaleString('en-US')}.</p>`;
     //    ${explainPVAnnuityConst_PV(quesVars)}
         return obj;
 

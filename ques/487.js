@@ -56,7 +56,7 @@ function fnQues487(objFromMainQues) {
 
         // Create object with the full value of the variable ready for display
         const dispFull = Object.fromEntries(
-            Object.entries(contractAmt).map( ([key, curVal], idx) => ["AmtYr"+key, `\$`+curVal.toLocaleString('en')] )
+            Object.entries(contractAmt).map( ([key, curVal], idx) => ["AmtYr"+key, `\$`+curVal.toLocaleString('en-US')] )
         );
 
         // Create object with the full value of the variable ready for display
@@ -117,13 +117,13 @@ function fnQues487(objFromMainQues) {
         <p>
         \\[
             \\begin{aligned}
-                \\text{Year 0} &= \\$${parseInt(calcPVYr00).toLocaleString('en')} \\\\
-                \\text{+ Year 1} &= \\$${parseInt(calcPVYr01).toLocaleString('en')} \\\\
-                \\text{+ Year 2} &= \\$${parseInt(calcPVYr02).toLocaleString('en')} \\\\
-                \\text{+ Year 3} &= \\$${parseInt(calcPVYr03).toLocaleString('en')} \\\\
-                \\text{+ Year 4} &= \\$${parseInt(calcPVYr04).toLocaleString('en')} \\\\
-                \\text{+ Year 5} &= \\$${parseInt(calcPVYr05).toLocaleString('en')} \\\\
-                \\text{Total } PV_0 \\text{ of the contact} &= \\bold{\\$${parseInt(calcTheAns).toLocaleString('en')}}
+                \\text{Year 0} &= \\$${parseInt(calcPVYr00).toLocaleString('en-US')} \\\\
+                \\text{+ Year 1} &= \\$${parseInt(calcPVYr01).toLocaleString('en-US')} \\\\
+                \\text{+ Year 2} &= \\$${parseInt(calcPVYr02).toLocaleString('en-US')} \\\\
+                \\text{+ Year 3} &= \\$${parseInt(calcPVYr03).toLocaleString('en-US')} \\\\
+                \\text{+ Year 4} &= \\$${parseInt(calcPVYr04).toLocaleString('en-US')} \\\\
+                \\text{+ Year 5} &= \\$${parseInt(calcPVYr05).toLocaleString('en-US')} \\\\
+                \\text{Total } PV_0 \\text{ of the contact} &= \\bold{\\$${parseInt(calcTheAns).toLocaleString('en-US')}}
             \\end{aligned}
 
         \\]

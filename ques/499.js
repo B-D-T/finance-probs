@@ -53,8 +53,8 @@ function fnQues499(objFromMainQues) {
             and that both alternatives have equal risk.
         </p>
         <p>
-            <b>Choice A:</b> In varNa years, they'll pay you \$${varFVa.toLocaleString('en')}.<br />
-            <b>Choice B:</b> In varNb years, they'll pay you \$${varFVb.toLocaleString('en')}.
+            <b>Choice A:</b> In varNa years, they'll pay you \$${varFVa.toLocaleString('en-US')}.<br />
+            <b>Choice B:</b> In varNb years, they'll pay you \$${varFVb.toLocaleString('en-US')}.
         </p>
         `;
 

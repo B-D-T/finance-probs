@@ -36,7 +36,7 @@ fnQues497 = function (objFromMainQues) {
 
         obj.stem = probDisplay(quesVars)`
         <p>
-            You will receive a payment of \$${varFV.toLocaleString('en')} in varN years.
+            You will receive a payment of \$${varFV.toLocaleString('en-US')} in varN years.
             What is the present value of the payment in today's dollars (at t=0),
             assuming a dispRatePerc% discount rate?
         </p>

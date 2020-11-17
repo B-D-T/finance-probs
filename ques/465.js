@@ -29,8 +29,8 @@ function fnQues465(objFromMainQues) {
         let displayVars = {
             dispRatePerc: uRound(varRate * 100, 4), //discountrateInteger
             dispCouponRatePerc: uRound(varCouponRate * 100, 4), //couponrateInteger
-            dispPMT: uRound(varPMT,2).toLocaleString('en'),
-            dispFV: uRound(varFV,2).toLocaleString('en')
+            dispPMT: uRound(varPMT,2).toLocaleString('en-US'),
+            dispFV: uRound(varFV,2).toLocaleString('en-US')
         };
         createEDVarInScope(displayVars);
 

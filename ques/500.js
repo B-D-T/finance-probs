@@ -47,8 +47,8 @@ function fnQues500(objFromMainQues) {
             At what <i>rate</i> would the present value of the two choices be equal?
         </p>
         <p>
-            <b>Choice A:</b> Receive a future amount of \$${varFVa.toLocaleString('en')} in varNa years<br />
-            <b>Choice B:</b> Receive a future amount of \$${varFVb.toLocaleString('en')} in varNb years
+            <b>Choice A:</b> Receive a future amount of \$${varFVa.toLocaleString('en-US')} in varNa years<br />
+            <b>Choice B:</b> Receive a future amount of \$${varFVb.toLocaleString('en-US')} in varNb years
         </p>
         `;
 

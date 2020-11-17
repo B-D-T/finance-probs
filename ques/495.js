@@ -46,10 +46,10 @@ function fnQues495(objFromMainQues) {
         obj.solution = probDisplay(quesVars)`
         Step-by-step solution unavailable at this time.<br />
         In short, you need to determine the FV of the annuity portion
-        (FV<sub>${varY + varN - 1}</sub> = ${calcFVofAnn.toLocaleString('en')}),
+        (FV<sub>${varY + varN - 1}</sub> = ${calcFVofAnn.toLocaleString('en-US')}),
         then compound that lump sum forward ${calcNforSinglePmt} years to get
         the final answer: <br>
-        FV<sub>${varReturnInYear}</sub> = \$${calcTheAns.toLocaleString('en')}.`;
+        FV<sub>${varReturnInYear}</sub> = \$${calcTheAns.toLocaleString('en-US')}.`;
 
         return obj;
     } // end of fillPage

@@ -43,7 +43,7 @@ function fnQues498(objFromMainQues) {
         obj.ansBoxMessage = ansBoxMessages("writeOutNums");
 
         obj.stem = probDisplay(quesVars)`
-            In varN years, a pension liability will require payment of \$${varFV.toLocaleString('en')}.
+            In varN years, a pension liability will require payment of \$${varFV.toLocaleString('en-US')}.
             If the discount rate is dispRatePerc%, how much should be invested
             today to ensure the liability is exactly met?
         `;

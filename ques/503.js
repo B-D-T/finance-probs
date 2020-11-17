@@ -43,7 +43,7 @@ function fillPage() {
     obj.ansBoxMessage = ansBoxMessages("writeOutNums");
 
     obj.stem = probDisplay(quesVars)`
-        You have \$${varPV.toLocaleString('en')} right now.
+        You have \$${varPV.toLocaleString('en-US')} right now.
         If we wait varN years, what will the value be of that money,
         assuming a compounding rate of dispRatePerc%?
     `;

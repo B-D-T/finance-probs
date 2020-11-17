@@ -32,7 +32,7 @@ function fnQues490 (objFromMainQues) {
     function fillPage() {
         let obj = {};
 
-        const dispPMT = uRound(varPMT,4).toLocaleString('en');
+        const dispPMT = uRound(varPMT,4).toLocaleString('en-US');
         const dispRatePerc = uRound(varRate*100,4);
 
         obj.ansBoxMessage = ansBoxMessages("writeOutNums");
@@ -48,7 +48,7 @@ function fnQues490 (objFromMainQues) {
 
         obj.solution = probDisplay(quesVars)`
         Step-by-step solution unavailable at this time.
-        The correct answer is \$${calcTheAns.toLocaleString('en')}.`;
+        The correct answer is \$${calcTheAns.toLocaleString('en-US')}.`;
     //    ${explainPVAnnuityConst_PV(quesVars)}
         return obj;
 

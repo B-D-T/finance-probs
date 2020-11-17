@@ -33,7 +33,7 @@ function fnQues486 (objFromMainQues) {
 
         obj.stem = probDisplay(quesVars)`
         What is the future value (the value in year varN) of a standard annuity that
-        pays \$${varPMT.toLocaleString('en')} for varN years at a rate of ${uRound(varRate*100,4)}%?
+        pays \$${varPMT.toLocaleString('en-US')} for varN years at a rate of ${uRound(varRate*100,4)}%?
         `
 
         obj.solution = probDisplay(quesVars)`

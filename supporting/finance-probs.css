@@ -1,0 +1,183 @@
+
+/* I created this for the IRR problems in 469.js,
+but it probably can be useful in many other places too.  */
+.cash-flow-table{
+    display: flex;
+    flex-flow: column;
+    max-width: 900px;
+}
+    .cash-flow-table>div{
+        display: flex;
+        flex-flow: row nowrap;
+    }
+    .cash-flow-table .heading{
+        min-width: 60px;
+        font-weight: bold;
+    }
+    .cash-flow-table .years-container>div{
+        font-weight: bold;
+        padding: 3px 1px;
+        background-color: black;
+        color: white;
+    }
+    .cash-flow-table .amts-container>div{
+        padding: 3px 1px;
+        border: 0.5px solid black;
+    }
+    .cash-flow-table .entry{
+        text-align: center;
+        width: 100%;
+        min-width: 65px;
+    }
+
+.capbudg-resp-area {
+    margin-bottom:3em;
+}
+
+.capbudg-resp-area .prompt-text{
+    font-weight: bold;
+    font-style: italic;
+    color: rgb(80, 11, 121);
+    font-size:1.1em;
+}
+.capbudg-resp-area input.ansbox{
+    width: 300px;
+    height: 1.5em;
+    text-align: right;
+}
+
+
+.capbudg-resp-area .prompt-text.payback-period, .capbudg-resp-area .prompt-text.irr{
+    margin-bottom: 0px;    
+}
+    /* Clarifying text below the prompts that tells what to enter 0 if answer is unavailable*/
+    .capbudg-resp-area .prompt-text.payback-period + p, .capbudg-resp-area .prompt-text.irr + p{
+        margin-top:0px;
+        font-size:0.8em;
+    }
+
+.capbudg-variables-container *{
+    /* border: 1px solid red; */
+}
+.capbudg-variables-container{
+    width: fit-content;
+    padding-bottom: 15px;
+    border: 1px solid black;
+}
+
+.capbudg-variables-container{
+    display: flex;
+    flex-flow: column;
+
+}
+.variable-rows{
+    display:flex;
+    flex-flow: column;
+}
+.row-variable:nth-child(odd){
+    background-color: #f2f2f2;
+}
+
+.variable-rows>div{
+    display:flex;
+    flex-flow: row;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.capbudg-variables-container .row-top-heading{
+    background-color: black;
+    color: white;
+}
+.capbudg-variables-container .row-top-heading.solution{
+    background-color: rgb(50, 0, 129);
+}
+
+.capbudg-variables-container .row-top-heading>div{
+    font-weight: bold;
+    font-size: 2em;
+    width: 100%;
+    text-align: center;
+}
+.variable-rows .row-section-heading{
+    background-color: black;
+    color: white;
+}
+.variable-rows .row-section-heading.solution{
+    background-color: rgb(50, 0, 129);
+}
+.variable-rows .row-section-heading>div{
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.variable-rows .catg{
+    width: 100px;
+    margin-right: 2%;
+    padding-left:10px;
+    font-weight: 500;
+}
+.variable-rows .meaning{
+    width: 300px;
+    margin-right: 2%;
+}
+.variable-rows .value{
+    text-align: center;
+    width: 200px;
+}
+
+.value input.ansbox{
+    height: 1.5em;
+    text-align: right;
+}
+.value input.ansbox.solution{
+    font-weight: bold;
+    border: 0px;
+    background-color: transparent;
+}
+
+
+.small-text-below-paragraph{
+    font-size:0.8em;
+    margin-top: 0px;
+}
+
+
+/* .capbudg-variables-container .row-top-heading{
+    grid-area: tophead;
+    text-align: center;
+    font-weight: bold;
+    font-size: 2em;
+    justify-items: stretch;
+    grid-column:start-col end-col;
+}
+
+.capbudg-variables-container .variable-rows>div{
+    display: grid;
+    grid-template-columns: 18% 48% 30%;
+    grid-template-rows: auto;
+    grid-template-areas: 
+      "[start-col] tophead . . [end-col]"
+      "header header header"
+      "catg meaning value";
+    gap: 10px 2%;
+}
+
+.variable-rows .row-section-heading{
+    grid-area: header;
+    text-align: center;
+    font-weight: bold;
+}
+.variable-rows .row-variable{
+    grid-area: header;
+}
+
+.variable-rows .catg{
+    text-align: left;
+}
+.variable-rows .meaning{
+    text-align: center;
+}
+.variable-rows .value{
+    text-align: center;
+} */

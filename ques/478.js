@@ -22,7 +22,7 @@ function fnQues478(objFromMainQues) {
         let displayVars = {
             dispPMT: varPMT.toFixed(2),//$D
             dispGPerc: uRound(varG * 100, 4), // perr
-            dispPV: varPV.toFixed(2).toLocaleString('en'),
+            dispPV: varPV.toFixed(2).toLocaleString('en-US'),
             dispTheAns: uRound(calcTheAns*100,4)
         };
         createEDVarInScope(displayVars);

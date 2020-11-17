@@ -52,7 +52,7 @@ function fnQues475(objFromMainQues) {
         createEDVarInScope(calcVars);
 
         let displayVars = {
-            dispDiv1: varDiv1.toFixed(2).toLocaleString('en'),
+            dispDiv1: varDiv1.toFixed(2).toLocaleString('en-US'),
             dispPartBDiv: partBDiv.toFixed(2),
             dispG1Perc: uRound(varG1 * 100, 4), // perg1
             dispG2Perc: uRound(varG2 * 100, 4), // perg2

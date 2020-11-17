@@ -43,7 +43,7 @@ function fnQues501 (objFromMainQues) {
         obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
 
         obj.stem = probDisplay(quesVars)`
-            An NBA team's value is currently \$${varPV.toLocaleString('en')} and has been increasing
+            An NBA team's value is currently \$${varPV.toLocaleString('en-US')} and has been increasing
             at a rate of dispRatePerc% per year over the last 10 years.
             Assuming that trend continues,
             how many years will it be until the team is worth one billion dollars?

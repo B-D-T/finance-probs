@@ -13,7 +13,7 @@ function explainPVSinglePmt_PV(qvObj) {
         varFV: "black"
     };
 
-    const dispFV = qvObj.varFV.toFixed(2).toLocaleString('en');
+    const dispFV = qvObj.varFV.toFixed(2).toLocaleString('en-US');
     let myStr = `
         <p>
             There is a lump sum (\$${dispFV}) in the future (year varN),
@@ -57,7 +57,7 @@ function explainFVSinglePmt_FV(qvObj) {
 
     let myStr = `
         <p>
-            You have a lump sum (\$${varPV.toLocaleString('en')}) in year ${varY},
+            You have a lump sum (\$${varPV.toLocaleString('en-US')}) in year ${varY},
             and you want to know what it is worth in year ${varY + varN}.
             Let's see this on a timeline:
             ${timelineFVSinglePmt(qvObj)}
@@ -88,8 +88,8 @@ function explainFVSinglePmt_N(qvObj) {
 
     let myStr = `
         <p>
-            You know PV<sub>varY</sub> (\$${varPV.toLocaleString('en')})
-            and FV<sub>??</sub> (\$${varFV.toLocaleString('en')}),
+            You know PV<sub>varY</sub> (\$${varPV.toLocaleString('en-US')})
+            and FV<sub>??</sub> (\$${varFV.toLocaleString('en-US')}),
             but you don't know how long it will take for the
             PV to grow to the FV amount.
             Let's see this on a timeline:
@@ -166,13 +166,13 @@ function explainPVAnnuityConst_PV(qv) {
             but we want PV<sub>0</sub> (the Present Value of the payments in Year 0).
             At this point, we can (and should)
             <i>completely forget about
-            the original ${varN} payments of \$${varPMT.toLocaleString('en')} --
+            the original ${varN} payments of \$${varPMT.toLocaleString('en-US')} --
             they are irrelevant now!</i>
             We've collapsed those payments into a single value.
             Essentially, we have an entirely new problem now, with "new" variables:</p>
             <p style="margin-left:30px;">
             "What is the value in Year 0 of a lump sum payment of
-            \$${theAns.toLocaleString('en')}
+            \$${theAns.toLocaleString('en-US')}
             happening in year ${varY-1}, assuming a rate of ${uRound(varRate*100,4)}%?"
             </p>
             <p>
@@ -216,7 +216,7 @@ function explainPVGrowingAnnuityStand_PV(qv) {
         `
         <p>
             There is a series of varN payments.
-            The first payment (in year varY) is \$${varPMT.toLocaleString('en')},
+            The first payment (in year varY) is \$${varPMT.toLocaleString('en-US')},
             and the payment amount changes each year at a rate of ${uRound(varG * 100, 4)}%.
             Let's see these on a timeline:
             ${timelineAnnuity(qvObj, "pv")}
@@ -265,7 +265,7 @@ function explainPVPerpetuityConst_PV(qv) {
         `
         <p>
             This is a series of payments that go on forever, with
-            the first payment of \$${varPMT.toLocaleString('en')}
+            the first payment of \$${varPMT.toLocaleString('en-US')}
             happening in year varY.
     `;
 
@@ -317,7 +317,7 @@ function explainPVPerpetuityConst_PV(qv) {
             Essentially, we have an entirely new problem now, with "new" variables:</p>
             <p style="margin-left:30px;">
             "What is the value in Year 0 of a lump sum payment of
-            \$${theAns.toFixed(2).toLocaleString('en')}
+            \$${theAns.toFixed(2).toLocaleString('en-US')}
             happening in year ${varY-1}, assuming a rate of ${uRound(varRate*100,4)}%?"
             </p>
             <p>
@@ -701,7 +701,7 @@ function explainPVBondLevelAnnual_PV(qv){
     `;
 
     // Add them back together
-    const dispTheAns = uRound(qv.calcTheAns,4).toLocaleString('en');
+    const dispTheAns = uRound(qv.calcTheAns,4).toLocaleString('en-US');
     myStr+= `
         <div>
             <h2 style="${strAddBackTogether}">
@@ -780,13 +780,13 @@ function explainPVBondLevelAnnual_PV(qv){
             but we want PV<sub>0</sub> (the Present Value of the payments in Year 0).
             At this point, we can (and should)
             <i>completely forget about
-            the original ${varN} payments of \$${varPMT.toLocaleString('en')} --
+            the original ${varN} payments of \$${varPMT.toLocaleString('en-US')} --
             they are irrelevant now!</i>
             We've collapsed those payments into a single value.
             Essentially, we have an entirely new problem now, with "new" variables:</p>
             <p style="margin-left:30px;">
             "What is the value in Year 0 of a lump sum payment of
-            \$${theAns.toLocaleString('en')}
+            \$${theAns.toLocaleString('en-US')}
             happening in year ${varY-1}, assuming a rate of ${uRound(varRate*100,4)}%?"
             </p>
             <p>
@@ -834,8 +834,8 @@ function timelinePVSinglePmt(qv) {
 }
 
 function timelineFVSinglePmt(qv) {
-    const dispPV = (qv.varPV.toString()).includes("?") ? "??" : (qv.varPV).toLocaleString('en');
-    const dispFV = (qv.varFV.toString()).includes("?") ? "??" : (qv.varFV).toLocaleString('en');
+    const dispPV = (qv.varPV.toString()).includes("?") ? "??" : (qv.varPV).toLocaleString('en-US');
+    const dispFV = (qv.varFV.toString()).includes("?") ? "??" : (qv.varFV).toLocaleString('en-US');
     let myStr = `
     <div style="width:350px;text-align: center; margin:25px;">
         <div style="display:flex; justify-content:center; font-weight:bold;">
@@ -874,7 +874,7 @@ function timelineAnnuity(qv, tvmType = "pv", annPmts = [], showArrow = true) {
     let
         varN = isPerpetuity ? tlMaxCols-2 : qv.varN,
         varY = qv.varY,
-        varPMT = qv.varPMT.toFixed(2).toLocaleString('en');
+        varPMT = qv.varPMT.toFixed(2).toLocaleString('en-US');
 
     // If a payment timeline (annPmts) is passed, that's used instead of the qv values.
     let useCallerTL = false;
@@ -1663,7 +1663,7 @@ function solvePVAnnuityConstant_PV(qv, objColors) {
     <p>
         This can be interpreted as follows:
         The value in Year ${varY - 1} of ${varN} payments of \$${varPMT} each, starting in year ${varY},
-        is the same as a lump sum of \$${uRound(theAns, 2).toLocaleString('en')} in year ${varY - 1}.
+        is the same as a lump sum of \$${uRound(theAns, 2).toLocaleString('en-US')} in year ${varY - 1}.
     </p>
 `;
     myStr = addColorToVars(myStr, objColors);
@@ -1718,7 +1718,7 @@ function solvePVAnnuityGrowing_PV(qv, objColors) {
         This can be interpreted as follows:
         The value in Year ${varY - 1} of an annuity growing at ${uRound(varG*100,4)}% over ${varN} payments,
         where the first payment of \$${varPMT} is in year ${varY},
-        is the same as a lump sum of \$${uRound(theAns, 2).toLocaleString('en')} in year ${varY - 1}.
+        is the same as a lump sum of \$${uRound(theAns, 2).toLocaleString('en-US')} in year ${varY - 1}.
     </p>
 `;
     myStr = addColorToVars(myStr, objColors);
@@ -1759,7 +1759,7 @@ function solvePVPerpetuityStand_PV(qv, objColors) {
         This can be interpreted as follows:
         The value in Year ${varY - 1} of a perpetuity growing at ${uRound(varG*100,4)}% indefinitely,
         where the first payment of \$${varPMT.toFixed(2)} is in year ${varY},
-        is the same as a lump sum of \$${theAns.toFixed(2).toLocaleString('en')} in year ${varY - 1}.
+        is the same as a lump sum of \$${theAns.toFixed(2).toLocaleString('en-US')} in year ${varY - 1}.
     </p>
 `;
     myStr = addColorToVars(myStr, objColors);
@@ -1956,7 +1956,7 @@ function solveFVAnnuityConstant_FV(qv, objColors) {
     <p>
         This can be interpreted as follows:
         The value in year ${fvInYear} of ${varN} payments of \$${varPMT} each
-        is the same as a lump sum of \$${uRound(theAns, 2).toLocaleString('en')} in year ${fvInYear}.
+        is the same as a lump sum of \$${uRound(theAns, 2).toLocaleString('en-US')} in year ${fvInYear}.
     </p>
 `;
     myStr = addColorToVars(myStr, objColors);

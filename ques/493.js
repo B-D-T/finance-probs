@@ -36,7 +36,7 @@ function fnQues493(objFromMainQues) {
         obj.ansBoxMessage = ansBoxMessages("writeOutNums");
 
         obj.stem = probDisplay(quesVars)`
-            An annuity makes its first payment of \$${varPMT.toLocaleString('en')} in year ${varY.toString()}
+            An annuity makes its first payment of \$${varPMT.toLocaleString('en-US')} in year ${varY.toString()}
             and increases that amount by ${dispGrowthRatePerc}% per year over ${varN} years.
             Assuming a rate of ${dispRatePerc}%,
             what is the future value (the value in year ${dispFinalYear}) of the annuity?

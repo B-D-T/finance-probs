@@ -38,25 +38,17 @@ function jsonLoaded(objQuesFileInfo) {
 	const udfScriptLocation = baseURL() + "supporting/user-defined-functions.js";
 	const tvmScriptLocation = baseURL() + "supporting/tvm-explanations.js";
 	const tvmCalcsLocation = baseURL() + "supporting/tvm-calcs.js"
+	const captbudgLocation = baseURL() + "supporting/capbudg.js";
 
 
 	// The code below uses nested callbacks, though this risks callback hell if we keep going.
 	// We need udfScript to finish loading before we do anything else.
-	jQuery.getScript(udfScriptLocation, function () {
-		// At this point, the UDF script has been loaded.
-		// Now, we can load other scripts.
-		jQuery.getScript(tvmCalcsLocation, function () {
-			// At this point, the TVM Calcs script has been loaded
-			// The next line loads TVM Explanations, then continues loading scripts.
-			jQuery.getScript(tvmScriptLocation, function () {
-				// At this point, the TVM script has been loaded
-				// The next line loads quesScriptLocation, then it calls the scriptLoaded function.
-				// That is, scriptLoaded happens ONLY after the external 433.js is loaded.
-				jQuery.getScript(quesScriptLocation, scriptsLoaded);
-
-			});
-		});
-	});
+	jQuery
+	.when(jQuery.getScript(udfScriptLocation) ) // At this point, the UDF script has been loaded. Now, we can load other scripts.
+	.then((prevScript)=>jQuery.getScript(tvmCalcsLocation) ) // At this point, the TVM Calcs script has been loaded. The next line loads TVM Explanations, then continues loading scripts.
+	.then((prevScript)=>jQuery.getScript(captbudgLocation) ) // The Capital Budgeting script has been loaded
+	.then((prevScript)=>jQuery.getScript(tvmScriptLocation) ) // At this point, the TVM script has been loaded. The next line loads quesScriptLocation, then it calls the scriptLoaded function. That is, scriptLoaded happens ONLY after the external 433.js is loaded.
+	.done((prevScript)=>jQuery.getScript(quesScriptLocation, scriptsLoaded) );
 }
 
 

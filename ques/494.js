@@ -34,7 +34,7 @@ function fnQues494 (objFromMainQues) {
     function fillPage() {
         let obj = {};
 
-        const dispPMT = uRound(varPMT,4).toLocaleString('en');
+        const dispPMT = uRound(varPMT,4).toLocaleString('en-US');
         const dispRatePerc = uRound(varRate*100,4);
 
         obj.ansBoxMessage = ansBoxMessages("writeOutNums");
@@ -61,7 +61,7 @@ function fnQues494 (objFromMainQues) {
         <p>
         Then, treat that as a single payment and 
         discount it back ${varY-1-varReturnInYear} years to get to year varReturnInYear.
-        The correct answer is \$${calcTheAns.toLocaleString('en')}.</p>`;
+        The correct answer is \$${calcTheAns.toLocaleString('en-US')}.</p>`;
     //    ${explainPVAnnuityConst_PV(quesVars)}
         return obj;
 

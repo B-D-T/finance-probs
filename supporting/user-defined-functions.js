@@ -12,7 +12,8 @@ function storeQuesRespVars(theQuesVars, theAns) {
         "objQuesVars": theQuesVars, // the property stores an object
         "correctAns": theAns
     };
-    let strQuesVarsStorageKey = "strQues" + objQuesResp.quesNum + "VarsStorage";
+    let strQuesVarsStorageKey = "strQues" + objQuesResp.quesNum + "VarsStorage"; // strQues433VarsStorage
+    console.log('udf -> objQuesResp = ', objQuesResp);
     let strQuesVarsStorageVal = JSON.stringify(objQuesResp);
 
     if (!(objQuesCaller.isProduction == false)) {
@@ -28,7 +29,7 @@ function setEDQuesRespVars(objRespFeedback) {
     // Read the student's response from the page and add it to the feedback object
     let stuResp = "123123123";
     if (!(objQuesCaller.isProduction == false)) {
-        stuResp = document.getElementById("QR~" + objRespFeedback.qtrxQuesID).value;
+        stuResp = document.getElementById("QR~" + objRespFeedback.qtrxQuesID).value; // read answer from Qualtrics page
     }
     stuResp = sanitizeInput(stuResp);
     objRespFeedback["stuResp"] = stuResp;
