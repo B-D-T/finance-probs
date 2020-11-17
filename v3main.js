@@ -34,8 +34,9 @@ function mainFunc($) {
     if (typeof IS_QUES_PAGE === 'undefined' || IS_QUES_PAGE === false) { return "Cancelling all code" };
 
 
-    let udf, tvmcalc, tvmexpl, capbudg, ques, Finance; // classes
+    let udf, tvmcalc, tvmexpl, capbudg, Finance; // classes
     let jsInfo;
+    let ques = null;
 
 
     function buildPage(varsObj) {
@@ -70,6 +71,7 @@ function mainFunc($) {
     $.when(loadJSFiles())
         // Then get the variables from the question
         .then((respObj) => {
+            console.log('ques', ques, 'respObj', respObj, 'quesNum', respObj["quesNum"]);
             console.log(`Apparently, I'm done with loadJSFiles. Here's the response:`, respObj);
             const origVars = ques.defineVariables();
             return (IS_PRODUCTION) ? fetchQuesVars(origVars, respObj["quesNum"]) : origVars;
@@ -147,6 +149,7 @@ function mainFunc($) {
     //     });
     //     return newObj;
     // }
+    
 
     // Load each of the scripts in order using async-await Promises.
     async function loadJSFiles() {
@@ -170,7 +173,12 @@ function mainFunc($) {
                 $.when($.getJSON(baseURL + "supporting/objQuesFileInfo.json", resp => objJSPaths.ques = 'ques/' + resp[self.quesNum].filename))
                     // Prepend each file in the objJSPaths object with the baseURL
                     .then((resp) => $.each(objJSPaths, (key, value) => objJSPaths[key] = baseURL + value))
-                    .done((resp) => resolve(objJSPaths));
+                    .done((resp) => {
+                        if (typeof objJSPaths['quesNum'] == 'undefined') {
+                            objJSPaths['quesNum'] = self.quesNum;
+                        }
+                        resolve(objJSPaths)
+                    });
             });
         }
 
@@ -205,15 +213,16 @@ function mainFunc($) {
             return resolve(objJS[quesFunction]);
         }));
 
-        await Promise.all([
-            jsInfo = await jsPaths(),
-            udf = await udfLoad(),
-            Finance = await financeLoad(),
-            tvmcalc = await tvmcalcLoad(),
-            tvmexpl = await tvmexplLoad(),
-            capbudg = await capbudgLoad(),
-            ques = await quesLoad()
-        ]);
+        
+        jsInfo = await jsPaths(),
+        udf = await udfLoad(),
+        Finance = await financeLoad(),
+        tvmcalc = await tvmcalcLoad(),
+        tvmexpl = await tvmexplLoad(),
+        capbudg = await capbudgLoad(),
+        ques = await quesLoad()
+        
+        return jsPaths();
         
     };
 } // end of mainFunc
