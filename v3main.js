@@ -8,7 +8,7 @@ if (typeof IS_PRODUCTION == 'undefined') {
 IS_PRODUCTION = !window.Qualtrics === false;
 
 if (typeof IS_QUES_PAGE == 'undefined') {
-    var IS_QUES_PAGE = true;
+    var IS_QUES_PAGE;
 }
 
 function quesNumGlobal() {
@@ -18,6 +18,7 @@ function quesNumGlobal() {
         IS_QUES_PAGE = false;
         return undefined;
     } else {
+        IS_QUES_PAGE = true;
         const regexMatch = divID.match(/(divQues)(\d*)(\-*)/);
         return parseInt(regexMatch[2]);
     }
