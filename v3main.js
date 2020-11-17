@@ -1,12 +1,21 @@
 // main.js
 
 // GLOBAL
-let IS_PRODUCTION = !window.Qualtrics === false;
+
+if (typeof IS_PRODUCTION == 'undefined') {
+    let IS_PRODUCTION=true;
+}
+IS_PRODUCTION = !window.Qualtrics === false;
+
 function quesNumGlobal() { 
     // reads 'divQues470-stem' and returns 470
     const divID = jQuery("#kxAutoRender>div").attr('id');
-    const regexMatch = divID.match(/(divQues)(\d*)(\-*)/);
-    return parseInt(regexMatch[2]);
+    if (!divID) {
+        return undefined
+    } else {
+        const regexMatch = divID.match(/(divQues)(\d*)(\-*)/);
+        return parseInt(regexMatch[2]);    
+    }
 }
 
 function mainFunc($) {
