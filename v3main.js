@@ -197,6 +197,9 @@ function mainFunc($) {
         }
 
         let objJS = { "IS_PRODUCTION": IS_PRODUCTION };
+        jsInfo = await jsPaths();
+        console.log('jsInfo', jsInfo);
+
         const udfLoad = () => new Promise(resolve => $.getScript(jsInfo.udf, () => {
             objJS.udf = new UDFClass($, objJS);
             return resolve(objJS.udf);
@@ -228,7 +231,6 @@ function mainFunc($) {
         }));
 
         
-        jsInfo = await jsPaths();
         udf = await udfLoad();
         Finance = await financeLoad();
         tvmcalc = await tvmcalcLoad();
