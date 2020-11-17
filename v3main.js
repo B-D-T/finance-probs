@@ -1,7 +1,7 @@
 // main.js
 
 // GLOBAL
-let IS_PRODUCTION = false;
+let IS_PRODUCTION = !window.Qualtrics === false;
 function quesNumGlobal() { 
     // reads 'divQues470-stem' and returns 470
     const divID = jQuery("#kxAutoRender>div").attr('id');
