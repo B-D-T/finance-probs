@@ -29,9 +29,10 @@ function mainFunc($) {
     const self = this;
     console.log("Here I am", IS_PRODUCTION , IS_QUES_PAGE);
 
+    self.quesNum = quesNumGlobal(); // FIX: I need a better way to do the quesNum. 
+
     if (typeof IS_QUES_PAGE === 'undefined' || IS_QUES_PAGE === false) {return "Cancelling all code"};
 
-    self.quesNum = quesNumGlobal(); // FIX: I need a better way to do the quesNum. 
 
     let udf, tvmcalc, tvmexpl, capbudg, ques, Finance; // classes
     let jsInfo;
