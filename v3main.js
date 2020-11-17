@@ -7,11 +7,16 @@ if (typeof IS_PRODUCTION == 'undefined') {
 }
 IS_PRODUCTION = !window.Qualtrics === false;
 
+if (typeof IS_QUES_PAGE == 'undefined') {
+    let IS_QUES_PAGE=true;
+}
+
 function quesNumGlobal() { 
     // reads 'divQues470-stem' and returns 470
     const divID = jQuery("#kxAutoRender>div").attr('id');
     if (!divID) {
-        return undefined
+        IS_QUES_PAGE = false;
+        return undefined;
     } else {
         const regexMatch = divID.match(/(divQues)(\d*)(\-*)/);
         return parseInt(regexMatch[2]);    
@@ -21,6 +26,8 @@ function quesNumGlobal() {
 function mainFunc($) {
     "use strict";
     const self = this;
+
+    if (IS_QUES_PAGE===false) {return "Cancelling all code"};
 
     self.quesNum = quesNumGlobal(); // FIX: I need a better way to do the quesNum. 
 
@@ -151,8 +158,8 @@ function mainFunc($) {
                 udf: "supporting/v3user-defined-functions.js",
                 tvmexpl: "supporting/v3tvm-explanations.js",
                 tvmcalc: "supporting/v3tvm-calcs.js",
-                capbudg: "supporting/v3capbudg.js",
-                ques: ''
+                capbudg: "supporting/v3capbudg.js"
+                // ques: ''
             };
             return new Promise(resolve => {
                 // Find the location for the JSON that has all the file names for each question and add it to the jsLocation object
