@@ -86,7 +86,7 @@ function mainFunc($) {
             const origVars = ques.defineVariables();
             const varsObj = (IS_PRODUCTION) ? fetchQuesVars(origVars,468) : origVars;
             buildPage(varsObj)
-        }, 3000);
+        }, 10000);
         
         // $.when(loadJSFiles())
         // // Then get the variables from the question
