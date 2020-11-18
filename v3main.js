@@ -14,16 +14,20 @@ function quesNumGlobal() {
         IS_QUES_PAGE = false;
         return undefined;
     } else {
-        IS_QUES_PAGE = true;
+        // Right now this only works for capital budgeting questions.
+        // If students are working on any earlier questions, quit out of here by setting IS_QUES_PAGE to false.
         const regexMatch = divID.match(/(divQues)(\d*)(\-*)/);
-        return parseInt(regexMatch[2]);
+        const thisQuesNum = parseInt(regexMatch[2]);
+        const capBudgQues = [467,468,469,470,471];
+        IS_QUES_PAGE = capBudgQues.includes(thisQuesNum);
+
+        return thisQuesNum;
     }
 }
 
 function mainFunc($) {
     "use strict";
     const self = this;
-    console.log("Here I am", IS_PRODUCTION, IS_QUES_PAGE);
 
     self.quesNum = quesNumGlobal(); // FIX: I need a better way to do the quesNum. 
 
@@ -163,7 +167,6 @@ function mainFunc($) {
 
         let objJS = { "IS_PRODUCTION": IS_PRODUCTION };
         jsInfo = await jsPaths();
-        console.log('jsInfo', jsInfo, typeof jsInfo);
 
         const udfLoad = () => new Promise(resolve => $.getScript(jsInfo.udf, () => {
             objJS.udf = new UDFClass($, objJS);
@@ -209,7 +212,6 @@ function mainFunc($) {
 } // end of mainFunc
 
 if (IS_PRODUCTION) {
-    console.log("bottom");
     Qualtrics.SurveyEngine.addOnload(function () {
         // Self-invokes the file. Putting .bind allows me to use self=this inside the function, which wouldn't have worked otherwise in strict mode
         jQuery(document).ready(() => {
