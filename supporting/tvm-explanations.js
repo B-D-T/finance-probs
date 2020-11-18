@@ -740,7 +740,7 @@ function explainPVBondLevelAnnual_PV(qv){
                 <p>
                     We can compare our answer to we knew from the pre-check process.
                     As expected, the price of the bond is equal to the par value:<br />
-                    \$${uRound(dispTheAns,0)} = \$${dispFV}
+                    \$${uRound(qv.calcTheAns,0).toLocaleString('en-US')} = \$${dispFV}
                 </p>
             </div>
         `;
@@ -751,7 +751,7 @@ function explainPVBondLevelAnnual_PV(qv){
                 <p>
                     We can compare our answer to we knew from the pre-check process.
                     As expected, the price of the bond is greater than the par value:<br />
-                    \$${uRound(dispTheAns,0)} > \$${dispFV}
+                    \$${uRound(qv.calcTheAns,0).toLocaleString('en-US')} > \$${dispFV}
                 </p>
             </div>
         `;
@@ -762,7 +762,7 @@ function explainPVBondLevelAnnual_PV(qv){
                 <p>
                     We can compare our answer to we knew from the pre-check process.
                     As expected, the price of the bond is less than the par value:<br />
-                    \$${uRound(dispTheAns,0)} < \$${dispFV}
+                    \$${uRound(qv.calcTheAns,0).toLocaleString('en-US')} < \$${dispFV}
                 </p>
             </div>
         `;

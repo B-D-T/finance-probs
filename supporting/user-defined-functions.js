@@ -13,7 +13,6 @@ function storeQuesRespVars(theQuesVars, theAns) {
         "correctAns": theAns
     };
     let strQuesVarsStorageKey = "strQues" + objQuesResp.quesNum + "VarsStorage"; // strQues433VarsStorage
-    console.log('udf -> objQuesResp = ', objQuesResp);
     let strQuesVarsStorageVal = JSON.stringify(objQuesResp);
 
     if (!(objQuesCaller.isProduction == false)) {
