@@ -74,7 +74,9 @@ function CapitalBudgeting($, objFromMain) {
 
     // This takes an instance of CapBudgVar and returns the IRR 
     // Or, if IRR<0, it returns a text message saying it couldn't find a positive IRR
-    this.financeIRR = (aryCashflow) => Finance.IRR(aryCashflow)
+    this.financeIRR = function (aryCashflow) {
+        Finance.IRR(aryCashflow);
+    }
 
     // This calculates the Payback Period for a series of cash flows.
     // The discRate is optional; if it's included, all payments are discounted before the payback period is calculated

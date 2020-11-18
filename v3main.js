@@ -252,6 +252,7 @@ function mainFunc($) {
         tvmcalc = await tvmcalcLoad();
         tvmexpl = await tvmexplLoad();
         capbudg = await capbudgLoad();
+        console.log('capbudg', capbudg);
         ques = await quesLoad();
         
         return jsPaths();
