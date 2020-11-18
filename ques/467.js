@@ -77,7 +77,7 @@ function fnQues467 ($, objFromMain) {
             it is expected that the machines will increase the number of games bowled by ${v.varAddlGames.toLocaleString('en-US')} each year,
             for the 8 years.
             The price of each game ${(v.varCostPerGameOld==v.varCostPerGameNew ? "will remain at " : "is now ") + v.varCostPerGameNew.$$(2)} per game.
-            The new machines will have annual maintenance expenses of ${(-1*v.varENEWPExp).$$()} per year.
+            The new machines will have annual maintenance expenses of ${(-1*v.varENEPIExp).$$()} per year.
         </p>
         <p>
             BDT faces a ${v.dispTaxRate} tax rate, and it has a cost of capital of ${v.dispRate}.
