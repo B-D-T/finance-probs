@@ -78,19 +78,28 @@ function mainFunc($) {
     //     })
     //     .then((varsObj) => buildPage(varsObj));
 
+        loadJSFiles();
 
-        $.when(loadJSFiles())
-        // Then get the variables from the question
-        .then((respObj) => {
-            console.log('before SET TIMEOUT');
-            setTimeout(() => {
-                console.log('ques', ques, 'respObj', respObj, 'quesNum', respObj["quesNum"]);
-                console.log(`Apparently, I'm done with loadJSFiles. Here's the response:`, respObj);
-                const origVars = ques.defineVariables();
-                const varsObj = (IS_PRODUCTION) ? fetchQuesVars(origVars, respObj["quesNum"]) : origVars;
-                buildPage(varsObj)
-            }, 3000);
-        });
+        setTimeout(() => {
+            console.log('ques', ques, 'respObj', 'quesNum');
+            console.log(`Apparently, I'm done with loadJSFiles. Here's the response:`);
+            const origVars = ques.defineVariables();
+            const varsObj = (IS_PRODUCTION) ? fetchQuesVars(origVars,468) : origVars;
+            buildPage(varsObj)
+        }, 3000);
+        
+        // $.when(loadJSFiles())
+        // // Then get the variables from the question
+        // .then((respObj) => {
+        //     console.log('before SET TIMEOUT');
+        //     setTimeout(() => {
+        //         console.log('ques', ques, 'respObj', respObj, 'quesNum', respObj["quesNum"]);
+        //         console.log(`Apparently, I'm done with loadJSFiles. Here's the response:`, respObj);
+        //         const origVars = ques.defineVariables();
+        //         const varsObj = (IS_PRODUCTION) ? fetchQuesVars(origVars, respObj["quesNum"]) : origVars;
+        //         buildPage(varsObj)
+        //     }, 3000);
+        // });
 
 
     // If the variable is already in the embedded data, we'll use that. Otherwise, the code stores the variable in the embedded data based on our definition.
@@ -220,12 +229,10 @@ function mainFunc($) {
             objJS.capbudg = new CapitalBudgeting($, objJS);
             return resolve(objJS.capbudg)
         }));
-    // const quesLoad = () => new Promise(resolve => $.getScript(jsInfo.ques, (jsText) => {
-    const quesLoad = () => new Promise(resolve => $.getScript("https://b-d-t.github.io/finance-probs/ques/468.js", (jsText) => {
+        const quesLoad = () => new Promise(resolve => $.getScript(jsInfo.ques, (jsText) => {
             console.log('THIS IS THE ISSUE ',jsText);
             const regex = new RegExp("(function)\\s(fnQues\\d*)\\s*\\("); // Assumes question file starts with `function fnQues470 (objFromMainQues) {`
-    // const quesFunction = jsText.split(regex)[2]; // returns fnQues470
-    const quesFunction = 'fnQues468';
+            const quesFunction = jsText.split(regex)[2]; // returns fnQues470
             // Creates constructor based on that finance question (e.g., function fnQues470)
             // Also passes all the JS files to the question, received as objFromMain. The question then chooses which ones to use.
             // const objToQues = { "IS_PRODUCTION": IS_PRODUCTION, "udf": udf, "tvmexpl": tvmexpl, "tvmcalc": tvmcalc, "capbudg": capbudg, "Finance":new udf.financejs };
