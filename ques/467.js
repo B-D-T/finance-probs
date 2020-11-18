@@ -68,7 +68,7 @@ function fnQues467 ($, objFromMain) {
             The new machines will have a useful life of ${v.varLifespan} years
             and can be depreciated in a straight-line method over these  ${v.varLifespan} years.
             At the end of the ${v.varLifespan} years,
-            they are expected to have a salvage/scrap value of ${v.varSalvage.$$()} each.
+            they are expected to have a salvage/scrap value of ${v.varSalvagePerUnit.$$()} each.
         </p>
         <p>
             The machines will reset the pins faster after each bowler rolls,
