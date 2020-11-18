@@ -229,10 +229,16 @@ function mainFunc($) {
             objJS.capbudg = new CapitalBudgeting($, objJS);
             return resolve(objJS.capbudg)
         }));
-        const quesLoad = () => new Promise(resolve => $.getScript(jsInfo.ques, (jsText) => {
-            console.log('THIS IS THE ISSUE ',jsText);
-            const regex = new RegExp("(function)\\s(fnQues\\d*)\\s*\\("); // Assumes question file starts with `function fnQues470 (objFromMainQues) {`
-            const quesFunction = jsText.split(regex)[2]; // returns fnQues470
+        const quesLoad = () => new Promise(resolve => $.getScript(jsInfo.ques, () => {
+            console.log('THIS IS THE ISSUE ');
+            // const regex = new RegExp("(function)\\s(fnQues\\d*)\\s*\\("); // Assumes question file starts with `function fnQues470 (objFromMainQues) {`
+            // const quesFunction = jsText.split(regex)[2]; // returns fnQues470
+            let quesFunction = jsInfo.ques.split('/');
+            quesFunction = quesFunction[quesFunction.length - 1].split('.');
+            quesFunction = 'fnQues'+quesFunction[0];
+
+            console.log('THIS IS THE ISSUE22 ', quesFunction);
+
             // Creates constructor based on that finance question (e.g., function fnQues470)
             // Also passes all the JS files to the question, received as objFromMain. The question then chooses which ones to use.
             // const objToQues = { "IS_PRODUCTION": IS_PRODUCTION, "udf": udf, "tvmexpl": tvmexpl, "tvmcalc": tvmcalc, "capbudg": capbudg, "Finance":new udf.financejs };
