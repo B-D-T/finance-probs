@@ -68,25 +68,25 @@ function mainFunc($) {
 
     // THIS RUNS FIRST
     // Load all the JS files
-    // $.when(loadJSFiles())
-    //     // Then get the variables from the question
-    //     .then((respObj) => {
-    //         console.log('ques', ques, 'respObj', respObj, 'quesNum', respObj["quesNum"]);
-    //         console.log(`Apparently, I'm done with loadJSFiles. Here's the response:`, respObj);
-    //         const origVars = ques.defineVariables();
-    //         return (IS_PRODUCTION) ? fetchQuesVars(origVars, respObj["quesNum"]) : origVars;
-    //     })
-    //     .then((varsObj) => buildPage(varsObj));
-
-        loadJSFiles();
-
-        setTimeout(() => {
-            console.log('ques', ques, 'respObj', 'quesNum');
-            console.log(`Apparently, I'm done with loadJSFiles. Here's the response:`);
+    $.when(loadJSFiles())
+        // Then get the variables from the question
+        .then((respObj) => {
+            console.log('ques', ques, 'respObj', respObj, 'quesNum', respObj["quesNum"]);
+            console.log(`Apparently, I'm done with loadJSFiles. Here's the response:`, respObj);
             const origVars = ques.defineVariables();
-            const varsObj = (IS_PRODUCTION) ? fetchQuesVars(origVars,468) : origVars;
-            buildPage(varsObj)
-        }, 10000);
+            return (IS_PRODUCTION) ? fetchQuesVars(origVars, respObj["quesNum"]) : origVars;
+        })
+        .then((varsObj) => buildPage(varsObj));
+
+        // loadJSFiles();
+
+        // setTimeout(() => {
+        //     console.log('ques', ques, 'respObj', 'quesNum');
+        //     console.log(`Apparently, I'm done with loadJSFiles. Here's the response:`);
+        //     const origVars = ques.defineVariables();
+        //     const varsObj = (IS_PRODUCTION) ? fetchQuesVars(origVars,468) : origVars;
+        //     buildPage(varsObj)
+        // }, 1000);
         
         // $.when(loadJSFiles())
         // // Then get the variables from the question
