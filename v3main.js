@@ -2,14 +2,10 @@
 
 // GLOBAL
 
-if (typeof IS_PRODUCTION == 'undefined') {
-    var IS_PRODUCTION = true;
-}
+if (typeof IS_PRODUCTION == 'undefined') {var IS_PRODUCTION = true;}
 IS_PRODUCTION = !window.Qualtrics === false;
 
-if (typeof IS_QUES_PAGE == 'undefined') {
-    var IS_QUES_PAGE;
-}
+if (typeof IS_QUES_PAGE == 'undefined') {var IS_QUES_PAGE;}
 
 function quesNumGlobal() {
     // reads 'divQues470-stem' and returns 470
@@ -69,38 +65,13 @@ function mainFunc($) {
     // THIS RUNS FIRST
     // Load all the JS files
     loadJSFiles()
-        // Then get the variables from the question
+        // the 'Then' statement waits for a promise from the loadJSFiles function
         .then((respObj) => {
-            console.log('ques', ques, 'respObj', respObj, 'quesNum', respObj["quesNum"]);
-            console.log(`Apparently, I'm done with loadJSFiles. Here's the response:`, respObj);
+            // Get the variables that we'll use in the question, either from the ques itself (origVars) or from Qualtrics embedded data
             const origVars = ques.defineVariables();
             return (IS_PRODUCTION) ? fetchQuesVars(origVars, respObj["quesNum"]) : origVars;
         })
         .then((varsObj) => buildPage(varsObj));
-
-        // loadJSFiles();
-
-        // setTimeout(() => {
-        //     console.log('ques', ques, 'respObj', 'quesNum');
-        //     console.log(`Apparently, I'm done with loadJSFiles. Here's the response:`);
-        //     const origVars = ques.defineVariables();
-        //     const varsObj = (IS_PRODUCTION) ? fetchQuesVars(origVars,468) : origVars;
-        //     buildPage(varsObj)
-        // }, 1000);
-        
-        // $.when(loadJSFiles())
-        // // Then get the variables from the question
-        // .then((respObj) => {
-        //     console.log('before SET TIMEOUT');
-        //     setTimeout(() => {
-        //         console.log('ques', ques, 'respObj', respObj, 'quesNum', respObj["quesNum"]);
-        //         console.log(`Apparently, I'm done with loadJSFiles. Here's the response:`, respObj);
-        //         const origVars = ques.defineVariables();
-        //         const varsObj = (IS_PRODUCTION) ? fetchQuesVars(origVars, respObj["quesNum"]) : origVars;
-        //         buildPage(varsObj)
-        //     }, 3000);
-        // });
-
 
     // If the variable is already in the embedded data, we'll use that. Otherwise, the code stores the variable in the embedded data based on our definition.
     function fetchQuesVars(objVars, quesNum = self.quesNum) {
@@ -110,13 +81,13 @@ function mainFunc($) {
         let objQuesVarsActual = {};
         if (!IS_PRODUCTION) { return objVars; };
         $.each(objUniqueNames, function (theKey, valueFromQues) {
-            $.when(self.getEDValue(theKey)).then(function (edValue) {
+            $.when(udf.getEDValue(theKey)).then(function (edValue) {
                 // If the key exists within the embedded data, use that value
                 if (edValue) {
                     objQuesVarsActual[theKey] = edValue;
                     // If the key does not exist within the ED, set it and return the same value that we started with
                 } else {
-                    $.when(self.setEDValue(theKey, valueFromQues)).then(function () {
+                    $.when(udf.setEDValue(theKey, valueFromQues)).then(function () {
                         objQuesVarsActual[theKey] = valueFromQues;
                     });
                 };
@@ -157,21 +128,6 @@ function mainFunc($) {
             return objToReturn;
         };
     }
-
-
-    // // Add prefix to create a key that's unique across ALL questions in the course
-    // varsForStorage = addQuesPrefix(varsForStorage, quesNum());
-
-    // // This add a prefix to each key in an object of variables so that key is unique within the question. E.g., if quesVars and displayVars both have a Rate variable.
-    // // This receives something like ({Rate:.05, PV:1000}, "var") and returns ({varDiscRate:.05, varPV:1000}
-    // function addVarTypePrefix(varObj, typePrefix) {
-    //     let newObj = {};
-    //     $.each(varObj, (theKey, theValue)=>{
-    //         const newKey = theKey.startsWith(typePrefix) ? theKey : typePrefix + theKey;
-    //         newObj[newKey] = theValue;
-    //     });
-    //     return newObj;
-    // }
     
 
     // Load each of the scripts in order using async-await Promises.
@@ -230,18 +186,11 @@ function mainFunc($) {
             return resolve(objJS.capbudg)
         }));
         const quesLoad = () => new Promise(resolve => $.getScript(jsInfo.ques, () => {
-            console.log('THIS IS THE ISSUE ');
-            // const regex = new RegExp("(function)\\s(fnQues\\d*)\\s*\\("); // Assumes question file starts with `function fnQues470 (objFromMainQues) {`
-            // const quesFunction = jsText.split(regex)[2]; // returns fnQues470
-            let quesFunction = jsInfo.ques.split('/');
-            quesFunction = quesFunction[quesFunction.length - 1].split('.');
-            quesFunction = 'fnQues'+quesFunction[0];
-
-            console.log('THIS IS THE ISSUE22 ', quesFunction);
+            // Get the name of the top-level function in the ques file that we loaded (e.g., fnQues470)
+            const quesFunction = 'fnQues'+self.quesNum;
 
             // Creates constructor based on that finance question (e.g., function fnQues470)
             // Also passes all the JS files to the question, received as objFromMain. The question then chooses which ones to use.
-            // const objToQues = { "IS_PRODUCTION": IS_PRODUCTION, "udf": udf, "tvmexpl": tvmexpl, "tvmcalc": tvmcalc, "capbudg": capbudg, "Finance":new udf.financejs };
             objJS[quesFunction] = new window[quesFunction]($, objJS);
             return resolve(objJS[quesFunction]);
         }));
@@ -252,10 +201,9 @@ function mainFunc($) {
         tvmcalc = await tvmcalcLoad();
         tvmexpl = await tvmexplLoad();
         capbudg = await capbudgLoad();
-        console.log('capbudg', capbudg);
         ques = await quesLoad();
         
-        return jsPaths();
+        return jsPaths(); //jsPaths() serves as the Promise to return to the caller
         
     };
 } // end of mainFunc
