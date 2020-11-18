@@ -254,7 +254,7 @@ function mainFunc($) {
         capbudg = await capbudgLoad();
         ques = await quesLoad();
         
-        return jsInfo;
+        return jsPaths();
         
     };
 } // end of mainFunc
