@@ -74,9 +74,10 @@ function CapitalBudgeting($, objFromMain) {
 
     // This takes an instance of CapBudgVar and returns the IRR 
     // Or, if IRR<0, it returns a text message saying it couldn't find a positive IRR
-    this.financeIRR = function (aryCashflow) {
+    function financeIRR(aryCashflow) {
         Finance.IRR(aryCashflow);
     }
+    this.financeIRR = financeIRR;
 
     // This calculates the Payback Period for a series of cash flows.
     // The discRate is optional; if it's included, all payments are discounted before the payback period is calculated
@@ -127,7 +128,7 @@ function CapitalBudgeting($, objFromMain) {
         this.tlADT = tlADT || (blnHideCalcs ? [] : capbudgTimeline(this, "ADT"));
         this.tlICF = tlICF || (blnHideCalcs ? [] : capbudgTimeline(this, "ICF"));
         this.tlICFPV = tlICFPV || (blnHideCalcs ? [] : capbudgTimeline(this, "ICFPV"));
-        this.ansIRR = ansIRR || (blnHideCalcs ? '' : this.financeIRR(capbudgTimeline(this, "ICF")));
+        this.ansIRR = ansIRR || (blnHideCalcs ? '' : financeIRR(capbudgTimeline(this, "ICF")));
         this.ansPaybackPeriodReg = ansPaybackPeriodReg || (blnHideCalcs ? '' : financePaybackPeriod(capbudgTimeline(this, "ICF")));
         this.ansPaybackPeriodDisc = ansPaybackPeriodDisc || (blnHideCalcs ? '' : financePaybackPeriod(capbudgTimeline(this, "ICF"), this.varDiscRate));
         this.ansNPV = ansNPV || (blnHideCalcs ? '' : financeNPV(capbudgTimeline(this, "ICFPV")));
@@ -176,7 +177,8 @@ function CapitalBudgeting($, objFromMain) {
                 method: 'IRR',
                 prompt: 'Accept using IRR?',
                 threshold: objCBVars.varDiscRate,
-                get calcTest() { return this.financeIRR(capbudgTimeline(objCBVars, "ICF")) },
+    // get calcTest() { return this.financeIRR(capbudgTimeline(objCBVars, "ICF")) },
+                get calcTest() { return financeIRR(capbudgTimeline(objCBVars, "ICF")) },
                 get calcTestOutcome() { return this.calcTest >= this.threshold },
                 get decisionYes() { return `Yes, because the IRR is >= the cost of capital.` },
                 decisionNo: `No, because the IRR is < the cost of capital.`
