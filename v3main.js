@@ -68,7 +68,7 @@ function mainFunc($) {
 
     // THIS RUNS FIRST
     // Load all the JS files
-    $.when(loadJSFiles())
+    loadJSFiles()
         // Then get the variables from the question
         .then((respObj) => {
             console.log('ques', ques, 'respObj', respObj, 'quesNum', respObj["quesNum"]);
