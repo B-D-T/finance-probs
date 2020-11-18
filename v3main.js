@@ -198,7 +198,7 @@ function mainFunc($) {
 
         let objJS = { "IS_PRODUCTION": IS_PRODUCTION };
         jsInfo = await jsPaths();
-        console.log('jsInfo', jsInfo);
+        console.log('jsInfo', jsInfo, typeof jsInfo);
 
         const udfLoad = () => new Promise(resolve => $.getScript(jsInfo.udf, () => {
             objJS.udf = new UDFClass($, objJS);
@@ -220,9 +220,12 @@ function mainFunc($) {
             objJS.capbudg = new CapitalBudgeting($, objJS);
             return resolve(objJS.capbudg)
         }));
-        const quesLoad = () => new Promise(resolve => $.getScript(jsInfo.ques, (jsText) => {
+    // const quesLoad = () => new Promise(resolve => $.getScript(jsInfo.ques, (jsText) => {
+    const quesLoad = () => new Promise(resolve => $.getScript("https://b-d-t.github.io/finance-probs/ques/468.js", (jsText) => {
+            console.log('THIS IS THE ISSUE ',jsText);
             const regex = new RegExp("(function)\\s(fnQues\\d*)\\s*\\("); // Assumes question file starts with `function fnQues470 (objFromMainQues) {`
-            const quesFunction = jsText.split(regex)[2]; // returns fnQues470
+    // const quesFunction = jsText.split(regex)[2]; // returns fnQues470
+    const quesFunction = 'fnQues468';
             // Creates constructor based on that finance question (e.g., function fnQues470)
             // Also passes all the JS files to the question, received as objFromMain. The question then chooses which ones to use.
             // const objToQues = { "IS_PRODUCTION": IS_PRODUCTION, "udf": udf, "tvmexpl": tvmexpl, "tvmcalc": tvmcalc, "capbudg": capbudg, "Finance":new udf.financejs };
