@@ -1,30 +1,36 @@
-function fnQues471 ($, objFromMain) {
+function fnQues471($, objFromMain) {
     "use strict";
 
     const udf = objFromMain.udf;
     const capbudg = objFromMain.capbudg;
 
-    
-    this.defineVariables = function(){
-        
+
+    this.defineVariables = function () {
+
         const quesVars = {
-            "varIP":-150000,// -1 * udf.uRand(120000, 150000, 10000),
-            "varATP":-1000000,// -1 * udf.uRand(1000000, 1100000, 100000),
+            "varIP": -1 * udf.uRand(120000, 150000, 10000),
+            "varATP": -1 * udf.uRand(1000000, 1100000, 100000),
 
-            "varENEPIRev":480000,// udf.uRand(460000, 490000, 10000),
+            "varENEPIRev": udf.uRand(460000, 490000, 10000),
 
-            "varLifespan":10,// udf.uRand(8,13,1),
+            "varLifespan": udf.uRand(8, 13, 1),
 
-            "varDiscRate":0.04// udf.uRand(.04, .06, .01)
+            "varDiscRate": udf.uRand(.04, .06, .01)
         };
+
+        let ansVars = new capbudg.CapBudgVar(quesVars, false); // Returns object with all solutions in it
 
         const calcVars = {
-            calcTheAns: new capbudg.CapBudgVar(quesVars, false) // Returns object with all solutions in it
+            calcTheAns: ansVars,
+            correctAns: {
+                "payback-reg": ansVars.ansPaybackPeriodReg,
+                "payback-disc": ansVars.ansPaybackPeriodDisc,
+                "npv": ansVars.ansNPV
+            }
         };
-        const ansVars = calcVars.calcTheAns;
 
         const displayVars = {
-            "dispDiscRate": udf.uRound(quesVars.varDiscRate*100,2)+"%",
+            "dispDiscRate": udf.uRound(quesVars.varDiscRate * 100, 2) + "%",
             get dispAnsPaybackPeriodReg() {
                 let ans = ansVars.ansPaybackPeriodReg;
                 return ans == undefined ? `Does not pay back within ${quesVars.varLifespan} years.` : ans.toFixed(5).toLocaleString('en-US') + " years"
@@ -39,8 +45,8 @@ function fnQues471 ($, objFromMain) {
         return udf.combineVarObjs(quesVars, calcVars, displayVars);
     }
 
-    this.pageContent = function(v) {
-        let obj = {};
+    this.pageContent = function (v) {
+        let obj = { "allVars": v };
 
         obj.ansBoxMessage = udf.ansBoxMessages("writeOutNums"); //decimalPlaces4
 
@@ -52,8 +58,8 @@ function fnQues471 ($, objFromMain) {
         </p>
 
         <p>
-            The cost of the purchasing the seats is ${(-1*v.varIP).$$()},
-            and installation costs are ${(-1*v.varATP).$$()},
+            The cost of the purchasing the seats is ${(-1 * v.varIP).$$()},
+            and installation costs are ${(-1 * v.varATP).$$()},
             all of which are incurred today.
             The University's basketball facility is scheduled to be replaced,
             but that will not happen for another ${v.varLifespan} years.
@@ -90,7 +96,7 @@ function fnQues471 ($, objFromMain) {
         <p>
             Net present value (NPV): <b>${v.dispAnsNPV}</b>
         </p>
-        `;        
+        `;
         return obj;
 
     } // end of pageContent
@@ -99,6 +105,6 @@ function fnQues471 ($, objFromMain) {
 
 // Invoke the page on load in order to create the shortcuts to udf and other classes
 try { fnQues471(); }
-catch (error) { console.error();}
+catch (error) { console.error(); }
 
 console.log('Question loaded');

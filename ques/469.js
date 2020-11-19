@@ -27,22 +27,31 @@ function fnQues469 ($, objFromMain) {
             varInvTL03: populateInvestmentTL(inv03)
         };
 
-        const calcVars = {
+        let ansVars = {
             calcIRRInv01: capbudg.financeIRR(quesVars.varInvTL01),
             calcIRRInv02: capbudg.financeIRR(quesVars.varInvTL02),
-            calcIRRInv03: capbudg.financeIRR(quesVars.varInvTL03),
+            calcIRRInv03: capbudg.financeIRR(quesVars.varInvTL03)
+        };
+        console.log('ansVars',ansVars);
+
+        const calcVars = {
             calcTheAns: {
-                inv01IRR: this.calcIRRInv01,
-                inv02IRR: this.calcIRRInv02,
-                inv03IRR: this.calcIRRInv03
+                inv01IRR: ansVars.calcIRRInv01,
+                inv02IRR: ansVars.calcIRRInv02,
+                inv03IRR: ansVars.calcIRRInv03
+            },
+            correctAns: {
+                irr_1: ansVars.calcIRRInv01,
+                irr_2: ansVars.calcIRRInv02,
+                irr_3: ansVars.calcIRRInv03
             }
         };
 
         const strNoIRRFound = `This code was unable to calculate a IRR for the investment`;
         const displayVars = {
-            dispIRRInv01: Number(calcVars.calcIRRInv01) ? udf.uRound(calcVars.calcIRRInv01,6) : strNoIRRFound,
-            dispIRRInv02: Number(calcVars.calcIRRInv02) ? udf.uRound(calcVars.calcIRRInv02,6) : strNoIRRFound,
-            dispIRRInv03: Number(calcVars.calcIRRInv03) ? udf.uRound(calcVars.calcIRRInv03,6) : strNoIRRFound
+            dispIRRInv01: Number(ansVars.calcIRRInv01) ? udf.uRound(ansVars.calcIRRInv01,6) : strNoIRRFound,
+            dispIRRInv02: Number(ansVars.calcIRRInv02) ? udf.uRound(ansVars.calcIRRInv02,6) : strNoIRRFound,
+            dispIRRInv03: Number(ansVars.calcIRRInv03) ? udf.uRound(ansVars.calcIRRInv03,6) : strNoIRRFound
         };
 
         return udf.combineVarObjs(quesVars, calcVars, displayVars);
@@ -50,7 +59,7 @@ function fnQues469 ($, objFromMain) {
 
     
     this.pageContent = function(v) {
-        let obj = {};
+        let obj = { "allVars": v };
         
         obj.ansBoxMessage = udf.ansBoxMessages("writeOutNums"); //decimalPlaces4
 

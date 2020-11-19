@@ -1,29 +1,4 @@
 
-// // Treating it as an object works.
-// //In main.js, I run the following:
-// (() => jQuery.getScript( "./supporting/v3user-defined-functions.js", ()=>console.log(udf.poodleFunc(" cat")) ) )();
-// // This is the code in the udf.js file
-// var udf = { poodleFunc: function(arg){ return poodleCall(arg); } }
-// function poodleCall(arg){ return 'poodle'+arg; }
-// console.log('v3user-defined-functions.js loaded');
-
-// // Treating it as a class works!! Yay!!
-// // In main.js, put the following:
-// (function(){
-//     jQuery.getScript( "./supporting/v3user-defined-functions.js",function(){
-//     var udf = new UDFClass(jQuery);
-//     console.log(udf.poodleFunc(" cat"));
-// });
-// })();
-// // In udf.js, put the following:
-// function UDFClass($){ this.poodleFunc = (arg) => poodleCall(arg); }
-// function poodleCall(arg){ 
-//     const $divStem = $('#divQues470-stem');
-//     $divStem.html('poodle'+arg); 
-//     return 'It is done';
-// }
-// console.log('v3user-defined-functions.js loaded');
-
 function UDFClass($, objFromMain) {
     const self = this;
     self.quesNum = quesNumGlobal();
@@ -32,14 +7,14 @@ function UDFClass($, objFromMain) {
 
 
 
-    // This add a global method to all numbers for formating
-    Number.prototype.$$ = function ({minDecimals=0, maxDecimals=2, strRegion="en-US", strCurrency="USD"}={}){
+    // This add a global method to all numbers for formatting
+    Number.prototype.$$ = function ({ minDecimals = 0, maxDecimals = 2, strRegion = "en-US", strCurrency = "USD" } = {}) {
         // Get primitive copy of number
-        let myNum= this.valueOf();
+        let myNum = this.valueOf();
         // If only one argument is passed, assume that it's the number of decimals
         // E.g., varPV.$$(2) means I want 2 decimal places and all other default formatting
-        if (arguments.length==1 && typeof arguments[0] != "object"){
-            minDecimals=arguments[0]; maxDecimals=arguments[0];
+        if (arguments.length == 1 && typeof arguments[0] != "object") {
+            minDecimals = arguments[0]; maxDecimals = arguments[0];
         }
         // Return modified copy of number using given parameters
         return myNum.toLocaleString(strRegion, {
@@ -47,6 +22,19 @@ function UDFClass($, objFromMain) {
             "minimumFractionDigits": minDecimals, "maximumFractionDigits": maxDecimals
         });
     };
+
+    // This is an aggregator that returns to the sum of all values in an array
+    self.arraySum = (theArray) => {
+        try {
+            return theArray.reduce((a, b) => a + b, 0);
+        } catch (error) {
+            console.log(error);
+            return 0
+        }
+    }
+
+    // // Return an array of unique values by using Set to remove duplicates and then converting it back to an array
+    // self.arrayUnique = (theArray) => [...new Set(theArray)];
 
     // Generate a random number between two numbers
     self.uRand = function (min, max, step) {
@@ -104,6 +92,8 @@ function UDFClass($, objFromMain) {
 
 
 
+
+
     // $$$$$$$$$$$$$$$$$$$$$$$$$
     // FINANCEJS FUNCTIONS
     // $$$$$$$$$$$$$$$$$$$$$$$$$
@@ -124,33 +114,69 @@ function UDFClass($, objFromMain) {
         }
 
         function origIRR(aryCashFlow) {
-            // https://github.com/ebradyjobory/finance.js#internal-rate-of-return-irrfinanceirrinitial-investment-cash-flows
-
-            // Internal Rate of Return (IRR) is the discount rate often used in capital budgeting that makes the net present value of all cash flows from a particular project equal to zero.6
-            // // e.g., If initial investment is -$500,000 and the cash flows are $200,000, $300,000, and $200,000, IRR is 18.82%.
-            //  finance.IRR(-500000, 200000, 300000, 200000);  => 18.82
+            "use strict;"
+            // The financejs IRR file wasn't working right, so I replaced it with this one from https://stackoverflow.com/questions/15089151/javascript-irr-internal-rate-of-return-formula-accuracy
             let args = aryCashFlow;
             let numberOfTries = 1;
-            // Cash flow values must contain at least one positive value and one negative value
             let positive, negative;
             $.each(args, function (idx, value) {
                 if (!positive) positive = value > 0;
                 if (!negative) negative = value < 0;
             });
-            if (!positive || !negative) throw new Error('IRR requires at least one positive value and one negative value');
-            function npv(rate) {
-                numberOfTries++;
-                if (numberOfTries > 1000) { throw new Error('Cannot find a positive IRR result'); }
-                let rrate = (1 + rate / 100);
-                let npv = args[0];
-                for (let i = 1; i < args.length; i++) {
-                    npv += (args[i] / Math.pow(rrate, i));
-                }
-                return npv;
+            if (!positive || !negative) {
+                throw new Error('IRR requires at least one positive value and one negative value')
             }
-            // return Math.round(seekZero(npv) * 100) / 100;
-            return self.uRound(seekZero(npv) / 100, 12);
+            
+            let min = -1.0; let max = 1.0; let guess; let NPV=0;
+            do {
+                numberOfTries++;
+                if (numberOfTries > 10000) {
+                    throw new Error('Cannot find an IRR result');
+                }
+        
+                guess = (min + max) / 2;
+                NPV = 0;
+                for (let cfIndex = 0; cfIndex < aryCashFlow.length; cfIndex++) {
+                    NPV += aryCashFlow[cfIndex] / Math.pow((1 + guess), cfIndex);
+                }
+                if (NPV > 0) {
+                    min = guess;
+                }
+                else {
+                    max = guess;
+                }
+            } while (Math.abs(NPV) > 0.000001);
+            return guess;
         }
+
+        // function origIRR(aryCashFlow) {
+        //     // https://github.com/ebradyjobory/finance.js#internal-rate-of-return-irrfinanceirrinitial-investment-cash-flows
+
+        //     // Internal Rate of Return (IRR) is the discount rate often used in capital budgeting that makes the net present value of all cash flows from a particular project equal to zero.6
+        //     // // e.g., If initial investment is -$500,000 and the cash flows are $200,000, $300,000, and $200,000, IRR is 18.82%.
+        //     //  finance.IRR(-500000, 200000, 300000, 200000);  => 18.82
+        //     let args = aryCashFlow;
+        //     let numberOfTries = 1;
+        //     // Cash flow values must contain at least one positive value and one negative value
+        //     let positive, negative;
+        //     $.each(args, function (idx, value) {
+        //         if (!positive) positive = value > 0;
+        //         if (!negative) negative = value < 0;
+        //     });
+        //     if (!positive || !negative) throw new Error('IRR requires at least one positive value and one negative value');
+        //     function npv(rate) {
+        //         numberOfTries++;
+        //         if (numberOfTries > 1000) { throw new Error('Cannot find a positive IRR result'); }
+        //         let rrate = (1 + rate / 100);
+        //         let npv = args[0];
+        //         for (let i = 1; i < args.length; i++) {
+        //             npv += (args[i] / Math.pow(rrate, i));
+        //         }
+        //         return npv;
+        //     }
+        //     // return Math.round(seekZero(npv) * 100) / 100;
+        //     return self.uRound(seekZero(npv) / 100, 12);
+        // }
         function seekZero(fn) {
             let x = 1;
             while (fn(x) > 0) { x += 1; }
@@ -194,93 +220,10 @@ console.log('v3user-defined-functions.js loaded');
 // // user-defined-functions.js
 
 
-// // Each student sees variables unique to that student (randomly generated)
-// // This function writes those embedded data.
-// // When the student leaves the page, 
-// // the student's answer will be combined with those variables and written as a different variable in the Qualtrics embedded data.
-// function storeQuesRespVars(theQuesVars, theAns) {
-//     let objQuesResp = {
-//         "quesNum": quesNum(),
-//         "objQuesVars": theQuesVars, // the property stores an object
-//         "correctAns": theAns
-//     };
-//     let strQuesVarsStorageKey = "strQues" + objQuesResp.quesNum + "VarsStorage"; // strQues433VarsStorage
-//     console.log('udf -> objQuesResp = ', objQuesResp);
-//     let strQuesVarsStorageVal = JSON.stringify(objQuesResp);
-
-//     if (!(objQuesCaller.isProduction == false)) {
-//         setEDValue(strQuesVarsStorageKey, strQuesVarsStorageVal);
-//     } else { console.log("No setEDValue for " + strQuesVarsStorageKey + ": " + strQuesVarsStorageVal) }
-// }
 
 
-// // This function writes the student-question-specific variables (and student answer)
-// // into long-term storage (i.e., Embedded Data)
-// function setEDQuesRespVars(objRespFeedback) {
 
-//     // Read the student's response from the page and add it to the feedback object
-//     let stuResp = "123123123";
-//     if (!(objQuesCaller.isProduction == false)) {
-//         stuResp = document.getElementById("QR~" + objRespFeedback.qtrxQuesID).value; // read answer from Qualtrics page
-//     }
-//     stuResp = sanitizeInput(stuResp);
-//     objRespFeedback["stuResp"] = stuResp;
 
-//     // Retrieve stored question information from Embedded data and convert it to an object
-//     let strQuesVarsStorageKey = "strQues" + objRespFeedback.strQuesNum + "VarsStorage";
-//     jQuery.when(getEDValue(strQuesVarsStorageKey)).then(function (edValue) {
-
-//         let objQuesResp = JSON.parse(edValue);
-
-//         // Check answer, then add the score to the QuesResp object
-//         objQuesResp["percCorrect"] = respPercCorrect(objRespFeedback.stuResp, objQuesResp.correctAns);
-
-//         // Store feedback that will be shown to user when they see the Solution
-//         objQuesResp["respFeedback"] = objRespFeedback;
-
-//         const strObjName = "objQuesResp" + objQuesResp.quesNum.toString(); // objRespQues433
-//         const strQuesRespED = JSON.stringify(objQuesResp);
-
-//         // Write quesResp to Embedded Data (assuming we're in production,
-//         // although I don't think this function ever gets called during testing anyway).
-//         setEDValue(strObjName, strQuesRespED);
-
-//     });
-
-// }
-
-// function showFeedback(strEDQuesResp) {
-//     let objQuesResp = JSON.parse(strEDQuesResp);
-//     let dispPercCorrect, resultIcon, stuRespLocal;
-
-//     try {
-//         dispPercCorrect = parseFloat(objQuesResp.percCorrect * 100).toFixed(0) + "%";
-//         resultIcon = dispPercCorrect == "100%"
-//             ? `<span style="color: green;">&#10004;</span>`
-//             : `<span style="color: red;">&#10008;</span>`;
-//         stuRespLocal = objQuesResp.respFeedback.stuResp;
-//     }
-//     catch (err) {
-//         console.log("Error trying to set the dispPercCorrect variable");
-//         stuRespLocal = "The response is stored in the system, but it cannot be retrieved at this time.";
-//         dispPercCorrect = "Not available.";
-//         resultIcon = "";
-//     }
-//     // finally {
-//     //     stuRespLocal = "The response is stored in the system, but it cannot be retrieved at this time.";
-//     //     dispPercCorrect = "Not available.";
-//     //     resultIcon = "";
-//     // }
-
-//     let dispQuesResp = `
-//         Your answer: ${stuRespLocal}
-//         <br />
-//         Score: ${dispPercCorrect}
-//         ${resultIcon}
-//     `;
-
-//     return dispQuesResp;
-// }
 
 
 // // When you use console . log( someObj), it passes a REFERENCE to someObj.
@@ -412,37 +355,6 @@ console.log('v3user-defined-functions.js loaded');
 
 //         return isCorrect ? 1 : 0;
 //     }
-
-//     function convertRespToNum(theResp) {
-//         let resp = theResp.toString().trim();
-
-//         const charsToRemove = [",", "\\$"];
-//         jQuery.each(charsToRemove, function (i, char) {
-//             const regex = new RegExp(char, "g");
-//             resp = resp.replace(regex, '');
-//         });
-
-//         return parseFloat(resp);
-//     }
-// }
-
-
-// function sanitizeInput(userInput) {
-//     // Code from https://stackoverflow.com/questions/2794137/sanitizing-user-input-before-adding-it-to-the-dom-in-javascript
-//     const map = {
-//         '&': '&amp;',
-//         '<': '&lt;',
-//         '>': '&gt;',
-//         '"': '&quot;',
-//         "'": '&#x27;',
-//         "/": '&#x2F;',
-//         "`": '&grave;'
-//     };
-//     const reg = /[&<>"'/]/ig;
-//     return userInput.replace(reg, (match) => (map[match]));
-// }
-
-
 
 
 
