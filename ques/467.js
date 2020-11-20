@@ -130,6 +130,6 @@ function fnQues467 ($, objFromMain) {
 }
 
 try { fnQues467(); }
-catch (error) { console.error();}
+catch (error) { Error("Error in the 467.js file. ")+console.error();}
 
 console.log('Question loaded');

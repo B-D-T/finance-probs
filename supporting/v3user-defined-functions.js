@@ -2,8 +2,34 @@
 function UDFClass($, objFromMain) {
     const self = this;
     self.quesNum = quesNumGlobal();
-    self.getEDValue = (edKey) => Qualtrics.SurveyEngine.getEmbeddedData(edKey);
-    self.setEDValue = (edKey, edValue) => Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue);
+    self.getEDValue = function(edKey) { // I made this thenable because the real Qtrx function nested inside it is thenable
+        return new Promise((getEDVal_success, getEDVal_reject) => {
+            Qualtrics.SurveyEngine.getEmbeddedData(edKey)  // getEmbeddedData is a thenable object (I hope)
+            .then(
+                qtrxGetSuccess => {
+                    console.log(`getEmbeddedData (${edKey}) fulfilled a promise: `,qtrxGetSuccess);
+                    return getEDVal_success(qtrxGetSuccess);
+                },
+                qtrxGetFail => {
+                    console.log(Error(`getEmbeddedData (${edKey}) was rejected on a promise. `),qtrxGetFail);
+                    return getEDVal_reject(qtrxGetFail);
+                })
+        });
+    };
+    self.setEDValue = function(edKey, edValue) {  // I made this thenable because the real Qtrx function nested inside it is thenable
+        return new Promise((setEDVal_success, setEDVal_reject) => {
+            Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue) // setEmbeddedData is a thenable object (I hope)
+            .then(
+                qtrxSetSuccess => {
+                    console.log(`setEmbeddedData (${edKey}, ${edValue}) fulfilled a promise: `,qtrxSetSuccess);
+                    return setEDVal_success(qtrxSetSuccess);
+                },
+                qtrxSetFail => {
+                    console.log(Error(`setEmbeddedData (${edKey}, ${edValue}) was rejected on a promise. `),qtrxSetFail);
+                    return setEDVal_reject(qtrxSetFail);
+                });
+        });
+    };
 
 
 
@@ -64,6 +90,28 @@ function UDFClass($, objFromMain) {
     }
 
     self.combineVarObjs = (...args) => $.extend(...args);
+
+    self.objKeysPerLevel = (obj) => {
+        // from https://stackoverflow.com/a/32638121/9312373
+        // returns object like { "0": 4, "1": 3, "2": 1}
+
+        let result = {};
+        return countKeysPerLevel(result, obj);
+
+        function countKeysPerLevel(store, obj, level=0) {
+            const keys = Object.keys(obj);
+            let count = keys.length;
+
+            store[level] = (store[level] || 0) + count;
+
+            for (let counter = 0; counter < count; counter++) {
+                let childObj = obj[keys[counter]];
+                if (typeof childObj === 'object') {
+                    countKeysPerLevel(store, childObj, level + 1);
+                }
+            }
+        }
+    }
 
     self.ansBoxMessages = function (msgKeyToReturn) {
         const objAnsBoxMessages = {
@@ -312,49 +360,6 @@ console.log('v3user-defined-functions.js loaded');
 
 
 
-
-// // Most questions can be graded with this.
-// // The ones that can't will do their own grading within each question.
-// // Pass a single answer to check or pass arrays of answers.
-// function respPercCorrect(stuResp, correctAns, rawTolerance) {
-
-//     // Return 0 if stuResp is null or empty (this will allow stuResp = 0)
-//     if (stuResp === null || stuResp === "") { return 0; }
-
-//     // If this is only checking a single value, run the check and return 1/0
-//     if (!Array.isArray(correctAns)) { return percCorrect(stuResp, correctAns, rawTolerance); }
-
-//     let ptsPossible = 0;
-//     let ptsEarned = 0;
-
-//     // If the student submitted only one answer, convert it to an array
-//     stuResp = !Array.isArray(stuResp) ? stuResp.split() : stuResp
-
-//     // For multi-answer questions, assign 1 point to each answer.
-//     // Students can earn a point each time through.
-//     jQuery.each(correctAns, (index, curAns) => {
-//         ptsPossible += 1;
-//         const curResp = stuResp[index] || 0;
-//         ptsEarned += percCorrect(curResp, curAns, rawTolerance);
-//     });
-
-//     return ptsEarned / ptsPossible;
-
-//     function percCorrect(respToEvaluate, paramCorrectAns, rawTolerance) {
-//         curCorrectAns = parseFloat(paramCorrectAns);
-
-//         // If a rawTolerance is passed, the code will accept answers +/- that amount.
-//         // Otherwise, it uses a percent difference (i.e., curCorrectAns +/- 1.25% ).
-//         // The default is 0.0125 (2^-3) because the binary system is happier with that.
-//         const tolAmt = rawTolerance || curCorrectAns * 0.0125;
-
-//         // Clean text in the student's answer
-//         let numRespToEvaluate = convertRespToNum(respToEvaluate);
-
-//         const isCorrect = Math.abs(numRespToEvaluate - curCorrectAns) < tolAmt;
-
-//         return isCorrect ? 1 : 0;
-//     }
 
 
 
