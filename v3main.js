@@ -106,29 +106,30 @@ function mainFunc($) {
             return new Promise((storeQRVResolve, storeQRVReject) => {
                 // Each student sees variables unique to that student (randomly generated). This function writes those embedded data.
                 // When the student leaves the page, the student's submission is combined with those variables.
-                let sqrvObjContent = {
+                let sqrvObjContentINITIAL = {
                     "quesNum": objContentStoreQRVinED.quesNum,
                     "objQuesVars": objContentStoreQRVinED.allVars, // this property stores the object
                     "correctAns": objContentStoreQRVinED.allVars.correctAns
                 };
-                const strQuesVarsStorageKey = "strQues" + sqrvObjContent.quesNum + "VarsStorage"; // strQues433VarsStorage
+                const strQuesVarsStorageKey = "strQues" + sqrvObjContentINITIAL.quesNum + "VarsStorage"; // strQues433VarsStorage
+                let sqrvObjContent = quesPrefix(sqrvObjContentINITIAL, self.quesNum, "include");
                 const strQuesVarsStorageVal = JSON.stringify(sqrvObjContent);
                 console.log('sqrvObjContent',sqrvObjContent);
-                console.log(strQuesVarsStorageKey + ' about to be written to embedded data: ', strQuesVarsStorageVal.substring(0, 20) + "... (very long)");
+                console.log(strQuesVarsStorageKey + ' about to be written to embedded data: ', strQuesVarsStorageVal.substring(0, 30) + "... (very long)");
 
                 if (IS_PRODUCTION) {
                     $.when(udf.setEDValue(strQuesVarsStorageKey, strQuesVarsStorageVal))
                         .then(
                             setQtrxResp_success => {
                                 console.log(`From setEDValue for ${strQuesVarsStorageKey}:`, setQtrxResp_success);
-                                return storeQRVResolve;
+                                storeQRVResolve;
                             },
                             setQtrxResp_err => {
-                                return storeQRVReject(Error("Encountered an error trying to store variables in Qualtrics: " + setQtrxResp_err, objQuesResp))
+                                storeQRVReject(Error("Encountered an error trying to store variables in Qualtrics: " + setQtrxResp_err, objQuesResp))
                             }
                         );
                 } else {
-                    console.log("In testing mode, so no setEDValue for " + strQuesVarsStorageKey + ": " + strQuesVarsStorageVal.substring(0, 20) + "... (very long)");
+                    console.log("In testing mode, so no setEDValue for " + strQuesVarsStorageKey + ": " + strQuesVarsStorageVal.substring(0, 30) + "... (very long)");
                     return storeQRVResolve;
                 }
             });
@@ -217,16 +218,17 @@ function mainFunc($) {
                         // This leaves the objContent variable untouched, creating a near duplicate object.
                         // I wanted to leave objContent stable in case [when!] there are coding errors and I need to troubleshoot using a student's historical record of submissions
                         const fnQuesName = Object.keys(objContentToStore.stuSubmission)[0];
-                        let sssObjContent = {
+                        let sssObjContentINITIAL = {
                             "quesNum": objContentToStore.quesNum,
                             "objQuesVars": objContentToStore.allVars, // this property stores the object
                             "correctAns": objContentToStore.allVars.correctAns,
                             "stuSubmission": objContentToStore.stuSubmission,
                             "percCorrect": objContentToStore.stuSubmission[fnQuesName].percCorrect
                         };
-                        const strQuesVarsStorageKey = "strQues" + sssObjContent.quesNum + "VarsStorage"; // strQues433VarsStorage
-                        console.log('sssObjContent',sssObjContent);
-                        const strQuesVarsStorageVal = JSON.stringify(sssObjContent);
+                        const strQuesVarsStorageKey = "strQues" + sssObjContentINITIAL.quesNum + "VarsStorage"; // strQues433VarsStorage
+                        let sssObjContentPREFIX = quesPrefix(sssObjContentINITIAL, self.quesNum, "include");
+                        console.log('sssObjContent',sssObjContentPREFIX);
+                        const strQuesVarsStorageVal = JSON.stringify(sssObjContentPREFIX);
                         console.log(strQuesVarsStorageKey + ' about to be written to embedded data with student submission results: ', strQuesVarsStorageVal.substring(0, 20) + "... (very long)");
 
                         if (IS_PRODUCTION) {
