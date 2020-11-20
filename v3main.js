@@ -113,6 +113,7 @@ function mainFunc($) {
                 };
                 const strQuesVarsStorageKey = "strQues" + sqrvObjContent.quesNum + "VarsStorage"; // strQues433VarsStorage
                 const strQuesVarsStorageVal = JSON.stringify(sqrvObjContent);
+                console.log('sqrvObjContent',sqrvObjContent);
                 console.log(strQuesVarsStorageKey + ' about to be written to embedded data: ', strQuesVarsStorageVal.substring(0, 20) + "... (very long)");
 
                 if (IS_PRODUCTION) {
@@ -224,6 +225,7 @@ function mainFunc($) {
                             "percCorrect": objContentToStore.stuSubmission[fnQuesName].percCorrect
                         };
                         const strQuesVarsStorageKey = "strQues" + sssObjContent.quesNum + "VarsStorage"; // strQues433VarsStorage
+                        console.log('sssObjContent',sssObjContent);
                         const strQuesVarsStorageVal = JSON.stringify(sssObjContent);
                         console.log(strQuesVarsStorageKey + ' about to be written to embedded data with student submission results: ', strQuesVarsStorageVal.substring(0, 20) + "... (very long)");
 
