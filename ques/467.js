@@ -34,30 +34,8 @@ function fnQues467 ($, objFromMain) {
             "varDiscRate": udf.uRand(.08, .1, .01),
         };
 
-        let ansVars = new capbudg.CapBudgVar(quesVars, false); // Returns object with all solutions in it
-
         const calcVars = {
-            calcTheAns: ansVars,
-            correctAns: {
-                "ip": ansVars.varIP,
-                "atp": ansVars.varATP,
-                "eqp": ansVars.varEQP,
-                "enewp-rev": ansVars.varENEWPRev,
-                "enewp-exp": ansVars.varENEWPExp,
-                "enepi-rev": ansVars.varENEPIRev,
-                "enepi-exp": ansVars.varENEPIExp,
-                "salvage-value": ansVars.varSalvage,
-                "lifespan": ansVars.varLifespan,
-                "tax-rate": ansVars.varTaxRate,
-                "discount-rate": ansVars.varDiscRate,
-                "ic": ansVars.calcIC,
-                "enepi-total": ansVars.calcENEPI,
-                "enewp-total": ansVars.calcENEWP,
-                "ene-total": ansVars.calcENE,
-                "ane-total": ansVars.calcANE,
-                "dep-amt": ansVars.calcDepAmt,
-                "dep-tax-savings": ansVars.calcDepTaxSavings
-            }
+            calcTheAns: new capbudg.CapBudgVar(quesVars, false) // Returns object with all solutions in it
         };
 
         const displayVars = {
@@ -69,7 +47,7 @@ function fnQues467 ($, objFromMain) {
     }
 
     this.pageContent = function(v) {
-        let obj = { "allVars": v };
+        let obj = {};
 
         obj.ansBoxMessage = udf.ansBoxMessages("writeOutNums"); //decimalPlaces4
 

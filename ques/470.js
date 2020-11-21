@@ -20,18 +20,15 @@ function fnQues470 ($, objFromMain) {
             "varLifespan": 3
         };
 
-        let ansVars = new capbudg.CapBudgVar(quesVars, false); // Returns object with all solutions in it
-
         const calcVars = {
-            calcTheAns: ansVars,
-            correctAns: {
-                "payback-reg": ansVars.ansPaybackPeriodReg,
-                "payback-disc": ansVars.ansPaybackPeriodDisc,
-                "npv": ansVars.ansNPV
-            }
+            calcTheAns: new capbudg.CapBudgVar(quesVars, false) // Returns object with all solutions in it
         };
+        const ansVars = calcVars.calcTheAns;
 
         const displayVars = {
+            "dispIP": (-1*quesVars.varIP).toLocaleString('en-US'),
+            "dispENEPIRev": quesVars.varENEPIRev.toLocaleString('en-US'),
+            "dispENEPIExp": (-1*quesVars.varENEPIExp).toLocaleString('en-US'),
             "dispTaxRate": udf.uRound(quesVars.varTaxRate*100,2),
             "dispRate": udf.uRound(quesVars.varDiscRate*100,2),
             get dispAnsPaybackPeriodReg() {
@@ -49,20 +46,20 @@ function fnQues470 ($, objFromMain) {
     }
 
     this.pageContent = function(v) {
-        let obj = { "allVars": v };
+        let obj = {};
 
         obj.ansBoxMessage = udf.ansBoxMessages("writeOutNums"); //decimalPlaces4
 
         obj.stem = `
         <p>
             Down Under Boomerang, Inc, is considering a new 3-year expansion project that
-            requires an initial fixed asset investment of ${(-1*v.varIP).$$()}.
+            requires an initial fixed asset investment of \$${v.dispIP}.
             The fixed asset will be depreciated straight-line to zero over its 3-year tax life,
             after which time it will be worthless.
         </p>
         <p>
-            The project is estimated to generate ${v.varENEPIRev.$$()}
-            in new annual sales, with costs of ${(-1*v.varENEPIExp).$$()} per year.
+            The project is estimated to generate \$${v.dispENEPIRev}
+            in new annual sales, with costs of \$${v.dispENEPIExp} per year.
         </p>
         <p>
             The tax rate is ${v.dispTaxRate}%, and the cost of capital is ${v.dispRate}%.

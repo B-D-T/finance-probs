@@ -1,48 +1,3 @@
-/* 
-#####################
- TOP LEVEL CONTROLS: my-qtrx-page
-#####################
-Anything I build should be within a .my-qtrx-page wrapper.
-It's not, at the moment (Nov 2020), but it should be.
-*/
-
-.my-qtrx-page{
-    width: 100%;
-}
-
-    /* These are top-level elements (stem, solution, response) */
-    .my-qtrx-page .qtrx-page-elem{
-        border-top: 2px solid black; /* dividing line to use instead of <hr> */
-        margin: 10px auto;    
-    }
-
-    /* Div structure for top sections */
-    .qtrx-page-elem .ques-stem{}
-    .qtrx-page-elem .ques-solution{}
-    .qtrx-page-elem .resp-to-student{}
-
-    .my-qtrx-page .section-head{
-        font-weight: bold;
-        color: rgb(136,28,28);
-        margin-top:18px;
-        margin-bottom: 6px;
-    }
-
-    .my-qtrx-page .section-head.head1{ font-size: 2.5em; }
-    .my-qtrx-page .section-head.head2{ font-size: 1.5em; }
-    
-    
-/* Indent all DIVs except section headings*/
-.qtrx-page-elem .resp-to-student>div:not(.section-head){
-    margin-left:10px;
-}
-.stu-score{
-    display: flex;
-    flex-flow: row;
-}
-.stu-score>div{
-    margin-right: 5px;
-}
 
 /* I created this for the IRR problems in 469.js,
 but it probably can be useful in many other places too.  */
@@ -166,16 +121,16 @@ but it probably can be useful in many other places too.  */
     width: 300px;
     margin-right: 2%;
 }
-.variable-rows .var-value{
+.variable-rows .value{
     text-align: center;
     width: 200px;
 }
 
-.var-value input.ansbox{
+.value input.ansbox{
     height: 1.5em;
     text-align: right;
 }
-.var-value input.solution{
+.value input.ansbox.solution{
     font-weight: bold;
     border: 0px;
     background-color: transparent;
