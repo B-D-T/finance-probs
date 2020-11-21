@@ -4,7 +4,7 @@ function UDFClass($, objFromMain) {
     self.quesNum = quesNumGlobal();
     self.getEDValue = function(edKey) { // I made this thenable because the real Qtrx function nested inside it is thenable
         return new Promise((getEDVal_success, getEDVal_reject) => {
-            $.when(Qualtrics.SurveyEngine.getEmbeddedData(edKey))
+            Qualtrics.SurveyEngine.getEmbeddedData(edKey)  // getEmbeddedData is a thenable object (I hope)
             .then(
                 qtrxGetSuccess => {
                     console.log(`getEmbeddedData (${edKey}) fulfilled a promise: `,qtrxGetSuccess);
@@ -18,7 +18,7 @@ function UDFClass($, objFromMain) {
     };
     self.setEDValue = function(edKey, edValue) {  // I made this thenable because the real Qtrx function nested inside it is thenable
         return new Promise((setEDVal_success, setEDVal_reject) => {
-            $.when(Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue)) 
+            Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue) // setEmbeddedData is a thenable object (I hope)
             .then(
                 qtrxSetSuccess => {
                     console.log(`setEmbeddedData (${edKey}, ${edValue}) fulfilled a promise: `,qtrxSetSuccess);
