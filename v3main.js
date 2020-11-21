@@ -387,8 +387,8 @@ function mainFunc($) {
                                                     default: // 2+
                                                         // look for any existing "myKey_" keys. To get the next number in the list,
                                                         // remove "myKey_", leave only the number oat the end, and take max + 1
-                                                        regex = new RegExp(parentKey + "_");
-                                                        const newMatches = aryExistingKeyMatches.map((theDSField) => parseInt(theDSField.replace(regex, '')));
+                                                        const regexMyKey = new RegExp(parentKey + "_");
+                                                        const newMatches = aryExistingKeyMatches.map((theDSField) => parseInt(theDSField.replace(regexMyKey, '')));
                                                         newParentKey = parentKey + '_' + (Math.max(...newMatches) + 1);
                                                         break;
                                                 }
