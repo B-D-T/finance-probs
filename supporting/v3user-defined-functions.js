@@ -2,8 +2,35 @@
 function UDFClass($, objFromMain) {
     const self = this;
     self.quesNum = quesNumGlobal();
-    self.getEDValue = (edKey) => Qualtrics.SurveyEngine.getEmbeddedData(edKey);
-    self.setEDValue = (edKey, edValue) => Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue);
+    self.getEDValue = function(edKey) { // I made this thenable because the real Qtrx function nested inside it is thenable
+        return new Promise((getEDVal_success, getEDVal_reject) => {
+            $.when(Qualtrics.SurveyEngine.getEmbeddedData(edKey))
+            .then(
+                qtrxGetSuccess => {
+                    console.log(`getEmbeddedData (${edKey}) fulfilled a promise: `,qtrxGetSuccess);
+                    return getEDVal_success(qtrxGetSuccess);
+                },
+                qtrxGetFail => {
+                    console.log(Error(`getEmbeddedData (${edKey}) was rejected on a promise. `),qtrxGetFail);
+                    return getEDVal_reject(qtrxGetFail);
+                })
+        });
+    };
+    self.setEDValue = function(edKey, edValue) {  // I made this thenable because the real Qtrx function nested inside it is thenable
+        return new Promise((setEDVal_success, setEDVal_reject) => {
+            $.when(Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue)) 
+            .then(
+                qtrxSetSuccess => {
+                    console.log(`setEmbeddedData (${edKey}, ${edValue}) fulfilled a promise: `,qtrxSetSuccess);
+                    return setEDVal_success(qtrxSetSuccess);
+                },
+                qtrxSetFail => {
+                    console.log(Error(`setEmbeddedData (${edKey}, ${edValue}) was rejected on a promise. `),qtrxSetFail);
+                    return setEDVal_reject(qtrxSetFail);
+                });
+        });
+    };
+
 
 
     // This add a global method to all numbers for formatting
