@@ -116,7 +116,7 @@ function mainFunc($) {
                 console.log(strQuesVarsStorageKey + ' about to be written to embedded data: ', strQuesVarsStorageVal.substring(0, 20) + "... (very long)");
 
                 if (IS_PRODUCTION) {
-                    $.when(udf.setEDValue(strQuesVarsStorageKey, strQuesVarsStorageVal))
+                    udf.setEDValue(strQuesVarsStorageKey, strQuesVarsStorageVal)
                         .then(
                             setQtrxResp_success => {
                                 console.log(`From setEDValue for ${strQuesVarsStorageKey}:`, setQtrxResp_success);
@@ -228,7 +228,7 @@ function mainFunc($) {
                         console.log(strQuesVarsStorageKey + ' about to be written to embedded data with student submission results: ', strQuesVarsStorageVal.substring(0, 20) + "... (very long)");
 
                         if (IS_PRODUCTION) {
-                            $.when(udf.setEDValue(strQuesVarsStorageKey, strQuesVarsStorageVal))
+                            udf.setEDValue(strQuesVarsStorageKey, strQuesVarsStorageVal)
                                 .then(
                                     setQtrxResp_success => {
                                         console.log(`From setEDValue for ${strQuesVarsStorageKey}:`, setQtrxResp_success);
