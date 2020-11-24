@@ -55,7 +55,7 @@ function fnQues467 ($, objFromMain) {
         <p>
             BDT Enterprises, which owns The Park (a local sports bar and bowling alley), 
             is considering updating by putting in seven new pin-setting machines.
-            The current machines allow for ${v.varGamesPerYr.$$()} bowled games per year
+            The current machines allow for ${v.varGamesPerYr.toLocaleString("en-US")} bowled games per year
             at ${v.varCostPerGameOld.$$(2)} per game.
             Despite being old, they have held up well and
             only require a total of ${(-1*v.varENEWPExp).$$()} per year in maintenance.
