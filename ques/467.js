@@ -75,7 +75,7 @@ function fnQues467 ($, objFromMain) {
             thus making the bowling alley more attractive to customers.
             Based on a market survey,
             it is expected that the machines will increase the number of games bowled by ${v.varAddlGames.toLocaleString('en-US')} each year,
-            for the 8 years.
+            for the ${v.varLifespan} years.
             The price of each game ${(v.varCostPerGameOld==v.varCostPerGameNew ? "will remain at " : "is now ") + v.varCostPerGameNew.$$(2)} per game.
             The new machines will have annual maintenance expenses of ${(-1*v.varENEPIExp).$$()} per year.
         </p>
