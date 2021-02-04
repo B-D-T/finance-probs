@@ -288,7 +288,7 @@ function respPercCorrect(stuResp, correctAns, rawTolerance) {
         // If a rawTolerance is passed, the code will accept answers +/- that amount.
         // Otherwise, it uses a percent difference (i.e., curCorrectAns +/- 1.25% ).
         // The default is 0.0125 (2^-3) because the binary system is happier with that.
-        const tolAmt = rawTolerance || curCorrectAns * 0.0125;
+        const tolAmt = rawTolerance || Math.abs(curCorrectAns) * 0.0125;
 
         // Clean text in the student's answer
         let numRespToEvaluate = convertRespToNum(respToEvaluate);
