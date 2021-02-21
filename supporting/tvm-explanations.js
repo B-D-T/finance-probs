@@ -873,8 +873,10 @@ function timelineAnnuity(qv, tvmType = "pv", annPmts = [], showArrow = true) {
 
     let
         varN = isPerpetuity ? tlMaxCols-2 : qv.varN,
-        varY = qv.varY,
+        varY = qv.varY;
+    if (!(typeof qv.varPMT === "undefined")) {
         varPMT = qv.varPMT.toFixed(2).toLocaleString('en-US');
+    }
 
     // If a payment timeline (annPmts) is passed, that's used instead of the qv values.
     let useCallerTL = false;

@@ -1,13 +1,13 @@
 function fnQues487(objFromMainQues) {
 
     let quesVars = {
-        varRate: uRand(.04, .10, .01),
-        AmtYr00: uRand(10000000, 18000000, 1000000),
-        AmtYr01: uRand(2000000, 5000000, 100000),
-        AmtYr02: uRand(2000000, 5000000, 100000),
-        AmtYr03: uRand(2000000, 5000000, 100000),
-        AmtYr04: uRand(2000000, 5000000, 100000),
-        AmtYr05: uRand(2000000, 5000000, 100000)
+        "varRate": uRand(.04, .10, .01),
+        "AmtYr00": uRand(10000000, 18000000, 1000000),
+        "AmtYr01": uRand(2000000, 5000000, 100000),
+        "AmtYr02": uRand(2000000, 5000000, 100000),
+        "AmtYr03": uRand(2000000, 5000000, 100000),
+        "AmtYr04": uRand(2000000, 5000000, 100000),
+        "AmtYr05": uRand(2000000, 5000000, 100000)
     };
 
     quesVars = addPrefix(quesVars);
@@ -137,15 +137,15 @@ function fnQues487(objFromMainQues) {
                 PV_{0} = ${AmtYr00}
             \\]
         <h3>Year 1</h3>
-        ${solvePVSinglePmt_PV({"varFV": AmtYr01, varN: 1, "varRate":varRate, varY:1})}
+        ${solvePVSinglePmt_PV({"varFV": AmtYr01, "varN": 1, "varRate":varRate, varY:1})}
         <h3>Year 2</h3>
-        ${solvePVSinglePmt_PV({"varFV": AmtYr02, varN: 2, "varRate":varRate, get varY() {return this.varN}})}
+        ${solvePVSinglePmt_PV({"varFV": AmtYr02, "varN": 2, "varRate":varRate, get varY() {return this.varN}})}
         <h3>Year 3</h3>
-        ${solvePVSinglePmt_PV({"varFV": AmtYr03, varN: 3, "varRate":varRate, get varY() {return this.varN}})}
+        ${solvePVSinglePmt_PV({"varFV": AmtYr03, "varN": 3, "varRate":varRate, get varY() {return this.varN}})}
         <h3>Year 4</h3>
-        ${solvePVSinglePmt_PV({"varFV": AmtYr04, varN: 4, "varRate":varRate, get varY() {return this.varN}})}
+        ${solvePVSinglePmt_PV({"varFV": AmtYr04, "varN": 4, "varRate":varRate, get varY() {return this.varN}})}
         <h3>Year 5</h3>
-        ${solvePVSinglePmt_PV({"varFV": AmtYr05, varN: 5, "varRate":varRate, get varY() {return this.varN}})}
+        ${solvePVSinglePmt_PV({"varFV": AmtYr05, "varN": 5, "varRate":varRate, get varY() {return this.varN}})}
 
         `
         return obj;
