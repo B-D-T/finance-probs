@@ -16,7 +16,7 @@ function fnQues489 (objFromMainQues) {
         quesVars = objQuesVars; createEDVarInScope(quesVars);
 
         let calcVars = {
-            calcTheAns: fPresentValue(quesVars)
+            calcTheAns: fPresentValue({varPMT, varRate, varN, varY})
         };
         createEDVarInScope(calcVars);
 
@@ -41,7 +41,20 @@ function fnQues489 (objFromMainQues) {
         `
 
         obj.solution = probDisplay(quesVars)`
+        <div>
         ${explainPVAnnuityConst_PV(quesVars)}
+        </div>
+        <div>
+        <p style="font-size:0.8em;">
+        The answer checker shown here has been weird on this one.
+        It shows the correct answer,
+        but even if you put the correct answer,
+        it may show that your answer is wrong.
+        Don't worry about that if it happens to you.
+        I grade these using a separate system anyway,
+        so if your answer matches the correct answer,
+        it will be marked correct.
+        </p>
         `
         return obj;
 

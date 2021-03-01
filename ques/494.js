@@ -60,7 +60,7 @@ function fnQues494 (objFromMainQues) {
         </p>
         <p>
         Then, treat that as a single payment and 
-        discount it back ${varY-1-varReturnInYear} years to get to year varReturnInYear.
+        discount it back ${varY-1-varReturnInYear} years to get to year ${varReturnInYear}.
         The correct answer is \$${calcTheAns.toLocaleString('en-US')}.</p>`;
     //    ${explainPVAnnuityConst_PV(quesVars)}
         return obj;
