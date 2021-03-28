@@ -12,18 +12,23 @@ function fnQues492(objFromMainQues) {
     };
 
     
-    quesVars = addPrefix(quesVars, quesNum());
-    if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
+    quesVars = addPrefix(quesVars);
+    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
 
-    function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars);
-        
+    function buildPage(objQuesVars) {
+        quesVars = objQuesVars; createEDVarInScope(quesVars);
+
         let calcVars = {
             calcTheAns:  fFutureValue(quesVars)
         };
         createEDVarInScope(calcVars);
 
         let displayVars = { };
-        createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
+        createEDVarInScope(displayVars);
+        
+        jQuery.extend(quesVars, calcVars, displayVars);
+        storeQuesRespVars(quesVars, calcTheAns);
+        return fillPage();
     }
 
     function fillPage() {
@@ -42,9 +47,23 @@ function fnQues492(objFromMainQues) {
 
 
         obj.solution = probDisplay(quesVars)`
-        Step-by-step solution unavailable at this time.<br />
-        In short, you need to determine the FV of the annuity in year ${varReturnInYear}.<br/>
-        FV<sub>${varReturnInYear}</sub> = \$${calcTheAns.toLocaleString('en-US')}.`;
+        <p>
+        Step-by-step solution unavailable at this time.</p>
+        <p>
+        In short, you need to use the FV of the annuity formula
+        to determine the value of the annuity in year ${varReturnInYear}.
+        The years that the annuity starts and ends are mostly irrelevant, however,
+        since you're dealing with FV.
+        You know that there are ${varN} payments,
+        so you can plug that into the FV of an annuity formula.<br/>
+        n = ${varN}<br />
+        C<sub>${varY}</sub> = ${varPMT}<br/>
+        i = ${dispRatePerc}%
+        </p>
+        <p>
+        FV<sub>${varReturnInYear}</sub> = \$${calcTheAns.toLocaleString('en-US')}.
+        </p.
+        `;
 
         return obj;
     } // end of fillPage

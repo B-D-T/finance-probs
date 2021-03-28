@@ -12,8 +12,8 @@ function fnQues493(objFromMainQues) {
     };
 
     
-    quesVars = addPrefix(quesVars, quesNum());
-    if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
+    quesVars = addPrefix(quesVars);
+    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
 
     function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars);
         
@@ -27,8 +27,11 @@ function fnQues493(objFromMainQues) {
             dispRatePerc: uRound(varRate * 100, 4),
             dispGrowthRatePerc: uRound(varG * 100, 5)
         };
-        createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
-    }
+        createEDVarInScope(displayVars); 
+        
+        jQuery.extend(quesVars, calcVars, displayVars);
+        storeQuesRespVars(quesVars, calcTheAns);
+        return fillPage();    }
 
     function fillPage() {
         let obj = {};

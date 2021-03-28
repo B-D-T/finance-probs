@@ -12,8 +12,8 @@ function fnQues495(objFromMainQues) {
     };
 
     
-    quesVars = addPrefix(quesVars, quesNum());
-    if (objFromMainQues.isProduction) {return buildPage(fetchQuesVars(quesVars))} else {return buildPage(quesVars);}
+    quesVars = addPrefix(quesVars);
+    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
 
     function buildPage(objQuesVars) { quesVars = objQuesVars; createEDVarInScope(quesVars);
         
@@ -25,7 +25,11 @@ function fnQues495(objFromMainQues) {
         createEDVarInScope(calcVars);
 
         let displayVars = { };
-        createEDVarInScope(displayVars); jQuery.extend(quesVars, calcVars, displayVars); return fillPage();
+        createEDVarInScope(displayVars);
+        
+        jQuery.extend(quesVars, calcVars, displayVars);
+        storeQuesRespVars(quesVars, calcTheAns);
+        return fillPage();
     }
 
     function fillPage() {
