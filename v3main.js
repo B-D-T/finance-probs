@@ -77,7 +77,8 @@ function mainFunc($) {
         if (jQuery.isEmptyObject(objStuRespAnsbox)) {
             // Do nothing
         } else {
-            aryAnsboxKeys.map(function(theAnsboxValue, idx) { 
+console.log('objStuRespAnsbox returned not empty. This is what is in it:',objStuRespAnsbox );
+            jQuery.each(aryAnsboxKeys, (theAnsboxValue, idx) => { 
                 // Return the full element that has this finance variable as the value of data-ansboxKey. This is the <input> box.
                 const objTheElement = document.querySelectorAll(`[data-ansboxkey='${theAnsboxValue}']`)[0];
                 objTheElement.value = objStuRespAnsbox[theAnsboxValue];
@@ -384,6 +385,7 @@ console.log('qtrxSubmitType:', qtrxSubmitType);
         const strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage";
 
         jQuery.when(getEDValue(strQuesVarsStorageKey)).then(function (edValue) {
+console.log('edValue is',edValue);
             // The storage key doesn't exist the first time the page is loaded, so we'll return an empty object
             if (!edValue) { return {} };
 
@@ -400,10 +402,11 @@ console.log('qtrxSubmitType:', qtrxSubmitType);
             } else {
                 jQuery.each(aryAnsboxKeys, (strAnsboxKey, idx) => objStuRespAnsbox[strAnsboxKey] = objStuResp[strAnsboxKey]);
             };
-
+console.log('In fetchStuRespAnsbox, objStuRespAnsbox is',objStuRespAnsbox );
             // If all the responses are 0, that probably means the student just clicked past the question without submitting an answer.
             // We want them to see the placeholder text for that question, so we return null instead of 0.
             const sumOfValues = Object.values(objStuRespAnsbox).reduce((a, b) => a + b);
+console.log('sumOfValues is',sumOfValues);
             return sumOfValues==0 ? {} : objStuRespAnsbox;
 
         });
