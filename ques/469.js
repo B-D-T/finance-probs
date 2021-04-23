@@ -32,7 +32,7 @@ function fnQues469 ($, objFromMain) {
 console.log('calcVars',calcVars);
         const strNoIRRFound = `This code was unable to calculate a IRR for the investment`;
         const displayVars = {
-            dispIRRInv01: Number(calcVars.calcTheAns) ? udf.uRound(calcVars.calcTheAns,6) : strNoIRRFound
+            dispIRRInv01: Number(calcVars.calcTheAns.ansIRR) ? udf.uRound(calcVars.calcTheAns.ansIRR,6) : strNoIRRFound
         };
 
         return udf.combineVarObjs(quesVars, calcVars, displayVars);
