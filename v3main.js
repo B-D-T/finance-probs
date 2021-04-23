@@ -393,7 +393,7 @@ console.log('createCustomInputBoxStuSubmit has aryStuSubmissions as', aryStuSubm
             if (!edValue) { return {} };
 
             const objQuesResp = JSON.parse(edValue);
-console.log('objQuesResp returned from embedded data is',logObj(objQuesResp)); // This is coming back with the right stuff, I think (need to double check using logObj)
+console.log('objQuesResp returned from embedded data is', udf.logObj(objQuesResp)); // This is coming back with the right stuff, I think (need to double check using logObj)
             // Student's submission(s) for the question
             const objStuResp = objQuesResp["objStuResp"];
 
