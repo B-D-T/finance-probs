@@ -151,7 +151,7 @@ console.log('qtrxSubmitType:', qtrxSubmitType);
                     } else { // respSubmitMethod == CustomInputBoxes
                         // There is NOT a Qualtrics input box on that page. In that case, we'll only look at our boxes.
 
-                        const objCustomInputBoxStuSubmit = createCustomInputBoxStuSubmit();
+                        const objCustomInputBoxStuSubmit = createCustomInputBoxStuSubmit(aryAnsboxKeys);
                         objStuResp = objCustomInputBoxStuSubmit.stuRespObject;
                         objCorrectAns = objCustomInputBoxStuSubmit.correctAnsObject;
                         percCorrect = objCustomInputBoxStuSubmit.thePercCorrect;
