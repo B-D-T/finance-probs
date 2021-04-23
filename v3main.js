@@ -393,7 +393,7 @@ console.log('createCustomInputBoxStuSubmit has aryStuSubmissions as', aryStuSubm
             if (!edValue) { return {} };
 
             const objQuesResp = JSON.parse(edValue);
-console.log('objQuesResp returned from embedded data is', udf.logObj(objQuesResp)); // This is coming back with the right stuff, I think (need to double check using logObj)
+console.log('objQuesResp returned from embedded data is', udf.logObj(objQuesResp)); // This is coming back with the right stuff
             // Student's submission(s) for the question
             const objStuResp = objQuesResp["objStuResp"];
 
@@ -403,7 +403,7 @@ console.log('objQuesResp returned from embedded data is', udf.logObj(objQuesResp
                 // No student response data for that question, probably because it's the first time the page has loaded
                 return {};
             } else {
-                jQuery.each(aryAnsboxKeys, (strAnsboxKey, idx) => objStuRespAnsbox[strAnsboxKey] = objStuResp[strAnsboxKey]);
+                jQuery.each(aryAnsboxKeys, (idx, strAnsboxKey) => objStuRespAnsbox[strAnsboxKey] = objStuResp[strAnsboxKey]);
 console.log('In fetchStuRespAnsbox, objStuRespAnsbox is',objStuRespAnsbox );
                 // If all the responses are 0, that probably means the student just clicked past the question without submitting an answer.
                 // We want them to see the placeholder text for that question, so we return null instead of 0.
