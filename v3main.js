@@ -166,8 +166,8 @@ console.log('objCustomInputBoxStuSubmit is returned as', objCustomInputBoxStuSub
                     let strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage";
 
                     // Once the old data have been read into memory, append the results based on the student's responses
-                    jQuery.when(getEDValue(strQuesVarsStorageKey)).then(function (edValue) {
-                        
+                    jQuery.when(getEDValue(strQuesVarsStorageKey))
+                    .then(function (edValue) {    
                         let objQuesResp = JSON.parse(edValue);
 
                         // Student's submission(s) for the question
@@ -180,13 +180,14 @@ console.log('objCustomInputBoxStuSubmit is returned as', objCustomInputBoxStuSub
 
                         // Store feedback that will be shown to user when they see the Solution
                         objQuesResp["respFeedback"] = {}; // Used to be objRespFeedback; WHAT GETS PUT HERE NOW?
-console.log('****This is what will be written back into the embedded data after student submits:', objQuesResp);
+console.log('****This is what will be written back into the embedded data for '+strQuesVarsStorageKey+' after student submits (in theory):', objQuesResp);
                         const strQuesRespED = JSON.stringify(objQuesResp);
-
-                        // Write quesResp to Embedded Data (assuming we're in production,
-                        // although I don't think this function ever gets called during testing anyway).
-                        setEDValue(strQuesVarsStorageKey, strQuesRespED);
-
+                        return strQuesRespED;
+                    })
+                    .done(function(strQuesRespED){
+                        // Write quesResp to Embedded Data (assuming we're in production, although I don't think this function ever gets called during testing anyway).
+console.log('****This SHOULD write a string '+strQuesRespED.length+' characters long to '+strQuesVarsStorageKey+' in embedded data');
+                        return setEDValue(strQuesVarsStorageKey,strQuesRespED);
                     });
 
                 });
