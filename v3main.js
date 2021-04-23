@@ -67,7 +67,9 @@ function mainFunc($) {
         // Create aryAnsboxKeys, an array of finance variable names from the data-ansboxkey values.
         // These are in the order in which they appear on the page (though it doesn't matter what order they're in, as long as the order stays constant).
         // Sample data returned: ["ansPaybackPeriodReg", "ansPaybackPeriodDisc", "ansNPV"]
-        const aryAnsboxKeys = $(divRoot + '-stem input').map(function() { return jQuery(this).data('ansboxkey'); }).get();
+        const aryAnsboxKeys = $(divRoot + '-stem input').map(function() {
+            return jQuery(this).data('ansboxkey'); 
+        }).get();
 
         // Pre-populate the boxes if the student has already submitted answers, clicks off, and then clicks back to this question again
         // Fetch an object with the student's previous responses to this question
@@ -122,7 +124,7 @@ console.log('varsObj:', varsObj);
                     
                     // If the Qualtrics input box exists, pull the student's submitted answers from there.
                     // Otherwise, pull the submissions from the fields we create as part of the code (e.g., for the multipart capital budgeting problems).
-                    // Any field we create must be an 'input' element with a "data-ansboxkey" HTML attribute.
+                    // Any field we create must be an 'input' element with a "data-ansboxkey" HTML attribute that is unique for that page (e.g., the same page cannot have two "ansIRR" boxes)
 
                     // Check if there is an input box with that id on the page.
                     // If it doesn't exist, qtrxInputBox returns null and we assume that the page only has our boxes.

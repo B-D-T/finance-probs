@@ -7,11 +7,10 @@ function fnQues469 ($, objFromMain) {
     
     this.defineVariables = function(){
         
-        // Originally there were 3 IRR problems on the same page. However, since I need unique data-ansboxKey names, I limited it to 1 per page
         let inv01 = Array(udf.uRand(5,9));
-        // let inv02 = Array(udf.uRand(6,12));
-        // let inv03 = Array(udf.uRand(4,6));
-        const aryInvestments = [inv01];//, inv02, inv03];
+        let inv02 = Array(udf.uRand(6,12));
+        let inv03 = Array(udf.uRand(4,6));
+        const aryInvestments = [inv01, inv02, inv03];
         aryInvestments.forEach(elem=> elem[0]= -1 * udf.uRand(14000,44000,2000) );
         
         // Build the cash flow timeline with random values
@@ -23,27 +22,27 @@ function fnQues469 ($, objFromMain) {
         }
 
         const quesVars = {
-            varInvTL01: populateInvestmentTL(inv01)
-            // varInvTL02: populateInvestmentTL(inv02),
-            // varInvTL03: populateInvestmentTL(inv03)
+            varInvTL01: populateInvestmentTL(inv01),
+            varInvTL02: populateInvestmentTL(inv02),
+            varInvTL03: populateInvestmentTL(inv03)
         };
 
         const calcVars = {
             calcIRRInv01: capbudg.financeIRR(quesVars.varInvTL01),
-            // calcIRRInv02: capbudg.financeIRR(quesVars.varInvTL02),
-            // calcIRRInv03: capbudg.financeIRR(quesVars.varInvTL03),
+            calcIRRInv02: capbudg.financeIRR(quesVars.varInvTL02),
+            calcIRRInv03: capbudg.financeIRR(quesVars.varInvTL03),
             calcTheAns: {
-                inv01IRR: this.calcIRRInv01
-                // inv02IRR: this.calcIRRInv02,
-                // inv03IRR: this.calcIRRInv03
+                inv01IRR: this.calcIRRInv01,
+                inv02IRR: this.calcIRRInv02,
+                inv03IRR: this.calcIRRInv03
             }
         };
 
         const strNoIRRFound = `This code was unable to calculate a IRR for the investment`;
         const displayVars = {
-            dispIRRInv01: Number(calcVars.calcIRRInv01) ? udf.uRound(calcVars.calcIRRInv01,6) : strNoIRRFound
-            // dispIRRInv02: Number(calcVars.calcIRRInv02) ? udf.uRound(calcVars.calcIRRInv02,6) : strNoIRRFound,
-            // dispIRRInv03: Number(calcVars.calcIRRInv03) ? udf.uRound(calcVars.calcIRRInv03,6) : strNoIRRFound
+            dispIRRInv01: Number(calcVars.calcIRRInv01) ? udf.uRound(calcVars.calcIRRInv01,6) : strNoIRRFound,
+            dispIRRInv02: Number(calcVars.calcIRRInv02) ? udf.uRound(calcVars.calcIRRInv02,6) : strNoIRRFound,
+            dispIRRInv03: Number(calcVars.calcIRRInv03) ? udf.uRound(calcVars.calcIRRInv03,6) : strNoIRRFound
         };
 
         return udf.combineVarObjs(quesVars, calcVars, displayVars);
@@ -57,12 +56,12 @@ function fnQues469 ($, objFromMain) {
 
         obj.stem = `
         <p>
-            The following is a table of cash flows.
-            Find the internal rate of return (IRR)
+            The following are tables of cash flows.
+            For each table, find the internal rate of return (IRR)
             by inputting the numbers into MS Excel and using the IRR function.
         </p>
         <p>
-            Enter your answer as a decimal with at least 4 decimal places.
+            Enter each answer as a decimal with at least 4 decimal places.
             By default, Excel returns IRR as as percent.
             If you don't know how to format a cell as a decimal, watch
             <a href="https://exceljet.net/lessons/what-is-a-number-format-in-excel" target="_blank">
@@ -72,15 +71,32 @@ function fnQues469 ($, objFromMain) {
             that will often return the percent as a decimal.
         </p>
         <div>
+            <h2>Investment #1</h2>
             <div id="cfTableInv01Ques469">${capbudg.htmlCashFlowTable(v.varInvTL01)}</div>
             <div id="respIRR01Ques469">${capbudg.htmlRespIRR()}</div>
         </div>
+        <div>
+            <h2>Investment #2</h2>
+            <div id="cfTableInv02Ques469">${capbudg.htmlCashFlowTable(v.varInvTL02)}</div>
+            <div id="respIRR02Ques469">${capbudg.htmlRespIRR()}</div>
+        </div>
+        <div>
+            <h2>Investment #3</h2>
+            <div id="cfTableInv03Ques469">${capbudg.htmlCashFlowTable(v.varInvTL03)}</div>
+            <div id="respIRR03Ques469">${capbudg.htmlRespIRR()}</div>
+        </div>                
         `;
 
 
         obj.solution = `
         <p>
-        IRR of investment: <b>${v.dispIRRInv01}</b>
+        IRR of investment #1: <b>${v.dispIRRInv01}</b>
+        </p>
+        <p>
+        IRR of investment #2: <b>${v.dispIRRInv02}</b>
+        </p>
+        <p>
+            IRR of investment #3: <b>${v.dispIRRInv03}</b>
         </p>
         `;        
         return obj;
@@ -93,4 +109,4 @@ function fnQues469 ($, objFromMain) {
 try { fnQues469(); }
 catch (error) { console.error();}
 
-console.log('Question 469 loaded');
+console.log('Question loaded');
