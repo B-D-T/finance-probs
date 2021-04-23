@@ -23,7 +23,6 @@ function fnQues468 ($, objFromMain) {
         const calcVars = {
             calcTheAns: new capbudg.CapBudgVar(quesVars, false) // Returns object with all solutions in it
         };
-console.log(calcVars.calcTheAns);
        
         const displayVars = {
             "dispIP": (-1*quesVars.varIP).toLocaleString('en-US'),
