@@ -134,6 +134,7 @@ console.log('varsObj:', varsObj);
                     let percCorrect=0;
 
                     if (respSubmitMethod=="QualtricsInputBox"){
+console.log(' xxxxxxxxxxxx QualtricsInputBox question  xxxxxxxxxxxx ');
                         // Sanitize student submission and convert empties to 0s
                         const stuRespToReturn = prepareStudentSubmissionValue(qtrxInputBox.value)
                         // This creates an object with one key:value pair, and the key is always "theStuResp"
@@ -220,7 +221,7 @@ console.log('****This is what will be written back into the embedded data for '+
             // These are stored in an array that's in the same order as aryAnsboxKeys.
             // Sample output: [1.9986096628432395, 2.310157473062218, 613013.901619191]
             const aryCorrectAnswers = aryAnsboxKeys.map(function(theAnsboxValue){ return varsObj.calcTheAns[theAnsboxValue]; });
-console.log('Len of aryAnsboxKeys: '+aryAnsboxKeys+'. Len of aryCorrectAnswers: '+aryCorrectAnswers.length+'. These need to be the same, otherwise the denominator (and the lookups) will be off.');
+console.log('Len of aryAnsboxKeys: '+aryAnsboxKeys.length+'. Len of aryCorrectAnswers: '+aryCorrectAnswers.length+'. These need to be the same, otherwise the denominator (and the lookups) will be off.');
 
             // aryStuSubmissions is an array of the student's answers in the same order as aryAnsboxKeys.
             // Sample output when the middle field is left blank: ["123", 0, "789"]
