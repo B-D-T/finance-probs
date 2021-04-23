@@ -136,7 +136,7 @@ console.log('varsObj:', varsObj);
                     let percCorrect=0;
 
                     if (respSubmitMethod=="QualtricsInputBox"){
-console.log(' xxxxxxxxxxxx QualtricsInputBox question  xxxxxxxxxxxx ');
+
                         // Sanitize student submission and convert empties to 0s
                         const stuRespToReturn = prepareStudentSubmissionValue(qtrxInputBox.value)
                         // This creates an object with one key:value pair, and the key is always "theStuResp"
@@ -177,7 +177,7 @@ console.log(' xxxxxxxxxxxx QualtricsInputBox question  xxxxxxxxxxxx ');
                         objQuesResp["percCorrect"] = percCorrect;
 
                         // Store feedback that will be shown to user when they see the Solution
-                        objQuesResp["respFeedback"] = {}; // Used to be objRespFeedback; WHAT GETS PUT HERE NOW?
+                        objQuesResp["respFeedback"] = feedbackToShow(objQuesResp);
 console.log('****This is what will be written back into the embedded data for '+strQuesVarsStorageKey+' after student submits (in theory):', udf.logObj(objQuesResp));
                         const strQuesRespED = JSON.stringify(objQuesResp);
                         return strQuesRespED;
@@ -194,8 +194,49 @@ console.log('****This is what will be written back into the embedded data for '+
                 objStuResp = objCustomInputBoxStuSubmit.stuRespObject; objCorrectAns = objCustomInputBoxStuSubmit.correctAnsObject; percCorrect = objCustomInputBoxStuSubmit.thePercCorrect;
                 console.log('objStuResp',objStuResp); console.log('objCorrectAns',objCorrectAns); console.log('percCorrect',percCorrect);
             };
-        } // no 'else' statement because there's nothing to do if this is a Solution page
+        } else { // This is a Solution page
+            // Retrieve stored question information from Embedded data and convert it to an object
+            let strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage";
 
+            // Once the old data have been read into memory, append the results based on the student's responses
+            jQuery.when(getEDValue(strQuesVarsStorageKey)).then(function (edValue) {
+                let objQuesResp = JSON.parse(edValue);
+                return objQuesResp["respFeedback"];
+            });
+        } // End of solution page
+
+        // Returns HTML for displaying score to students
+        function feedbackToShow(objQuesResp) {
+            let dispPercCorrect, resultIcon, stuRespLocal;
+            
+            try {
+                dispPercCorrect = parseFloat(objQuesResp.percCorrect * 100).toFixed(0) + "%";
+                resultIcon = dispPercCorrect == "100%"
+                    ? `<span style="color: green;">&#10004;</span>`
+                    : `<span style="color: red;">&#10008;</span>`;
+                stuRespLocal = "Your answer is embedded in the question at the top of the page."
+            }
+            catch (err) {
+                console.log("Error trying to set the dispPercCorrect variable");
+                stuRespLocal = "The response is stored in the system, but it cannot be retrieved at this time.";
+                dispPercCorrect = "Not available.";
+                resultIcon = "";
+            }
+            // finally {
+            //     stuRespLocal = "The response is stored in the system, but it cannot be retrieved at this time.";
+            //     dispPercCorrect = "Not available.";
+            //     resultIcon = "";
+            // }
+        
+            let dispQuesResp = `
+                ${stuRespLocal}
+                <br />
+                Score: ${dispPercCorrect}
+                ${resultIcon}
+            `;
+        
+            return dispQuesResp;
+        }
         
         // Each student sees variables unique to that student (randomly generated).
         // This function writes those to Qualtrics embedded data when the Question page is first generated.
@@ -328,6 +369,7 @@ console.log('   Math.abs(',numRespToEvaluate,' - ',curCorrectAns,') <= ',toleran
             const reg = /[&<>"'/]/ig;
             return userInput.replace(reg, (match) => (map[match]));
         }
+
 
 
     } // End of buildPage
