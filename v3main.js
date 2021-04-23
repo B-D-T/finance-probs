@@ -61,8 +61,6 @@ function mainFunc($) {
         const divRoot = '#divQues' + self.quesNum;
         $(divRoot + '-stem').html(objPageContent.stem);
         $(divRoot + '-solution').html(objPageContent.solution);
-        $(divRoot + '-response').html(objPageContent.response);
-
 
         // Create aryAnsboxKeys, an array of finance variable names from the data-ansboxkey values.
         // These are in the order in which they appear on the page (though it doesn't matter what order they're in, as long as the order stays constant).
@@ -198,11 +196,15 @@ console.log('****This is what will be written back into the embedded data for '+
             // Retrieve stored question information from Embedded data and convert it to an object
             let strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage";
 
+            let strFeedback='';
             // Once the old data have been read into memory, append the results based on the student's responses
             jQuery.when(getEDValue(strQuesVarsStorageKey)).then(function (edValue) {
                 let objQuesResp = JSON.parse(edValue);
-                return objQuesResp["respFeedback"];
+                strFeedback = objQuesResp["respFeedback"];
             });
+
+            $(divRoot + '-response').html(strFeedback, objPageContent.response);
+
         } // End of solution page
 
         // Returns HTML for displaying score to students
