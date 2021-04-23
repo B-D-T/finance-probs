@@ -247,7 +247,7 @@ console.log('Len of aryAnsboxKeys: '+aryAnsboxKeys+'. Len of aryCorrectAnswers: 
 
         // Pass a single submission (and answer) to check or pass arrays of submissions (and correct answers).
         function respPercCorrect(stuResp, correctAns, rawTolerance) {
-
+console.log("########## respPercCorrect received the following. stuResp:", stuResp, "correctAns:",correctAns);
             // Return 0 if stuResp is null or empty (but allow stuResp = 0 to continue)
             if (stuResp === null || stuResp === "") { return 0; }
 
@@ -264,7 +264,7 @@ console.log('Len of aryAnsboxKeys: '+aryAnsboxKeys+'. Len of aryCorrectAnswers: 
             // Students can earn a point each time through.
             jQuery.each(correctAns, (index, curAns) => {
                 ptsPossible += 1;
-                const curResp = stuResp[index] || 0;
+                const curResp = stuResp[index] || 0; // replace empty student responses with 0s
                 ptsEarned += percCorrect(curResp, curAns, rawTolerance);
             });
 
@@ -280,7 +280,7 @@ console.log('Len of aryAnsboxKeys: '+aryAnsboxKeys+'. Len of aryCorrectAnswers: 
 
                 // Clean text in the student's answer
                 const numRespToEvaluate = convertRespToNum(respToEvaluate);
-
+console.log('   numRespToEvaluate:'+numRespToEvaluate, '   curCorrectAns:'+curCorrectAns);
                 const isCorrect = Math.abs(numRespToEvaluate - curCorrectAns) < toleranceAmt;
 
                 return isCorrect ? 1 : 0;
