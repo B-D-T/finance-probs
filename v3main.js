@@ -403,7 +403,7 @@ console.log('objQuesResp returned from embedded data is', udf.logObj(objQuesResp
                 // No student response data for that question, probably because it's the first time the page has loaded
                 return {};
             } else {
-                jQuery.each(aryAnsboxKeys, (idx, strAnsboxKey) => objStuRespAnsbox[strAnsboxKey] = objStuResp[strAnsboxKey]);
+                jQuery.each(aryAnsboxKeys, (idx, strAnsboxKey) => objStuRespAnsbox[strAnsboxKey] = parseFloat(objStuResp[strAnsboxKey]));
 console.log('In fetchStuRespAnsbox, objStuRespAnsbox is',objStuRespAnsbox );
                 // If all the responses are 0, that probably means the student just clicked past the question without submitting an answer.
                 // We want them to see the placeholder text for that question, so we return null instead of 0.
