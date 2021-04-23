@@ -267,7 +267,7 @@ console.log("########## respPercCorrect received the following. stuResp:", stuRe
                 const curResp = stuResp[index] || 0; // replace empty student responses with 0s
                 ptsEarned += percCorrect(curResp, curAns, rawTolerance);
             });
-
+console.log('ptsEarned',ptsEarned,'/ptsPossible',ptsPossible);
             return ptsEarned / ptsPossible;
 
             function percCorrect(respToEvaluate, paramCorrectAns, rawTolerance) {
