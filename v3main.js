@@ -281,7 +281,7 @@ console.log("########## respPercCorrect received the following. stuResp:", stuRe
                 // Clean text in the student's answer
                 const numRespToEvaluate = convertRespToNum(respToEvaluate);
                 const isCorrect = Math.abs(numRespToEvaluate - curCorrectAns) < toleranceAmt;
-console.log('   numRespToEvaluate:'+numRespToEvaluate, 'curCorrectAns:'+curCorrectAns, 'isCorrect:',isCorrect);
+console.log('   numRespToEvaluate:',numRespToEvaluate, 'curCorrectAns:',curCorrectAns, 'isCorrect:',isCorrect);
 
                 return isCorrect ? 1 : 0;
             }
