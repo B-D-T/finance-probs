@@ -181,12 +181,11 @@ console.log('objCustomInputBoxStuSubmit is returned as', objCustomInputBoxStuSub
                         // Store feedback that will be shown to user when they see the Solution
                         objQuesResp["respFeedback"] = {}; // Used to be objRespFeedback; WHAT GETS PUT HERE NOW?
 console.log('****This is what will be written back into the embedded data after student submits:', objQuesResp);
-                        const strObjName = "objQuesResp" + objQuesResp.quesNum.toString(); // objRespQues433
                         const strQuesRespED = JSON.stringify(objQuesResp);
 
                         // Write quesResp to Embedded Data (assuming we're in production,
                         // although I don't think this function ever gets called during testing anyway).
-                        setEDValue(strObjName, strQuesRespED);
+                        setEDValue(strQuesVarsStorageKey, strQuesRespED);
 
                     });
 

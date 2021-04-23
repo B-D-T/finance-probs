@@ -495,7 +495,7 @@ function CapitalBudgeting($, objFromMain) {
                                 Pretax change in earnings
                             </div>
                             <div class="value">
-                                <input class="ansbox" type="number" data-ansboxkey="ENE" value="${includeAnswers ? objAns.calcENE.toLocaleString('en-US') : ''}">
+                                <input class="ansbox" type="number" data-ansboxkey="calcENE" value="${includeAnswers ? objAns.calcENE.toLocaleString('en-US') : ''}">
                             </div>
                         </div>
                         <div class="row-variable ane-total">
