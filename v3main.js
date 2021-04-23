@@ -387,6 +387,8 @@ console.log('   Math.abs(',numRespToEvaluate,' - ',curCorrectAns,') <= ',toleran
 
         
         let objStuRespAnsbox = {};
+        
+        if (!IS_PRODUCTION){return {}};
 
         jQuery.when(getEDValue(strQuesVarsStorageKey))
         .then(function (edValue) {

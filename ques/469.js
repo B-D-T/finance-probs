@@ -9,10 +9,10 @@ function fnQues469 ($, objFromMain) {
         
         // Originally there were 3 IRR problems on the same page. However, since I need unique data-ansboxKey names, I limited it to 1 per page
         let inv01 = Array(udf.uRand(5,9));
-        const aryInvestments = [inv01];//, inv02, inv03];
-        aryInvestments.forEach(elem=> elem[0]= -1 * udf.uRand(14000,44000,2000) );
+        const aryInvestments = [inv01];
+        aryInvestments.forEach(elem=> elem[0]= -1 * udf.uRand(14000,44000,2000) ); // Initial investment in year 0
         
-        // Build the cash flow timeline with random values
+        // Build the cash flow timeline with random values (This is overwritten in next step. So why is it here??)
         function populateInvestmentTL(ary){
             for (let index = 1; index < ary.length; index++) {
                 ary[index] = udf.uRand(8000,10000,200);
@@ -25,19 +25,14 @@ function fnQues469 ($, objFromMain) {
         };
 
         const calcVars = {
-            calcIRRInv01: capbudg.financeIRR(quesVars.varInvTL01),
-            // calcIRRInv02: capbudg.financeIRR(quesVars.varInvTL02),
-            // calcIRRInv03: capbudg.financeIRR(quesVars.varInvTL03),
             calcTheAns: {
-                ansIRR: this.calcIRRInv01
+                ansIRR: capbudg.financeIRR(quesVars.varInvTL01)
             }
         };
-
+console.log('calcVars',calcVars);
         const strNoIRRFound = `This code was unable to calculate a IRR for the investment`;
         const displayVars = {
-            dispIRRInv01: Number(calcVars.calcIRRInv01) ? udf.uRound(calcVars.calcIRRInv01,6) : strNoIRRFound
-            // dispIRRInv02: Number(calcVars.calcIRRInv02) ? udf.uRound(calcVars.calcIRRInv02,6) : strNoIRRFound,
-            // dispIRRInv03: Number(calcVars.calcIRRInv03) ? udf.uRound(calcVars.calcIRRInv03,6) : strNoIRRFound
+            dispIRRInv01: Number(calcVars.calcTheAns) ? udf.uRound(calcVars.calcTheAns,6) : strNoIRRFound
         };
 
         return udf.combineVarObjs(quesVars, calcVars, displayVars);
