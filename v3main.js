@@ -384,6 +384,9 @@ console.log('qtrxSubmitType:', qtrxSubmitType);
         const strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage";
 
         jQuery.when(getEDValue(strQuesVarsStorageKey)).then(function (edValue) {
+            // The storage key doesn't exist the first time the page is loaded, so we'll return an empty object
+            if (!edValue) { return {} };
+
             const objQuesResp = JSON.parse(edValue);
 
             // Student's submission(s) for the question
