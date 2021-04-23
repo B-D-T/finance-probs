@@ -109,7 +109,7 @@ console.log('qtrxSubmitType:', qtrxSubmitType);
                     // Check if there is an input box with that id on the page.
                     // If it doesn't exist, qtrxInputBox returns null and we assume that the page only has our boxes.
                     const qtrxInputBox = document.getElementById("QR~" + qtrxQuesID); 
-                    const respSubmitMethod = !qtrxInputBox ? "QualtricsInputBox" : "CustomInputBoxes";
+                    const respSubmitMethod = !qtrxInputBox ? "CustomInputBoxes" : "QualtricsInputBox";
 
                     let objStuResp={};
                     let objCorrectAns={};
