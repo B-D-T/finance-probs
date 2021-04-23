@@ -283,8 +283,8 @@ console.log('ptsEarned',ptsEarned,'/ptsPossible',ptsPossible);
 
                 // Clean text in the student's answer
                 const numRespToEvaluate = convertRespToNum(respToEvaluate);
-                const isCorrect = Math.abs(numRespToEvaluate - curCorrectAns) < toleranceAmt;
-console.log('   Math.abs(',numRespToEvaluate,' - ',curCorrectAns,') < ',toleranceAmt,'=',isCorrect);
+                const isCorrect = Math.abs(numRespToEvaluate - curCorrectAns) <= toleranceAmt; // must use <= to allow for 0 values
+console.log('   Math.abs(',numRespToEvaluate,' - ',curCorrectAns,') <= ',toleranceAmt,'=',isCorrect);
 
                 return isCorrect ? 1 : 0;
             }

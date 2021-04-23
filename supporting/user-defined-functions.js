@@ -293,7 +293,7 @@ function respPercCorrect(stuResp, correctAns, rawTolerance) {
         // Clean text in the student's answer
         let numRespToEvaluate = convertRespToNum(respToEvaluate);
 
-        const isCorrect = Math.abs(numRespToEvaluate - curCorrectAns) < tolAmt;
+        const isCorrect = Math.abs(numRespToEvaluate - curCorrectAns) <= tolAmt;
 
         return isCorrect ? 1 : 0;
     }
