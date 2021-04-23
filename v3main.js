@@ -59,14 +59,34 @@ function mainFunc($) {
 
         // objPageContent is used to populate the HTML on the page itself. We also store it as part of the embedded data, even though it's wasteful to do so; I think it will make it easier to re-create student's questions for them after the fact or in other mediums (e.g., within Python)
         const divRoot = '#divQues' + self.quesNum;
-        $(divRoot + '-stem').html(objPageContent.stem);
+        const $divStem = $(divRoot + '-stem');
+        $divStem.html(objPageContent.stem);
         $(divRoot + '-solution').html(objPageContent.solution);
         $(divRoot + '-response').html(objPageContent.response);
 
+
+        // Create aryAnsboxKeys, an array of finance variable names from the data-ansboxkey values.
+        // These are in the order in which they appear on the page (though it doesn't matter what order they're in, as long as the order stays constant).
+        // Sample data returned: ["ansPaybackPeriodReg", "ansPaybackPeriodDisc", "ansNPV"]
+        const aryAnsboxKeys = $(divRoot + '-stem input').map(function() { return jQuery(this).data('ansboxkey'); }).get();
+
+        // Pre-populate the boxes if the student has already submitted answers, clicks off, and then clicks back to this question again
+        // Fetch an object with the student's previous responses to this question
+        const objStuRespAnsbox = fetchStuRespAnsbox(aryAnsboxKeys);
+        // If the object comes back empty, do nothing. Otherwise, populate the answer boxes with the student's submissions.
+        if (jQuery.isEmptyObject(objStuRespAnsbox)) {
+            // Do nothing
+        } else {
+            aryAnsboxKeys.map(function(theAnsboxValue, idx) { 
+                // Return the full element that has this finance variable as the value of data-ansboxKey. This is the <input> box.
+                const objTheElement = document.querySelectorAll(`[data-ansboxkey='${theAnsboxValue}']`)[0];
+                objTheElement.value = objStuRespAnsbox[theAnsboxValue];
+            });
+        }
+
         // Check that the response DIV does NOT exist on this page (e.g., there's no divQues470-response). If there's no response DIV (i.e., the if statement returns true), we know this is a Question page and not a Solution page.
         // Solution pages READ data, but we want to prevent them from WRITING any of their data (i.e., we don't want to store anything from a Solution page into Qualtrics embedded data).
-//        if (!(jQuery("#divQues" + self.quesNum + "-response").length)) {
-if (1==1) {            // DELETE ME !!!!! And uncomment the if statement line above
+        if (!(jQuery("#divQues" + self.quesNum + "-response").length)) {
 
             // Returned true, which means it did NOT find the response DIV.
             // Thus, we know this is a Question page and we want to write variables from it to Qualtrics embedded data. 
@@ -82,13 +102,13 @@ console.log('objPageContent:',objPageContent);
 
                 // addOnPageSubmit is a Qualtrics function that accepts an optional parameter called 'type' (which we call 'submitType'). https://s.qualtrics.com/WRAPI/QuestionAPI/classes/Qualtrics%20JavaScript%20Question%20API.html#method_addOnPageSubmit
                 // When the user clicks a button, Qualtrics passes the 'type' parameter ('submitType', as we call it) to addOnPageSubmit.
-                // Possible values from submitType: ["jump", "next", "prev"]. It depends on how the page was submitted (i.e., which button was clicked).
+                // Possible values from submitType: ["jump", "next", "prev"]. It depends on how the page was submitted (i.e., which button was clicked). Clicking to go to another question via the floating menu counts as a 'jump'.
                 Qualtrics.SurveyEngine.addOnPageSubmit(function (submitType) {
                     // qtrxQuesID is the internal, stable ID of the question within Qualtrics (e.g., QID1310444524)
                    const qtrxQuesID = Object.keys(Qualtrics.SurveyEngine.QuestionInfo)[0];
 
                     // The built-in Qualtrics system only long-term saves the responses when the user clicks 'Next.' I warn the students about that, as does Qualtrics.
-                    // My system should save the response no matter what button the student clicks. FIX(?)- What happens if they change to another question using the upper-left menu? Is that same as clicking "jump"?
+                    // My system should save the response no matter what button the student clicks. 
                    const qtrxSubmitType = submitType;
 console.log('qtrxSubmitType:', qtrxSubmitType);
 
@@ -170,7 +190,7 @@ console.log('qtrxSubmitType:', qtrxSubmitType);
                 });
             } else { // IN TESTING ENVIRONMENT               
                 let objStuResp={}; let objCorrectAns={}; let percCorrect=0;
-                const objCustomInputBoxStuSubmit = createCustomInputBoxStuSubmit();
+                const objCustomInputBoxStuSubmit = createCustomInputBoxStuSubmit(aryAnsboxKeys);
                 objStuResp = objCustomInputBoxStuSubmit.stuRespObject; objCorrectAns = objCustomInputBoxStuSubmit.correctAnsObject; percCorrect = objCustomInputBoxStuSubmit.thePercCorrect;
                 console.log('objStuResp',objStuResp); console.log('objCorrectAns',objCorrectAns); console.log('percCorrect',percCorrect);
             };
@@ -197,11 +217,7 @@ console.log('qtrxSubmitType:', qtrxSubmitType);
         }
 
         // This function could live within the if(IS_PRODUCTION) section above, but I keep it here so it can be used when testing locally too.
-        function createCustomInputBoxStuSubmit(){
-            // Create aryAnsboxKeys, an array of finance variable names from the data-ansboxkey values.
-            // These are in the order in which they appear on the page (though it doesn't matter what order they're in, as long as the order stays constant).
-            // Sample data returned: ["ansPaybackPeriodReg", "ansPaybackPeriodDisc", "ansNPV"]
-            const aryAnsboxKeys = jQuery('input').map(function() { return jQuery(this).data('ansboxkey'); }).get();
+        function createCustomInputBoxStuSubmit(aryAnsboxKeys){
 
             // Use aryAnsboxKeys to parse out the correct answers from varsObj.calcTheAns
             // These are stored in an array that's in the same order as aryAnsboxKeys.
@@ -359,6 +375,35 @@ console.log('qtrxSubmitType:', qtrxSubmitType);
 
         // Remove the prefixes and return the object with the correct values
         return quesPrefix(objQuesVarsActual, quesNum, "remove");
+    }
+
+    // If the student has values already in the embedded data, we'll pre-populate the boxes with those. Otherwise, we'll leave the boxes empty.
+    function fetchStuRespAnsbox(aryAnsboxKeys) {
+
+        // Retrieve stored question information from Embedded data and convert it to an object
+        const strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage";
+
+        jQuery.when(getEDValue(strQuesVarsStorageKey)).then(function (edValue) {
+            const objQuesResp = JSON.parse(edValue);
+
+            // Student's submission(s) for the question
+            const objStuResp = objQuesResp["objStuResp"];
+
+            let objStuRespAnsbox = {};
+
+            if (!objStuResp){
+                // No student response data for that question, probably because it's the first time the page has loaded
+                return {};
+            } else {
+                jQuery.each(aryAnsboxKeys, (strAnsboxKey, idx) => objStuRespAnsbox[strAnsboxKey] = objStuResp[strAnsboxKey]);
+            };
+
+            // If all the responses are 0, that probably means the student just clicked past the question without submitting an answer.
+            // We want them to see the placeholder text for that question, so we return null instead of 0.
+            const sumOfValues = Object.values(objStuRespAnsbox).reduce((a, b) => a + b);
+            return sumOfValues==0 ? {} : objStuRespAnsbox;
+
+        });
     }
 
     // Add prefix to create a key that's unique across ALL questions in the course.
