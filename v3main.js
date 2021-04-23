@@ -73,13 +73,12 @@ function mainFunc($) {
         // Pre-populate the boxes if the student has already submitted answers, clicks off, and then clicks back to this question again
         // Fetch an object with the student's previous responses to this question
         const objStuRespAnsbox = fetchStuRespAnsbox(aryAnsboxKeys);
-console.log('*** fetchStuRespAnsbox returned objStuRespAnsbox as',objStuRespAnsbox );
+console.log('fetchStuRespAnsbox returned objStuRespAnsbox as',udf.logObj(objStuRespAnsbox) );
         // If the object comes back empty, do nothing. Otherwise, populate the answer boxes with the student's submissions.
         if (jQuery.isEmptyObject(objStuRespAnsbox)) {
             // Do nothing
-console.log('objStuRespAnsbox returned empty from fetchStuRespAnsbox');
+            console.log('objStuRespAnsbox returned empty from fetchStuRespAnsbox');
         } else {
-console.log('objStuRespAnsbox returned not empty. This is what is in it:',objStuRespAnsbox );
             jQuery.each(aryAnsboxKeys, (idx, theAnsboxValue) => { 
                 // Return the full element that has this finance variable as the value of data-ansboxKey. This is the <input> box.
                 const objTheElement = document.querySelectorAll(`[data-ansboxkey='${theAnsboxValue}']`)[0];
@@ -95,7 +94,6 @@ console.log('objStuRespAnsbox returned not empty. This is what is in it:',objStu
             // Thus, we know this is a Question page and we want to write variables from it to Qualtrics embedded data. 
 
 console.log('varsObj:', varsObj);
-console.log('objPageContent:',objPageContent);
 
             if (IS_PRODUCTION) {
 
@@ -113,8 +111,6 @@ console.log('objPageContent:',objPageContent);
                     // The built-in Qualtrics system only long-term saves the responses when the user clicks 'Next.' I warn the students about that, as does Qualtrics.
                     // My system should save the response no matter what button the student clicks. 
                    const qtrxSubmitType = submitType;
-console.log('qtrxSubmitType:', qtrxSubmitType);
-
 
                     // For v1 and v2 of these Problem Sets, this addOnPageSubmit code was stored in Qualtrics for each individual question. That code within Qualtrics prepared objRenderQuesResp and sent it to fnQuesResp(objPageSubmit) on main.js, who renamed the object twice (i.e., objRenderQuesResp == objPageSubmit == objRespFeedback). In v3, we're cutting out that back & forth by handling the whole process on v3main.js.
 
@@ -133,7 +129,6 @@ console.log('qtrxSubmitType:', qtrxSubmitType);
                     // If it doesn't exist, qtrxInputBox returns null and we assume that the page only has our boxes.
                     const qtrxInputBox = document.getElementById("QR~" + qtrxQuesID); 
                     const respSubmitMethod = !qtrxInputBox ? "CustomInputBoxes" : "QualtricsInputBox";
-console.log('respSubmitMethod is '+respSubmitMethod);
 
                     let objStuResp={};
                     let objCorrectAns={};
@@ -155,7 +150,6 @@ console.log('respSubmitMethod is '+respSubmitMethod);
                         // There is NOT a Qualtrics input box on that page. In that case, we'll only look at our boxes.
 
                         const objCustomInputBoxStuSubmit = createCustomInputBoxStuSubmit(aryAnsboxKeys);
-console.log('objCustomInputBoxStuSubmit is returned as', objCustomInputBoxStuSubmit);
                         objStuResp = objCustomInputBoxStuSubmit.stuRespObject;
                         objCorrectAns = objCustomInputBoxStuSubmit.correctAnsObject;
                         percCorrect = objCustomInputBoxStuSubmit.thePercCorrect;
@@ -182,13 +176,12 @@ console.log('objCustomInputBoxStuSubmit is returned as', objCustomInputBoxStuSub
 
                         // Store feedback that will be shown to user when they see the Solution
                         objQuesResp["respFeedback"] = {}; // Used to be objRespFeedback; WHAT GETS PUT HERE NOW?
-console.log('****This is what will be written back into the embedded data for '+strQuesVarsStorageKey+' after student submits (in theory):', objQuesResp);
+console.log('****This is what will be written back into the embedded data for '+strQuesVarsStorageKey+' after student submits (in theory):', udf.logObj(objQuesResp));
                         const strQuesRespED = JSON.stringify(objQuesResp);
                         return strQuesRespED;
                     })
                     .done(function(strQuesRespED){
                         // Write quesResp to Embedded Data (assuming we're in production, although I don't think this function ever gets called during testing anyway).
-console.log('****This SHOULD write a string '+strQuesRespED.length+' characters long to '+strQuesVarsStorageKey+' in embedded data');
                         return setEDValue(strQuesVarsStorageKey,strQuesRespED);
                     });
 
@@ -239,7 +232,7 @@ console.log('****This SHOULD write a string '+strQuesRespED.length+' characters 
                 // If the input box is empty, return a 0
                 return !sanitizedStuResp ? 0 : sanitizedStuResp;
             });
-console.log('createCustomInputBoxStuSubmit has aryStuSubmissions as', aryStuSubmissions);
+//console.log('createCustomInputBoxStuSubmit has aryStuSubmissions as', aryStuSubmissions);
 
             // Convert two arrays into an object of key:value pairs where the finance variables are the keys and other info are the values (e.g., the student's responses) 
             const stuRespObject = Object.fromEntries(aryAnsboxKeys.map((_, idx) => [aryAnsboxKeys[idx], aryStuSubmissions[idx]]));
@@ -408,17 +401,18 @@ console.log('objQuesResp returned from embedded data is', udf.logObj(objQuesResp
                 return {};
             } else {
                 jQuery.each(aryAnsboxKeys, (idx, strAnsboxKey) => objStuRespAnsbox[strAnsboxKey] = parseFloat(objStuResp[strAnsboxKey]));
-console.log('In fetchStuRespAnsbox, objStuRespAnsbox is',udf.logObj(objStuRespAnsbox) );
+
                 // If all the responses are 0, that probably means the student just clicked past the question without submitting an answer.
                 // We want them to see the placeholder text for that question, so we return null instead of 0.
                 const sumOfValues = Object.values(objStuRespAnsbox).reduce((a, b) => a + b);
-console.log('sumOfValues is',sumOfValues);
-                return sumOfValues==0 ? {} : objStuRespAnsbox;
+                if (sumOfValues==0) { objStuRespAnsbox = {} };
+
+                return objStuRespAnsbox;
             };
         })
         .done(()=>{return objStuRespAnsbox});
 
-console.log('This is objStuRespAnsbox being returned from fetchStuRespAnsbox', udf.logObj(objStuRespAnsbox));
+// console.log('This is objStuRespAnsbox being returned from fetchStuRespAnsbox', udf.logObj(objStuRespAnsbox));
         return objStuRespAnsbox;
     }
 
