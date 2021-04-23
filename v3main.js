@@ -59,8 +59,7 @@ function mainFunc($) {
 
         // objPageContent is used to populate the HTML on the page itself. We also store it as part of the embedded data, even though it's wasteful to do so; I think it will make it easier to re-create student's questions for them after the fact or in other mediums (e.g., within Python)
         const divRoot = '#divQues' + self.quesNum;
-        const $divStem = $(divRoot + '-stem');
-        $divStem.html(objPageContent.stem);
+        $(divRoot + '-stem').html(objPageContent.stem);
         $(divRoot + '-solution').html(objPageContent.solution);
         $(divRoot + '-response').html(objPageContent.response);
 
@@ -149,7 +148,7 @@ console.log('varsObj:', varsObj);
                     } else { // respSubmitMethod == CustomInputBoxes
                         // There is NOT a Qualtrics input box on that page. In that case, we'll only look at our boxes.
 
-                        const objCustomInputBoxStuSubmit = createCustomInputBoxStuSubmit(aryAnsboxKeys);
+                        const objCustomInputBoxStuSubmit = createCustomInputBoxStuSubmit(varsObj, aryAnsboxKeys);
                         objStuResp = objCustomInputBoxStuSubmit.stuRespObject;
                         objCorrectAns = objCustomInputBoxStuSubmit.correctAnsObject;
                         percCorrect = objCustomInputBoxStuSubmit.thePercCorrect;
@@ -188,7 +187,7 @@ console.log('****This is what will be written back into the embedded data for '+
                 });
             } else { // IN TESTING ENVIRONMENT               
                 let objStuResp={}; let objCorrectAns={}; let percCorrect=0;
-                const objCustomInputBoxStuSubmit = createCustomInputBoxStuSubmit(aryAnsboxKeys);
+                const objCustomInputBoxStuSubmit = createCustomInputBoxStuSubmit(varsObj, aryAnsboxKeys);
                 objStuResp = objCustomInputBoxStuSubmit.stuRespObject; objCorrectAns = objCustomInputBoxStuSubmit.correctAnsObject; percCorrect = objCustomInputBoxStuSubmit.thePercCorrect;
                 console.log('objStuResp',objStuResp); console.log('objCorrectAns',objCorrectAns); console.log('percCorrect',percCorrect);
             };
@@ -215,16 +214,17 @@ console.log('****This is what will be written back into the embedded data for '+
         }
 
         // This function could live within the if(IS_PRODUCTION) section above, but I keep it here so it can be used when testing locally too.
-        function createCustomInputBoxStuSubmit(aryAnsboxKeys){
+        function createCustomInputBoxStuSubmit(varsObj, aryAnsboxKeys){
 
             // Use aryAnsboxKeys to parse out the correct answers from varsObj.calcTheAns
             // These are stored in an array that's in the same order as aryAnsboxKeys.
             // Sample output: [1.9986096628432395, 2.310157473062218, 613013.901619191]
             const aryCorrectAnswers = aryAnsboxKeys.map(function(theAnsboxValue){ return varsObj.calcTheAns[theAnsboxValue]; });
+console.log('Len of aryAnsboxKeys: '+aryAnsboxKeys+'. Len of aryCorrectAnswers: '+aryCorrectAnswers.length+'. These need to be the same, otherwise the denominator (and the lookups) will be off.');
 
             // aryStuSubmissions is an array of the student's answers in the same order as aryAnsboxKeys.
             // Sample output when the middle field is left blank: ["123", 0, "789"]
-            const aryStuSubmissions = aryAnsboxKeys.map(function(theAnsboxValue, idx) { 
+            const aryStuSubmissions = aryAnsboxKeys.map(function(theAnsboxValue) { 
                 // Return the full element that has this finance variable as the value of data-ansboxKey. This is the <input> box.
                 const objTheElement = document.querySelectorAll(`[data-ansboxkey='${theAnsboxValue}']`)[0];
                 // Sanitize the student's response before going any further.
