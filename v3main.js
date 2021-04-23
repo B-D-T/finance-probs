@@ -393,7 +393,7 @@ console.log('createCustomInputBoxStuSubmit has aryStuSubmissions as', aryStuSubm
             if (!edValue) { return {} };
 
             const objQuesResp = JSON.parse(edValue);
-console.log('objQuesResp returned from embedded data is',objQuesResp);
+console.log('objQuesResp returned from embedded data is',logObj(objQuesResp)); // This is coming back with the right stuff, I think (need to double check using logObj)
             // Student's submission(s) for the question
             const objStuResp = objQuesResp["objStuResp"];
 
@@ -404,14 +404,13 @@ console.log('objQuesResp returned from embedded data is',objQuesResp);
                 return {};
             } else {
                 jQuery.each(aryAnsboxKeys, (strAnsboxKey, idx) => objStuRespAnsbox[strAnsboxKey] = objStuResp[strAnsboxKey]);
-            };
 console.log('In fetchStuRespAnsbox, objStuRespAnsbox is',objStuRespAnsbox );
-            // If all the responses are 0, that probably means the student just clicked past the question without submitting an answer.
-            // We want them to see the placeholder text for that question, so we return null instead of 0.
-            const sumOfValues = Object.values(objStuRespAnsbox).reduce((a, b) => a + b);
+                // If all the responses are 0, that probably means the student just clicked past the question without submitting an answer.
+                // We want them to see the placeholder text for that question, so we return null instead of 0.
+                const sumOfValues = Object.values(objStuRespAnsbox).reduce((a, b) => a + b);
 console.log('sumOfValues is',sumOfValues);
-            return sumOfValues==0 ? {} : objStuRespAnsbox;
-
+                return sumOfValues==0 ? {} : objStuRespAnsbox;
+            };
         });
     }
 
