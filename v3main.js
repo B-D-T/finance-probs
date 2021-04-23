@@ -20,7 +20,7 @@ function quesNumGlobal() {
         const thisQuesNum = parseInt(regexMatch[2]);
         const capBudgQues = [467,468,469,470,471];
         IS_QUES_PAGE = capBudgQues.includes(thisQuesNum);
-console.log('from v3main: QuesNum:',thisQuesNum, 'IS_QUES_PAGE:',IS_QUES_PAGE)
+// console.log('from v3main: QuesNum:',thisQuesNum, 'IS_QUES_PAGE:',IS_QUES_PAGE)
 
         return thisQuesNum;
     }
@@ -72,7 +72,7 @@ function mainFunc($) {
         // Pre-populate the boxes if the student has already submitted answers, clicks off, and then clicks back to this question again
         // Fetch an object with the student's previous responses to this question
         const objStuRespAnsbox = fetchStuRespAnsbox(aryAnsboxKeys);
-console.log('fetchStuRespAnsbox returned objStuRespAnsbox as',udf.logObj(objStuRespAnsbox) );
+// console.log('fetchStuRespAnsbox returned objStuRespAnsbox as',udf.logObj(objStuRespAnsbox) );
         // If the object comes back empty, do nothing. Otherwise, populate the answer boxes with the student's submissions.
         if (jQuery.isEmptyObject(objStuRespAnsbox)) {
             // Do nothing
@@ -92,7 +92,7 @@ console.log('fetchStuRespAnsbox returned objStuRespAnsbox as',udf.logObj(objStuR
             // Returned true, which means it did NOT find the response DIV.
             // Thus, we know this is a Question page and we want to write variables from it to Qualtrics embedded data. 
 
-console.log('varsObj:', varsObj);
+// console.log('varsObj:', varsObj);
 
             if (IS_PRODUCTION) {
 
@@ -176,7 +176,7 @@ console.log('varsObj:', varsObj);
 
                         // Store feedback that will be shown to user when they see the Solution
                         objQuesResp["respFeedback"] = feedbackToShow(objQuesResp);
-console.log('****This is what will be written back into the embedded data for '+strQuesVarsStorageKey+' after student submits (in theory):', udf.logObj(objQuesResp));
+// console.log('****This is what will be written back into the embedded data for '+strQuesVarsStorageKey+' after student submits (in theory):', udf.logObj(objQuesResp));
                         const strQuesRespED = JSON.stringify(objQuesResp);
                         return strQuesRespED;
                     })
@@ -266,7 +266,6 @@ console.log('****This is what will be written back into the embedded data for '+
             // These are stored in an array that's in the same order as aryAnsboxKeys.
             // Sample output: [1.9986096628432395, 2.310157473062218, 613013.901619191]
             const aryCorrectAnswers = aryAnsboxKeys.map(function(theAnsboxValue){ return varsObj.calcTheAns[theAnsboxValue]; });
-console.log('Len of aryAnsboxKeys: '+aryAnsboxKeys.length+'. Len of aryCorrectAnswers: '+aryCorrectAnswers.length+'. These need to be the same, otherwise the denominator (and the lookups) will be off.');
 
             // aryStuSubmissions is an array of the student's answers in the same order as aryAnsboxKeys.
             // Sample output when the middle field is left blank: ["123", 0, "789"]
@@ -293,7 +292,7 @@ console.log('Len of aryAnsboxKeys: '+aryAnsboxKeys.length+'. Len of aryCorrectAn
 
         // Pass a single submission (and answer) to check or pass arrays of submissions (and correct answers).
         function respPercCorrect(stuResp, correctAns, rawTolerance) {
-console.log("########## respPercCorrect received the following. stuResp:", stuResp, "correctAns:",correctAns);
+// console.log("########## respPercCorrect received the following. stuResp:", stuResp, "correctAns:",correctAns);
             // Return 0 if stuResp is null or empty (but allow stuResp = 0 to continue)
             if (stuResp === null || stuResp === "") { return 0; }
 
@@ -313,7 +312,7 @@ console.log("########## respPercCorrect received the following. stuResp:", stuRe
                 const curResp = stuResp[index] || 0; // replace empty student responses with 0s
                 ptsEarned += percCorrect(curResp, curAns, rawTolerance);
             });
-console.log('ptsEarned',ptsEarned,'/ptsPossible',ptsPossible);
+
             return ptsEarned / ptsPossible;
 
             function percCorrect(respToEvaluate, paramCorrectAns, rawTolerance) {
@@ -327,7 +326,6 @@ console.log('ptsEarned',ptsEarned,'/ptsPossible',ptsPossible);
                 // Clean text in the student's answer
                 const numRespToEvaluate = convertRespToNum(respToEvaluate);
                 const isCorrect = Math.abs(numRespToEvaluate - curCorrectAns) <= toleranceAmt; // must use <= to allow for 0 values
-console.log('   Math.abs(',numRespToEvaluate,' - ',curCorrectAns,') <= ',toleranceAmt,'=',isCorrect);
 
                 return isCorrect ? 1 : 0;
             }
@@ -441,7 +439,7 @@ console.log('   Math.abs(',numRespToEvaluate,' - ',curCorrectAns,') <= ',toleran
             if (!edValue) { return {} };
 
             const objQuesResp = JSON.parse(edValue);
-console.log('objQuesResp returned from embedded data is', udf.logObj(objQuesResp)); // This is coming back with the right stuff
+// console.log('objQuesResp returned from embedded data is', udf.logObj(objQuesResp)); // This is coming back with the right stuff
             // Student's submission(s) for the question
             const objStuResp = objQuesResp["objStuResp"];
 

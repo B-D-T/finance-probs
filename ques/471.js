@@ -8,14 +8,14 @@ function fnQues471 ($, objFromMain) {
     this.defineVariables = function(){
         
         const quesVars = {
-            "varIP":-150000,// -1 * udf.uRand(120000, 150000, 10000),
-            "varATP":-1000000,// -1 * udf.uRand(1000000, 1100000, 100000),
+            "varIP":-1 * udf.uRand(120000, 150000, 10000),
+            "varATP":-1 * udf.uRand(1000000, 1100000, 100000),
 
-            "varENEPIRev":480000,// udf.uRand(460000, 490000, 10000),
+            "varENEPIRev": udf.uRand(460000, 490000, 10000),
 
-            "varLifespan":10,// udf.uRand(8,13,1),
+            "varLifespan": udf.uRand(8,13,1),
 
-            "varDiscRate":0.04// udf.uRand(.04, .06, .01)
+            "varDiscRate": udf.uRand(.04, .06, .01)
         };
 
         const calcVars = {
