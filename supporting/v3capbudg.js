@@ -83,6 +83,7 @@ function CapitalBudgeting($, objFromMain) {
     // The discRate is optional; if it's included, all payments are discounted before the payback period is calculated
     const financePaybackPeriod = (aryCashflow, discRate = 0) => Finance.PaybackPeriod(tlInPV(aryCashflow, discRate))
 
+    // Adds an array of values together. To get NPV, the array needs to start in year 0 [costs] and all be PVs (I think)
     const financeNPV = (aryCashflow) => aryCashflow.reduce((a, b) => a + b, 0)
 
     // Create the object constructor function for CapBudgVars
@@ -219,9 +220,9 @@ function CapitalBudgeting($, objFromMain) {
 
 
 
-
+    // Add a CSS class of 'solution' for when the HTML table should be populated with the correct answers
     // I need to edit the HTML like this because I can't easily access it once it's loaded.
-    // *** Notice that 'answerbox"' needs to be the last class listed, and have type="number" right after it. I don't know that it's so rigid, but it'll do for now.
+    // *** Notice that 'ansbox"' needs to be the last class listed, and have type="number" right after it. I don't know that it's so rigid, but it'll do for now.
     const cssAnsboxSolutions = (strHTML) => strHTML.replace(/ansbox" type="number"/g, '"ansbox solution" type="text"');
 
     this.htmlRespPaybackPeriodReg = function(includeAnswers=false, objAns={}){
@@ -235,7 +236,7 @@ function CapitalBudgeting($, objFromMain) {
                     <p class="payback-period">If the payback period is beyond the timeline (i.e., greater than ${dispLifespan}), input a 0 in this blank</p>
                 </div>
                 <div class="resp">
-                    <input class="payback-reg ansbox" type="number" placeholder="Regular payback period" value="${includeAnswers ? objAns.ansPaybackPeriodReg.toFixed(5).toLocaleString('en-US') : ''}">
+                    <input class="payback-reg ansbox" type="number" placeholder="Regular payback period" data-ansboxkey="ansPaybackPeriodReg" value="${includeAnswers ? objAns.ansPaybackPeriodReg.toFixed(5).toLocaleString('en-US') : ''}">
                 </div>
             </div>
         `;
@@ -255,7 +256,7 @@ function CapitalBudgeting($, objFromMain) {
                     <p class="payback-period">If the discounted payback period is beyond the timeline (i.e., greater than ${dispLifespan}), input a 0 in this blank</p>
                 </div>
                 <div class="resp">
-                    <input class="payback-disc ansbox" type="number" placeholder="Discounted payback period" value="${includeAnswers ? dispAnsPaybackPeriodDisc : ''}">
+                    <input class="payback-disc ansbox" type="number" placeholder="Discounted payback period" data-ansboxkey="ansPaybackPeriodDisc" value="${includeAnswers ? dispAnsPaybackPeriodDisc : ''}">
                 </div>
             </div>
         `;
@@ -276,7 +277,7 @@ function CapitalBudgeting($, objFromMain) {
                     </p>
                 </div>
                 <div class="resp">
-                    <input class="npv ansbox" type="number" placeholder="Net Present value" value="${includeAnswers ? dispAns : ''}">
+                    <input class="npv ansbox" type="number" placeholder="Net Present value" data-ansboxkey="ansNPV" value="${includeAnswers ? dispAns : ''}">
                 </div>
             </div>
         `;
@@ -297,7 +298,7 @@ function CapitalBudgeting($, objFromMain) {
                     <p class="irr">If the IRR cannot be determined, input a 0 in this blank</p>
                 </div>
                 <div class="resp">
-                    <input class="irr ansbox" type="number" placeholder="Enter IRR as a decimal (4+ decimal places)" value="${includeAnswers ? dispAns : ''}">
+                    <input class="irr ansbox" type="number" placeholder="Enter IRR as a decimal (4+ decimal places)" data-ansboxkey="ansIRR" value="${includeAnswers ? dispAns : ''}">
                 </div>
             </div>
         `;
@@ -306,7 +307,8 @@ function CapitalBudgeting($, objFromMain) {
         }
         return tableText;
     }
-    // Returns HTML string of a blank variables table
+    // Returns HTML string of a capital budgeting variables table.
+    // It's blank by default, but it will be populated with the correct answers if it's passed includeAnswers=true and an object of CapBudgVar answers
     this.htmlVariableTable = function(includeAnswers = false, objAns={}){
 
         let tableText = `
@@ -328,7 +330,7 @@ function CapitalBudgeting($, objFromMain) {
                                 Invoice price
                             </div>
                             <div class="value">
-                                <input class="ansbox" type="number" placeholder="Write as negative" value="${includeAnswers ? objAns.varIP.toLocaleString('en-US') : ''}">
+                                <input class="ansbox" type="number" placeholder="Write as negative" data-ansboxkey="varIP" value="${includeAnswers ? objAns.varIP.toLocaleString('en-US') : ''}">
                             </div>
                         </div>
                         <div class="row-variable atp">
@@ -339,7 +341,7 @@ function CapitalBudgeting($, objFromMain) {
                                 Adjustments to price
                             </div>
                             <div class="value">
-                                <input class="ansbox" type="number" placeholder="Write as negative" value="${includeAnswers ? objAns.varATP.toLocaleString('en-US') : ''}">
+                                <input class="ansbox" type="number" placeholder="Write as negative" data-ansboxkey="varATP" value="${includeAnswers ? objAns.varATP.toLocaleString('en-US') : ''}">
                             </div>
                         </div>
                         <div class="row-variable eqp">
@@ -350,7 +352,7 @@ function CapitalBudgeting($, objFromMain) {
                                 Revenue from sale of existing equipment
                             </div>
                             <div class="value">
-                                <input class="ansbox" type="number" value="${includeAnswers ? objAns.varEQP.toLocaleString('en-US') : ''}">
+                                <input class="ansbox" type="number" data-ansboxkey="varEQP" value="${includeAnswers ? objAns.varEQP.toLocaleString('en-US') : ''}">
                             </div>
                         </div>
                         <div class="row-variable enewp-rev">
@@ -361,7 +363,7 @@ function CapitalBudgeting($, objFromMain) {
                                 Annual revenues from existing asset
                             </div>
                             <div class="value">
-                                <input class="ansbox" type="number" value="${includeAnswers ? objAns.varENEWPRev.toLocaleString('en-US') : ''}">
+                                <input class="ansbox" type="number" data-ansboxkey="varENEWPRev" value="${includeAnswers ? objAns.varENEWPRev.toLocaleString('en-US') : ''}">
                             </div>
                         </div>
                         <div class="row-variable enewp-exp">
@@ -372,7 +374,7 @@ function CapitalBudgeting($, objFromMain) {
                                 Annual expenses from existing asset
                             </div>
                             <div class="value">
-                                <input class="ansbox" type="number" placeholder="Write as negative" value="${includeAnswers ? objAns.varENEWPExp.toLocaleString('en-US') : ''}">
+                                <input class="ansbox" type="number" placeholder="Write as negative" data-ansboxkey="varENEWPExp" value="${includeAnswers ? objAns.varENEWPExp.toLocaleString('en-US') : ''}">
                             </div>
                         </div>
                         <div class="row-variable enepi-rev">
@@ -383,7 +385,7 @@ function CapitalBudgeting($, objFromMain) {
                                 Annual revenues from new asset
                             </div>
                             <div class="value">
-                                <input class="ansbox" type="number" value="${includeAnswers ? objAns.varENEPIRev.toLocaleString('en-US') : ''}">
+                                <input class="ansbox" type="number" data-ansboxkey="varENEPIRev" value="${includeAnswers ? objAns.varENEPIRev.toLocaleString('en-US') : ''}">
                             </div>
                         </div>
                         <div class="row-variable enepi-exp">
@@ -394,7 +396,7 @@ function CapitalBudgeting($, objFromMain) {
                                 Annual expenses from new asset
                             </div>
                             <div class="value">
-                                <input class="ansbox" type="number" placeholder="Write as negative" value="${includeAnswers ? objAns.varENEPIExp.toLocaleString('en-US') : ''}">
+                                <input class="ansbox" type="number" placeholder="Write as negative" data-ansboxkey="varENEPIExp" value="${includeAnswers ? objAns.varENEPIExp.toLocaleString('en-US') : ''}">
                             </div>
                         </div>
                         <div class="row-variable salvage-value">
@@ -405,7 +407,7 @@ function CapitalBudgeting($, objFromMain) {
                                 Expected revenue gained from new asset at end of its useful life
                             </div>
                             <div class="value">
-                                <input class="ansbox" type="number" value="${includeAnswers ? objAns.varSalvage.toLocaleString('en-US') : ''}">
+                                <input class="ansbox" type="number" data-ansboxkey="varSalvage" value="${includeAnswers ? objAns.varSalvage.toLocaleString('en-US') : ''}">
                             </div>
                         </div>
                         <div class="row-variable lifespan">
@@ -416,7 +418,7 @@ function CapitalBudgeting($, objFromMain) {
                                 Number of useful years expected from asset
                             </div>
                             <div class="value">
-                                <input class="ansbox" type="number" value="${includeAnswers ? objAns.varLifespan : ''}">
+                                <input class="ansbox" type="number" data-ansboxkey="varLifespan" value="${includeAnswers ? objAns.varLifespan : ''}">
                             </div>
                         </div>
                         <div class="row-variable tax-rate">
@@ -427,7 +429,7 @@ function CapitalBudgeting($, objFromMain) {
                                 Tax rate for organization
                             </div>
                             <div class="value">
-                                <input class="ansbox" type="number" placeholder="Write as decimal" value="${includeAnswers ? udf.uRound(objAns.varTaxRate,4) : ''}">
+                                <input class="ansbox" type="number" placeholder="Write as decimal" data-ansboxkey="varTaxRate" value="${includeAnswers ? udf.uRound(objAns.varTaxRate,4) : ''}">
                             </div>
                         </div>
                         <div class="row-variable discount-rate">
@@ -438,7 +440,7 @@ function CapitalBudgeting($, objFromMain) {
                                 Cost of capital
                             </div>
                             <div class="value">
-                                <input class="ansbox" type="number" placeholder="Write as decimal" value="${includeAnswers ? udf.uRound(objAns.varDiscRate,4) : ''}">
+                                <input class="ansbox" type="number" placeholder="Write as decimal" data-ansboxkey="varDiscRate" value="${includeAnswers ? udf.uRound(objAns.varDiscRate,4) : ''}">
                             </div>
                         </div>
                     </div>
@@ -460,7 +462,7 @@ function CapitalBudgeting($, objFromMain) {
                                 Total initial cost
                             </div>
                             <div class="value">
-                                <input class="ansbox" type="number" placeholder="Write as negative" value="${includeAnswers ? objAns.calcIC.toLocaleString('en-US') : ''}">
+                                <input class="ansbox" type="number" placeholder="Write as negative" data-ansboxkey="calcIC" value="${includeAnswers ? objAns.calcIC.toLocaleString('en-US') : ''}">
                             </div>
                         </div>
                         <div class="row-variable enepi-total">
@@ -471,7 +473,7 @@ function CapitalBudgeting($, objFromMain) {
                                 Annual profit from new asset
                             </div>
                             <div class="value">
-                                <input class="ansbox" type="number" value="${includeAnswers ? objAns.calcENEPI.toLocaleString('en-US') : ''}">
+                                <input class="ansbox" type="number" data-ansboxkey="calcENEPI" value="${includeAnswers ? objAns.calcENEPI.toLocaleString('en-US') : ''}">
                             </div>
                         </div>
                         <div class="row-variable enewp-total">
@@ -482,7 +484,7 @@ function CapitalBudgeting($, objFromMain) {
                                 Annual profit from existing asset
                             </div>
                             <div class="value">
-                                <input class="ansbox" type="number" value="${includeAnswers ? objAns.calcENEWP.toLocaleString('en-US') : ''}">
+                                <input class="ansbox" type="number" data-ansboxkey="calcENEWP" value="${includeAnswers ? objAns.calcENEWP.toLocaleString('en-US') : ''}">
                             </div>
                         </div>
                         <div class="row-variable ene-total">
@@ -493,7 +495,7 @@ function CapitalBudgeting($, objFromMain) {
                                 Pretax change in earnings
                             </div>
                             <div class="value">
-                                <input class="ansbox" type="number" value="${includeAnswers ? objAns.calcENE.toLocaleString('en-US') : ''}">
+                                <input class="ansbox" type="number" data-ansboxkey="ENE" value="${includeAnswers ? objAns.calcENE.toLocaleString('en-US') : ''}">
                             </div>
                         </div>
                         <div class="row-variable ane-total">
@@ -504,7 +506,7 @@ function CapitalBudgeting($, objFromMain) {
                                 Additional net earnings
                             </div>
                             <div class="value">
-                                <input class="ansbox" type="number" value="${includeAnswers ? objAns.calcANE.toLocaleString('en-US') : ''}">
+                                <input class="ansbox" type="number" data-ansboxkey="calcANE" value="${includeAnswers ? objAns.calcANE.toLocaleString('en-US') : ''}">
                             </div>
                         </div>
                         <div class="row-variable dep-amt">
@@ -515,7 +517,7 @@ function CapitalBudgeting($, objFromMain) {
                                 Annual depreciation amount of new asset
                             </div>
                             <div class="value">
-                                <input class="ansbox" type="number" placeholder="Write as positive" value="${includeAnswers ? objAns.calcDepAmt.toLocaleString('en-US') : ''}">
+                                <input class="ansbox" type="number" placeholder="Write as positive" data-ansboxkey="calcDepAmt" value="${includeAnswers ? objAns.calcDepAmt.toLocaleString('en-US') : ''}">
                             </div>
                         </div>
                         <div class="row-variable dep-tax-savings">
@@ -526,7 +528,7 @@ function CapitalBudgeting($, objFromMain) {
                                 Annual tax savings from depreciation
                             </div>
                             <div class="value">
-                                <input class="ansbox" type="number" value="${includeAnswers ? objAns.calcDepTaxSavings.toLocaleString('en-US') : ''}">
+                                <input class="ansbox" type="number" data-ansboxkey="calcDepTaxSavings" value="${includeAnswers ? objAns.calcDepTaxSavings.toLocaleString('en-US') : ''}">
                             </div>
                         </div>
                     </div>

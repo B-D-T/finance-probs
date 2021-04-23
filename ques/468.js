@@ -23,7 +23,8 @@ function fnQues468 ($, objFromMain) {
         const calcVars = {
             calcTheAns: new capbudg.CapBudgVar(quesVars, false) // Returns object with all solutions in it
         };
-
+console.log(calcVars.calcTheAns);
+       
         const displayVars = {
             "dispIP": (-1*quesVars.varIP).toLocaleString('en-US'),
             "dispENEPIRev": quesVars.varENEPIRev.toLocaleString('en-US'),
@@ -72,6 +73,8 @@ function fnQues468 ($, objFromMain) {
             Below is the completed table with the correct variables from the prompt. 
         </p>
         <div id="capbudgVarTableQues468Solutions">${capbudg.htmlVariableTable(true,v.calcTheAns)}</div>`;
+
+        obj.response = `<p>Can you read <b>this</b>??`
         
         return obj;
 
@@ -83,4 +86,4 @@ function fnQues468 ($, objFromMain) {
 try { fnQues468(); }
 catch (error) { console.error();}
 
-console.log('Question loaded');
+console.log('Question 468 loaded');

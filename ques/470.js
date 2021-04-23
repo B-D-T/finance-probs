@@ -100,4 +100,4 @@ function fnQues470 ($, objFromMain) {
 try { fnQues470(); }
 catch (error) { console.error();}
 
-console.log('Question loaded');
+console.log('Question 470 loaded');

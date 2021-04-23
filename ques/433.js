@@ -109,7 +109,7 @@ function fnQuesResp(objPageSubmit){
 }
 
 // The question files (like 433.js) will always call this function on click.
-// Most of the time this will only be an intermediary for the sedEDQuesRespVars function,
+// Most of the time this will only be an intermediary for the setEDQuesRespVars function,
 // but I can add any custom feedback in here too, if I have any.
 // I don't need to build an testing functionality because it'll never be called during testing (no clicks)
 // function fnQuesResp(stuResp){

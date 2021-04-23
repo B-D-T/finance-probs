@@ -8,7 +8,7 @@ IS_PRODUCTION = !window.Qualtrics === false;
 if (typeof IS_QUES_PAGE == 'undefined') {var IS_QUES_PAGE;}
 
 function quesNumGlobal() {
-    // reads 'divQues470-stem' and returns 470
+    // reads 'divQues470-stem' and returns 470 as an integer
     const divID = jQuery("#kxAutoRender>div").attr('id');
     if (!divID) {
         IS_QUES_PAGE = false;
@@ -20,6 +20,7 @@ function quesNumGlobal() {
         const thisQuesNum = parseInt(regexMatch[2]);
         const capBudgQues = [467,468,469,470,471];
         IS_QUES_PAGE = capBudgQues.includes(thisQuesNum);
+console.log('from v3main: QuesNum:',thisQuesNum, 'IS_QUES_PAGE:',IS_QUES_PAGE)
 
         return thisQuesNum;
     }
@@ -28,10 +29,17 @@ function quesNumGlobal() {
 function mainFunc($) {
     "use strict";
     const self = this;
+    const getEDValue = (edKey) => Qualtrics.SurveyEngine.getEmbeddedData(edKey);
+    const setEDValue = (edKey, edValue) => Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue);
 
+    // Returns the question number as an integer, and sets the IS_QUES_PAGE variable
+    // E.g., self.quesNum = 470
     self.quesNum = quesNumGlobal(); // FIX: I need a better way to do the quesNum. 
 
-    if (typeof IS_QUES_PAGE === 'undefined' || IS_QUES_PAGE === false) { return "Cancelling all code" };
+    if (typeof IS_QUES_PAGE === 'undefined' || IS_QUES_PAGE === false) {
+        console.log('Not a v3 problem. Cancelling any further v3 references and code.');
+        return "Cancelling all code";
+    };
 
 
     let udf, tvmcalc, tvmexpl, capbudg, Finance; // classes
@@ -39,27 +47,272 @@ function mainFunc($) {
     let ques = null;
 
 
+    // buildPage is called after loadJSFiles is done.
+    // It receives an object (varsObj) that contains all the variables for this question (quesVars, calcVars, and displayVars), either from Qualtrics embedded data or from the question definition (e.g., 468.js).
+    // Those variables have the simple variable names, NOT the long, unique ones with prefixes. 
     function buildPage(varsObj) {
-        const v = varsObj;
-        const objContent = ques.pageContent(varsObj);
+        // const v = varsObj; // Do I need this? I don't think I do.
 
+        // We pass the varsObj to the question itself (e.g., 468.js), which has the pageContent function.
+        // That function returns an object with ansBoxMessage, stem, solution, and response; those are mostly just HTML. We duplicate that object here as objPageContent.
+        const objPageContent = ques.pageContent(varsObj);
+
+        // objPageContent is used to populate the HTML on the page itself. We also store it as part of the embedded data, even though it's wasteful to do so; I think it will make it easier to re-create student's questions for them after the fact or in other mediums (e.g., within Python)
         const divRoot = '#divQues' + self.quesNum;
-        $(divRoot + '-stem').html(objContent.stem);
-        $(divRoot + '-solution').html(objContent.solution);
-        $(divRoot + '-response').html(objContent.response);
+        $(divRoot + '-stem').html(objPageContent.stem);
+        $(divRoot + '-solution').html(objPageContent.solution);
+        $(divRoot + '-response').html(objPageContent.response);
+
+        // Check that the response DIV does NOT exist on this page (e.g., there's no divQues470-response). If there's no response DIV (i.e., the if statement returns true), we know this is a Question page and not a Solution page.
+        // Solution pages READ data, but we want to prevent them from WRITING any of their data (i.e., we don't want to store anything from a Solution page into Qualtrics embedded data).
+//        if (!(jQuery("#divQues" + self.quesNum + "-response").length)) {
+if (1==1) {            // DELETE ME !!!!! And uncomment the if statement line above
+
+            // Returned true, which means it did NOT find the response DIV.
+            // Thus, we know this is a Question page and we want to write variables from it to Qualtrics embedded data. 
+
+console.log('varsObj:', varsObj);
+console.log('objPageContent:',objPageContent);
+
+            if (IS_PRODUCTION) {
+
+                // Store the existing variables and question HTML as a stringified JSON variable (e.g., strQues468VarsStorage) in Qualtrics embedded data
+                // Later, when the page is submitted, we'll append the student's submission(s) to this variable.
+                storeQuesRespVars(varsObj, varsObj.calcTheAns, objPageContent);
+
+                // addOnPageSubmit is a Qualtrics function that accepts an optional parameter called 'type' (which we call 'submitType'). https://s.qualtrics.com/WRAPI/QuestionAPI/classes/Qualtrics%20JavaScript%20Question%20API.html#method_addOnPageSubmit
+                // When the user clicks a button, Qualtrics passes the 'type' parameter ('submitType', as we call it) to addOnPageSubmit.
+                // Possible values from submitType: ["jump", "next", "prev"]. It depends on how the page was submitted (i.e., which button was clicked).
+                Qualtrics.SurveyEngine.addOnPageSubmit(function (submitType) {
+                    // qtrxQuesID is the internal, stable ID of the question within Qualtrics (e.g., QID1310444524)
+                   const qtrxQuesID = Object.keys(Qualtrics.SurveyEngine.QuestionInfo)[0];
+
+                    // The built-in Qualtrics system only long-term saves the responses when the user clicks 'Next.' I warn the students about that, as does Qualtrics.
+                    // My system should save the response no matter what button the student clicks. FIX(?)- What happens if they change to another question using the upper-left menu? Is that same as clicking "jump"?
+                   const qtrxSubmitType = submitType;
+console.log('qtrxSubmitType:', qtrxSubmitType);
 
 
-        // // received from addOnPageSubmit
-        // function fnQuesResp(objPageSubmit){
-        //     const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
-        //     if (!(jQuery(`${qtrxDivID}-response`).length)){
-        //         let objRespFeedback = objPageSubmit;
-        //         return setEDQuesRespVars(objRespFeedback);
-        //     }
-        // }
+                    // For v1 and v2 of these Problem Sets, this addOnPageSubmit code was stored in Qualtrics for each individual question. That code within Qualtrics prepared objRenderQuesResp and sent it to fnQuesResp(objPageSubmit) on main.js, who renamed the object twice (i.e., objRenderQuesResp == objPageSubmit == objRespFeedback). In v3, we're cutting out that back & forth by handling the whole process on v3main.js.
+
+                    // TWO WAYS FOR STUDENTS TO SUBMIT ANSWERS (mutually exclusive)
+                        // 1. QualtricsInputBox: Qualtrics Text-input-type question with a single input box
+                        // or
+                        // 2. CustomInputBoxes: Qualtrics text/graphic-type question with no input boxes, other than the 1+ boxes that we create when building the question (all of which have the HTML tag "data-ansboxkey")
+                    // Must be choice #1 or #2 -- we cannot create boxes on a question (#2) that also has the Qualtrics input box (#1). (well, we could, but my scoring code wouldn't work)
+                    // Choice #2 could only have 1 box, however. Thus, someday we could replace all Qualtrics questions and just use custom boxes instead.
+                    
+                    // If the Qualtrics input box exists, pull the student's submitted answers from there.
+                    // Otherwise, pull the submissions from the fields we create as part of the code (e.g., for the multipart capital budgeting problems).
+                    // Any field we create must be an 'input' element with a "data-ansboxkey" HTML attribute.
+
+                    // Check if there is an input box with that id on the page.
+                    // If it doesn't exist, qtrxInputBox returns null and we assume that the page only has our boxes.
+                    const qtrxInputBox = document.getElementById("QR~" + qtrxQuesID); 
+                    const respSubmitMethod = !qtrxInputBox ? "QualtricsInputBox" : "CustomInputBoxes";
+
+                    let objStuResp={};
+                    let objCorrectAns={};
+                    let percCorrect=0;
+
+                    if (respSubmitMethod=="QualtricsInputBox"){
+                        // Sanitize student submission and convert empties to 0s
+                        const stuRespToReturn = prepareStudentSubmissionValue(qtrxInputBox.value)
+                        // This creates an object with one key:value pair, and the key is always "theStuResp"
+                        objStuResp = {theStuResp: stuRespToReturn};
+
+                        // This creates an object with one key:value pair, and the key is always "theAns"
+                        objCorrectAns = {theAns: varsObj.calcTheAns};
+
+                        // Determine student's score on the question
+                        percCorrect = respPercCorrect(objStuResp.theStuResp, objCorrectAns.theAns);
+
+                    } else { // respSubmitMethod == CustomInputBoxes
+                        // There is NOT a Qualtrics input box on that page. In that case, we'll only look at our boxes.
+
+                        const objCustomInputBoxStuSubmit = createCustomInputBoxStuSubmit();
+                        objStuResp = objCustomInputBoxStuSubmit.stuRespObject;
+                        objCorrectAns = objCustomInputBoxStuSubmit.correctAnsObject;
+                        percCorrect = objCustomInputBoxStuSubmit.thePercCorrect;
+                    };
+
+                    // Read the embedded data variable from Qualtrics (e.g., strQues468VarsStorage),
+                    // append the student's answer(s) to that object, then re-write the object back to embedded data
+   
+                    // Retrieve stored question information from Embedded data and convert it to an object
+                    let strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage";
+
+                    // Once the old data have been read into memory, append the results based on the student's responses
+                    jQuery.when(getEDValue(strQuesVarsStorageKey)).then(function (edValue) {
+                        
+                        let objQuesResp = JSON.parse(edValue);
+
+                        // Student's submission(s) for the question
+                        objQuesResp["objStuResp"] = objStuResp;
+
+                        objQuesResp["objCorrectAns"] = objCorrectAns;
+
+                        // Add the score to the QuesResp object
+                        objQuesResp["percCorrect"] = percCorrect;
+
+                        // Store feedback that will be shown to user when they see the Solution
+                        objQuesResp["respFeedback"] = {}; // Used to be objRespFeedback; WHAT GETS PUT HERE NOW?
+
+                        const strObjName = "objQuesResp" + objQuesResp.quesNum.toString(); // objRespQues433
+                        const strQuesRespED = JSON.stringify(objQuesResp);
+
+                        // Write quesResp to Embedded Data (assuming we're in production,
+                        // although I don't think this function ever gets called during testing anyway).
+                        setEDValue(strObjName, strQuesRespED);
+
+                    });
+
+                });
+            } else { // IN TESTING ENVIRONMENT               
+                let objStuResp={}; let objCorrectAns={}; let percCorrect=0;
+                const objCustomInputBoxStuSubmit = createCustomInputBoxStuSubmit();
+                objStuResp = objCustomInputBoxStuSubmit.stuRespObject; objCorrectAns = objCustomInputBoxStuSubmit.correctAnsObject; percCorrect = objCustomInputBoxStuSubmit.thePercCorrect;
+                console.log('objStuResp',objStuResp); console.log('objCorrectAns',objCorrectAns); console.log('percCorrect',percCorrect);
+            };
+        } // no 'else' statement because there's nothing to do if this is a Solution page
+
+        
+        // Each student sees variables unique to that student (randomly generated).
+        // This function writes those to Qualtrics embedded data when the Question page is first generated.
+        // When the student leaves the Question page (even if he/she doesn't submit a response), 
+        // the student's answer will be combined with these variables and written as a different variable (e.g., strQues470VarsStorage) in the Qualtrics embedded data.
+        function storeQuesRespVars (theQuesVars, theAns, thePageContent) {
+            let objQuesResp = {
+                "quesNum": self.quesNum,
+                "objQuesVars": theQuesVars, // the property stores the variables as an object
+                "objPageContent": thePageContent // this is what the student sees. It's only for our reference, and maybe recreating the problems for students after the fact or in Python.
+            };
+            const strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage"; // strQues468VarsStorage
+            const strQuesVarsStorageVal = JSON.stringify(objQuesResp);
+
+            // 
+            if (IS_PRODUCTION) {
+                setEDValue(strQuesVarsStorageKey, strQuesVarsStorageVal);
+            } else { console.log("No setEDValue for " + strQuesVarsStorageKey + ": " + strQuesVarsStorageVal) }
+        }
+
+        // This function could live within the if(IS_PRODUCTION) section above, but I keep it here so it can be used when testing locally too.
+        function createCustomInputBoxStuSubmit(){
+            // Create aryAnsboxKeys, an array of finance variable names from the data-ansboxkey values.
+            // These are in the order in which they appear on the page (though it doesn't matter what order they're in, as long as the order stays constant).
+            // Sample data returned: ["ansPaybackPeriodReg", "ansPaybackPeriodDisc", "ansNPV"]
+            const aryAnsboxKeys = jQuery('input').map(function() { return jQuery(this).data('ansboxkey'); }).get();
+
+            // Use aryAnsboxKeys to parse out the correct answers from varsObj.calcTheAns
+            // These are stored in an array that's in the same order as aryAnsboxKeys.
+            // Sample output: [1.9986096628432395, 2.310157473062218, 613013.901619191]
+            const aryCorrectAnswers = aryAnsboxKeys.map(function(theAnsboxValue){ return varsObj.calcTheAns[theAnsboxValue]; });
+
+            // aryStuSubmissions is an array of the student's answers in the same order as aryAnsboxKeys.
+            // Sample output when the middle field is left blank: ["123", 0, "789"]
+            const aryStuSubmissions = aryAnsboxKeys.map(function(theAnsboxValue, idx) { 
+                // Return the full element that has this finance variable as the value of data-ansboxKey. This is the <input> box.
+                const objTheElement = document.querySelectorAll(`[data-ansboxkey='${theAnsboxValue}']`)[0];
+                // Sanitize the student's response before going any further.
+                const sanitizedStuResp = sanitizeInput(objTheElement.value);
+                // If the input box is empty, return a 0
+                return !sanitizedStuResp ? 0 : sanitizedStuResp;
+            });
+
+            // Convert two arrays into an object of key:value pairs where the finance variables are the keys and other info are the values (e.g., the student's responses) 
+            const stuRespObject = Object.fromEntries(aryAnsboxKeys.map((_, idx) => [aryAnsboxKeys[idx], aryStuSubmissions[idx]]));
+            const correctAnsObject = Object.fromEntries(aryAnsboxKeys.map((_, idx) => [aryAnsboxKeys[idx], aryCorrectAnswers[idx]]));
+            
+            // Determine points earned for the question.
+            // Each part of the question (i.e., ansbox) is worth the same amount; e.g., if there are 4 ansbox input spaces, each is worth 25% of the question overall.
+            const thePercCorrect = respPercCorrect(aryStuSubmissions, aryCorrectAnswers);
+
+            return {stuRespObject, correctAnsObject, thePercCorrect};
+        };
+
+        // Pass a single submission (and answer) to check or pass arrays of submissions (and correct answers).
+        function respPercCorrect(stuResp, correctAns, rawTolerance) {
+
+            // Return 0 if stuResp is null or empty (but allow stuResp = 0 to continue)
+            if (stuResp === null || stuResp === "") { return 0; }
+
+            // If this is only checking a single value, run the check and return 1/0
+            if (!Array.isArray(correctAns)) { return percCorrect(stuResp, correctAns, rawTolerance); }
+
+            let ptsPossible = 0;
+            let ptsEarned = 0;
+
+            // If the student submitted only one answer, convert it to an array
+            stuResp = !Array.isArray(stuResp) ? stuResp.split() : stuResp
+
+            // For multi-answer questions, assign 1 point to each answer.
+            // Students can earn a point each time through.
+            jQuery.each(correctAns, (index, curAns) => {
+                ptsPossible += 1;
+                const curResp = stuResp[index] || 0;
+                ptsEarned += percCorrect(curResp, curAns, rawTolerance);
+            });
+
+            return ptsEarned / ptsPossible;
+
+            function percCorrect(respToEvaluate, paramCorrectAns, rawTolerance) {
+                let curCorrectAns = parseFloat(paramCorrectAns);
+
+                // If a rawTolerance is passed, the code will accept answers +/- that amount.
+                // Otherwise, it uses a percent difference (i.e., curCorrectAns +/- 1.25% ).
+                // The default is 0.0125 (2^-3) because the binary system is happier with that.
+                const toleranceAmt = rawTolerance || Math.abs(curCorrectAns) * 0.0125;
+
+                // Clean text in the student's answer
+                const numRespToEvaluate = convertRespToNum(respToEvaluate);
+
+                const isCorrect = Math.abs(numRespToEvaluate - curCorrectAns) < toleranceAmt;
+
+                return isCorrect ? 1 : 0;
+            }
+
+            function convertRespToNum(theResp) {
+                let resp = theResp.toString().trim();
+
+                const charsToRemove = [",", "\\$"];
+                jQuery.each(charsToRemove, function (i, char) {
+                    const regex = new RegExp(char, "g");
+                    resp = resp.replace(regex, '');
+                });
+
+                return parseFloat(resp);
+            }
+        }
+
+        
+        function prepareStudentSubmissionValue(stuRespOrig){
+            // Sanitize the student's response
+            const sanitizedStuResp = sanitizeInput(stuRespOrig);
+
+            // If the input box is empty, return a 0
+            const stuRespToReturn = !sanitizedStuResp ? 0 : sanitizedStuResp;
+            
+            return stuRespToReturn;
+        }
+
+        
+        function sanitizeInput(userInput) {
+            // Code from https://stackoverflow.com/questions/2794137/sanitizing-user-input-before-adding-it-to-the-dom-in-javascript
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#x27;',
+                "/": '&#x2F;',
+                "`": '&grave;'
+            };
+            const reg = /[&<>"'/]/ig;
+            return userInput.replace(reg, (match) => (map[match]));
+        }
 
 
-    }
+    } // End of buildPage
 
 
 
@@ -71,8 +324,14 @@ function mainFunc($) {
     loadJSFiles()
         // the 'Then' statement waits for a promise from the loadJSFiles function
         .then((respObj) => {
-            // Get the variables that we'll use in the question, either from the ques itself (origVars) or from Qualtrics embedded data
+            // Get the variables that we'll use in the question
+
+            // The 'ques' in 'ques.defineVariables()' refers to the class within the question file (e.g., fnQues468 within 468.js)
+            // Thus, 'ques.defineVariables()' is like running the defineVariables() function on 468.js
             const origVars = ques.defineVariables();
+
+            // We first try to get the variables from Qualtrics embedded data.
+            // If that doesn't work, we'll get them from the ques itself (the origVars variable is stored in the line above)
             return (IS_PRODUCTION) ? fetchQuesVars(origVars, respObj["quesNum"]) : origVars;
         })
         .then((varsObj) => buildPage(varsObj));
@@ -85,13 +344,13 @@ function mainFunc($) {
         let objQuesVarsActual = {};
         if (!IS_PRODUCTION) { return objVars; };
         $.each(objUniqueNames, function (theKey, valueFromQues) {
-            $.when(udf.getEDValue(theKey)).then(function (edValue) {
+            $.when(getEDValue(theKey)).then(function (edValue) {
                 // If the key exists within the embedded data, use that value
                 if (edValue) {
                     objQuesVarsActual[theKey] = edValue;
                     // If the key does not exist within the ED, set it and return the same value that we started with
                 } else {
-                    $.when(udf.setEDValue(theKey, valueFromQues)).then(function () {
+                    $.when(setEDValue(theKey, valueFromQues)).then(function () {
                         objQuesVarsActual[theKey] = valueFromQues;
                     });
                 };

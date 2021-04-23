@@ -27,12 +27,11 @@
 function UDFClass($, objFromMain) {
     const self = this;
     self.quesNum = quesNumGlobal();
-    self.getEDValue = (edKey) => Qualtrics.SurveyEngine.getEmbeddedData(edKey);
-    self.setEDValue = (edKey, edValue) => Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue);
 
 
-
-    // This add a global method to all numbers for formating
+    // This add a global method to all numbers for formatting.
+    // To use, append .$$() to the end of a number variable.
+    // E.g., varPV.$$, or varPV.$$(whatever arguments you want)
     Number.prototype.$$ = function ({minDecimals=0, maxDecimals=2, strRegion="en-US", strCurrency="USD"}={}){
         // Get primitive copy of number
         let myNum= this.valueOf();
@@ -75,6 +74,8 @@ function UDFClass($, objFromMain) {
         return value.toString().split(".")[1].length || 0;
     }
 
+    // Receives multiple objects as arguments.
+    // Using the first object as starting place, it appends key:value pairs from the subsequent objects to the first object, returning a bigger version of the first object (i.e., with the key:value pairs from all the other objects, too)
     self.combineVarObjs = (...args) => $.extend(...args);
 
     self.ansBoxMessages = function (msgKeyToReturn) {
@@ -100,6 +101,13 @@ function UDFClass($, objFromMain) {
 
 
 
+    // When you use console . log( someObj), it passes a REFERENCE to someObj.
+    // That means someObj will change as the code is running, and by the time you look at it,
+    // it will have the final values. If you want to see the object AT THE TIME the line of code happens,
+    // you need to use something like this: console . log("Here's the obj right now:", logObj(theObject) );
+    self.logObj = function(someObj) {
+        return JSON.parse(JSON.stringify(someObj));
+    }
 
 
 
@@ -280,15 +288,6 @@ console.log('v3user-defined-functions.js loaded');
 //     `;
 
 //     return dispQuesResp;
-// }
-
-
-// // When you use console . log( someObj), it passes a REFERENCE to someObj.
-// // That means someObj will change as the code is running, and by the time you look at it,
-// // it will have the final values. If you want to see the object AT THE TIME the line of code happens,
-// // you need to use something like this: console . log("Here's the obj right now:", logObj(theObject) );
-// function logObj(someObj) {
-//     return JSON.parse(JSON.stringify(someObj));
 // }
 
 
