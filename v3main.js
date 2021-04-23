@@ -80,7 +80,7 @@ console.log('*** fetchStuRespAnsbox returned objStuRespAnsbox as',objStuRespAnsb
 console.log('objStuRespAnsbox returned empty from fetchStuRespAnsbox');
         } else {
 console.log('objStuRespAnsbox returned not empty. This is what is in it:',objStuRespAnsbox );
-            jQuery.each(aryAnsboxKeys, (theAnsboxValue, idx) => { 
+            jQuery.each(aryAnsboxKeys, (idx, theAnsboxValue) => { 
                 // Return the full element that has this finance variable as the value of data-ansboxKey. This is the <input> box.
                 const objTheElement = document.querySelectorAll(`[data-ansboxkey='${theAnsboxValue}']`)[0];
                 objTheElement.value = objStuRespAnsbox[theAnsboxValue];
