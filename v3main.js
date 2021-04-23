@@ -73,9 +73,11 @@ function mainFunc($) {
         // Pre-populate the boxes if the student has already submitted answers, clicks off, and then clicks back to this question again
         // Fetch an object with the student's previous responses to this question
         const objStuRespAnsbox = fetchStuRespAnsbox(aryAnsboxKeys);
+console.log('*** fetchStuRespAnsbox returned objStuRespAnsbox as',objStuRespAnsbox );
         // If the object comes back empty, do nothing. Otherwise, populate the answer boxes with the student's submissions.
         if (jQuery.isEmptyObject(objStuRespAnsbox)) {
             // Do nothing
+console.log('objStuRespAnsbox returned empty from fetchStuRespAnsbox');
         } else {
 console.log('objStuRespAnsbox returned not empty. This is what is in it:',objStuRespAnsbox );
             jQuery.each(aryAnsboxKeys, (theAnsboxValue, idx) => { 
@@ -387,7 +389,11 @@ console.log('createCustomInputBoxStuSubmit has aryStuSubmissions as', aryStuSubm
         // Retrieve stored question information from Embedded data and convert it to an object
         const strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage";
 
-        jQuery.when(getEDValue(strQuesVarsStorageKey)).then(function (edValue) {
+        
+        let objStuRespAnsbox = {};
+
+        jQuery.when(getEDValue(strQuesVarsStorageKey))
+        .then(function (edValue) {
 
             // The storage key doesn't exist the first time the page is loaded, so we'll return an empty object
             if (!edValue) { return {} };
@@ -397,21 +403,23 @@ console.log('objQuesResp returned from embedded data is', udf.logObj(objQuesResp
             // Student's submission(s) for the question
             const objStuResp = objQuesResp["objStuResp"];
 
-            let objStuRespAnsbox = {};
-
             if (!objStuResp){
                 // No student response data for that question, probably because it's the first time the page has loaded
                 return {};
             } else {
                 jQuery.each(aryAnsboxKeys, (idx, strAnsboxKey) => objStuRespAnsbox[strAnsboxKey] = parseFloat(objStuResp[strAnsboxKey]));
-console.log('In fetchStuRespAnsbox, objStuRespAnsbox is',objStuRespAnsbox );
+console.log('In fetchStuRespAnsbox, objStuRespAnsbox is',udf.logObj(objStuRespAnsbox) );
                 // If all the responses are 0, that probably means the student just clicked past the question without submitting an answer.
                 // We want them to see the placeholder text for that question, so we return null instead of 0.
                 const sumOfValues = Object.values(objStuRespAnsbox).reduce((a, b) => a + b);
 console.log('sumOfValues is',sumOfValues);
                 return sumOfValues==0 ? {} : objStuRespAnsbox;
             };
-        });
+        })
+        .done(()=>{return objStuRespAnsbox});
+
+console.log('This is objStuRespAnsbox being returned from fetchStuRespAnsbox', udf.logObj(objStuRespAnsbox));
+        return objStuRespAnsbox;
     }
 
     // Add prefix to create a key that's unique across ALL questions in the course.
