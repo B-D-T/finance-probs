@@ -281,7 +281,7 @@ console.log('ptsEarned',ptsEarned,'/ptsPossible',ptsPossible);
                 // Clean text in the student's answer
                 const numRespToEvaluate = convertRespToNum(respToEvaluate);
                 const isCorrect = Math.abs(numRespToEvaluate - curCorrectAns) < toleranceAmt;
-console.log('   numRespToEvaluate:',numRespToEvaluate, 'curCorrectAns:',curCorrectAns, 'isCorrect:',isCorrect);
+console.log('   Math.abs(',numRespToEvaluate,' - ',curCorrectAns,') < ',toleranceAmt,'=',isCorrect);
 
                 return isCorrect ? 1 : 0;
             }
