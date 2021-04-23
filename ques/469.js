@@ -9,8 +9,6 @@ function fnQues469 ($, objFromMain) {
         
         // Originally there were 3 IRR problems on the same page. However, since I need unique data-ansboxKey names, I limited it to 1 per page
         let inv01 = Array(udf.uRand(5,9));
-        // let inv02 = Array(udf.uRand(6,12));
-        // let inv03 = Array(udf.uRand(4,6));
         const aryInvestments = [inv01];//, inv02, inv03];
         aryInvestments.forEach(elem=> elem[0]= -1 * udf.uRand(14000,44000,2000) );
         
@@ -24,8 +22,6 @@ function fnQues469 ($, objFromMain) {
 
         const quesVars = {
             varInvTL01: populateInvestmentTL(inv01)
-            // varInvTL02: populateInvestmentTL(inv02),
-            // varInvTL03: populateInvestmentTL(inv03)
         };
 
         const calcVars = {
@@ -33,9 +29,7 @@ function fnQues469 ($, objFromMain) {
             // calcIRRInv02: capbudg.financeIRR(quesVars.varInvTL02),
             // calcIRRInv03: capbudg.financeIRR(quesVars.varInvTL03),
             calcTheAns: {
-                inv01IRR: this.calcIRRInv01
-                // inv02IRR: this.calcIRRInv02,
-                // inv03IRR: this.calcIRRInv03
+                ansIRR: this.calcIRRInv01
             }
         };
 
