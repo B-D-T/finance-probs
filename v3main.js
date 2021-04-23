@@ -131,6 +131,7 @@ console.log('qtrxSubmitType:', qtrxSubmitType);
                     // If it doesn't exist, qtrxInputBox returns null and we assume that the page only has our boxes.
                     const qtrxInputBox = document.getElementById("QR~" + qtrxQuesID); 
                     const respSubmitMethod = !qtrxInputBox ? "CustomInputBoxes" : "QualtricsInputBox";
+console.log('respSubmitMethod is '+respSubmitMethod);
 
                     let objStuResp={};
                     let objCorrectAns={};
@@ -152,6 +153,7 @@ console.log('qtrxSubmitType:', qtrxSubmitType);
                         // There is NOT a Qualtrics input box on that page. In that case, we'll only look at our boxes.
 
                         const objCustomInputBoxStuSubmit = createCustomInputBoxStuSubmit(aryAnsboxKeys);
+console.log('objCustomInputBoxStuSubmit is returned as', objCustomInputBoxStuSubmit);
                         objStuResp = objCustomInputBoxStuSubmit.stuRespObject;
                         objCorrectAns = objCustomInputBoxStuSubmit.correctAnsObject;
                         percCorrect = objCustomInputBoxStuSubmit.thePercCorrect;
@@ -178,7 +180,7 @@ console.log('qtrxSubmitType:', qtrxSubmitType);
 
                         // Store feedback that will be shown to user when they see the Solution
                         objQuesResp["respFeedback"] = {}; // Used to be objRespFeedback; WHAT GETS PUT HERE NOW?
-
+console.log('****This is what will be written back into the embedded data after student submits:', objQuesResp);
                         const strObjName = "objQuesResp" + objQuesResp.quesNum.toString(); // objRespQues433
                         const strQuesRespED = JSON.stringify(objQuesResp);
 
@@ -235,6 +237,7 @@ console.log('qtrxSubmitType:', qtrxSubmitType);
                 // If the input box is empty, return a 0
                 return !sanitizedStuResp ? 0 : sanitizedStuResp;
             });
+console.log('createCustomInputBoxStuSubmit has aryStuSubmissions as', aryStuSubmissions);
 
             // Convert two arrays into an object of key:value pairs where the finance variables are the keys and other info are the values (e.g., the student's responses) 
             const stuRespObject = Object.fromEntries(aryAnsboxKeys.map((_, idx) => [aryAnsboxKeys[idx], aryStuSubmissions[idx]]));
@@ -385,12 +388,12 @@ console.log('qtrxSubmitType:', qtrxSubmitType);
         const strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage";
 
         jQuery.when(getEDValue(strQuesVarsStorageKey)).then(function (edValue) {
-console.log('edValue is',edValue);
+
             // The storage key doesn't exist the first time the page is loaded, so we'll return an empty object
             if (!edValue) { return {} };
 
             const objQuesResp = JSON.parse(edValue);
-
+console.log('objQuesResp returned from embedded data is',objQuesResp);
             // Student's submission(s) for the question
             const objStuResp = objQuesResp["objStuResp"];
 
