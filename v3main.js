@@ -477,7 +477,7 @@ console.log(`setEDValue ran. Now objQuesVarsActual[theKey] = valueFromQues ---> 
             if (!edValue) { return {} };
 
             const objQuesResp = JSON.parse(edValue);
-console.log('objQuesResp returned from embedded data is', udf.logObj(objQuesResp)); // This is coming back with the right stuff
+console.log('############ objQuesResp returned from embedded data is', udf.logObj(objQuesResp)); // This is coming back with the right stuff
             // Student's submission(s) for the question
             const objStuResp = objQuesResp["objStuResp"];
 
