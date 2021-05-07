@@ -1966,4 +1966,4 @@ function solveFVAnnuityConstant_FV(qv, objColors) {
 }
 
 
-console.log("tvm-explanations.js loaded.");
+// console.log("tvm-explanations.js loaded.");

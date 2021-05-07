@@ -546,7 +546,7 @@ function CapitalBudgeting($, objFromMain) {
 
 
 }
-console.log("capbudg.js loaded.");
+// console.log("capbudg.js loaded.");
 
 // const myVar = new CapBudgVar(
 //     {

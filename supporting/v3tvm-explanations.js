@@ -1967,4 +1967,4 @@ function TVMExplanation($, objFromMain){
     }
 
 }
-console.log("tvm-explanations.js loaded.");
+// console.log("tvm-explanations.js loaded.");
