@@ -304,7 +304,7 @@ function mainFunc($) {
             // Determine points earned for the question.
             // Each part of the question (i.e., ansbox) is worth the same amount; e.g., if there are 4 ansbox input spaces, each is worth 25% of the question overall.
             const thePercCorrect = respPercCorrect(aryStuSubmissions, aryCorrectAnswers);
-
+console.log("thePercCorrect",thePercCorrect);
             return {stuRespObject, correctAnsObject, thePercCorrect};
         };
 

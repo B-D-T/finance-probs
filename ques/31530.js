@@ -6,11 +6,10 @@ function fnQues31530 ($, objFromMain) {
     this.defineVariables = function(){
         
         const quesVars = {
-            "placeholder":1
         };
 
         const calcVars = {
-            calcTheAns: "Need answer here"
+            calcTheAns: {ansStuResp:"Responses vary for each student"}
         };
 
         const displayVars = {
