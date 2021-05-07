@@ -176,7 +176,7 @@ console.log("Hey there. This is what came back from getEDValue(strQuesVarsStorag
 
                         // Store feedback that will be shown to user when they see the Solution
                         objQuesResp["respFeedback"] = feedbackToShow(objQuesResp);
-// console.log('****This is what will be written back into the embedded data for '+strQuesVarsStorageKey+' after student submits (in theory):', udf.logObj(objQuesResp));
+console.log('****This is what will be written back into the embedded data for '+strQuesVarsStorageKey+' after student submits (in theory):', udf.logObj(objQuesResp));
                         const strQuesRespED = JSON.stringify(objQuesResp);
                         return strQuesRespED;
                     })
@@ -462,13 +462,13 @@ console.log(`setEDValue ran. Now objQuesVarsActual[theKey] = valueFromQues ---> 
 
     // If the student has values already in the embedded data, we'll pre-populate the boxes with those. Otherwise, we'll leave the boxes empty.
     function fetchStuRespAnsbox(aryAnsboxKeys) {
-console.log("!!!!!!!!!!!!! I'm fetchStuRespAnsbox, and I'm running for question #"+self.quesNum+" with aryAnsboxKeys as",aryAnsboxKeys);
+console.log("I'm fetchStuRespAnsbox, and I'm running for question #"+self.quesNum+" with aryAnsboxKeys as",aryAnsboxKeys);
         // Retrieve stored question information from Embedded data and convert it to an object
         const strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage";
 
         
         let objStuRespAnsbox = {};
-console.log('....... I am trying to get strQuesVarsStorageKey: ', strQuesVarsStorageKey);
+console.log('I am trying to get strQuesVarsStorageKey: ', strQuesVarsStorageKey);
         
         if (!IS_PRODUCTION){return {}};
         jQuery.when(getEDValue(strQuesVarsStorageKey))
