@@ -447,6 +447,8 @@ console.log("########## respPercCorrect received the following. stuResp:", stuRe
                     // If the key does not exist within the ED, set it and return the same value that we started with
                 } else {
                     $.when(setEDValue(theKey, valueFromQues)).then(function () {
+console.log('objQuesVarsActual',udf.logObj(objQuesVarsActual));
+console.log(`setEDValue ran. Now objQuesVarsActual[theKey] = valueFromQues ---> objQuesVarsActual[${theKey}] = ${valueFromQues};`);
                         objQuesVarsActual[theKey] = valueFromQues;
                     });
                 };
