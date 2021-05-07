@@ -340,6 +340,11 @@ console.log("thePercCorrect",thePercCorrect);
         // You can pass a number, string, or RegExp as the correctAns. E.g., const theRegex = new RegExp("^abc$", "ig"); respPercCorrect("ab", theRegex);
         function respPercCorrect(stuResp, correctAns, rawTolerance) {
 console.log("########## respPercCorrect received the following. stuResp:", stuResp, "correctAns:",correctAns);
+            if (typeof correctAns === "undefined" || isNaN(correctAns)){
+                console.log("No correct answer provided for question "+self.quesNum+". respPercCorrect returned 0, but you may need to double check the submission.");
+                return 0;
+            }
+
             // Return 0 if stuResp is null or empty (but allow stuResp = 0 to continue)
             if (stuResp === null || stuResp === "") { return 0; }
 
