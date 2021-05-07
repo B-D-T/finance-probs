@@ -37,7 +37,10 @@ console.log("Yo. Official setEDValue here. I'm about to write this key-value:",e
     // Fetches the stored variables for strQues####VarsStorage and returns them as a object
     function getEDValueForQues(edStorageKeyName) {
         $.when(getEDValue(edStorageKeyName))
-        .then(function (edValue) {return JSON.parse(edStorageKeyName);})
+        .then(function (edValue) {
+            const objEDStorageKey = jQuery.isEmptyObject(edValue) ? {} : JSON.parse(edStorageKeyName);
+            return objEDStorageKey;
+            });
     };
 
     // Returns the question number as an integer, and sets the IS_QUES_PAGE variable
