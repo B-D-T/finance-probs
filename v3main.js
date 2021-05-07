@@ -182,6 +182,7 @@ console.log('****This is what will be written back into the embedded data for '+
                     })
                     .done(function(strQuesRespED){
                         // Write quesResp to Embedded Data (assuming we're in production, although I don't think this function ever gets called during testing anyway).
+console.log("okay... here's what setEDValue is writing to ED (I hope):", strQuesRespED);
                         return setEDValue(strQuesVarsStorageKey,strQuesRespED);
                     });
 
@@ -441,7 +442,7 @@ console.log('objUniqueNames is',udf.logObj(objUniqueNames));
         let objQuesVarsActual = {};
         if (!IS_PRODUCTION) { return objVars; };
         $.each(objUniqueNames, function (theKey, valueFromQues) {
-console.log("About to go fetch " + theKey + " key in objUniqueNames:",valueFromQues);
+console.log("About to go fetch " + theKey + " key in objUniqueNames. Here's what I think it is now, but that could be overwritten:",valueFromQues);
             $.when(getEDValue(theKey)).then(function (edValue) {
 console.log("When I tried to fetch "+theKey+", this is what came back from getEDValue:",edValue);
                 if (edValue) {

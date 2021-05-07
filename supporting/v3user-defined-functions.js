@@ -228,7 +228,7 @@ function UDFClass($, objFromMain) {
 
 }
 
-console.log('v3user-defined-functions.js loaded');
+// console.log('v3user-defined-functions.js loaded');
 
 
 
