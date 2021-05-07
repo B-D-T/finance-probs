@@ -467,9 +467,9 @@ console.log(`setEDValue ran. Now objQuesVarsActual[theKey] = valueFromQues ---> 
 
         
         let objStuRespAnsbox = {};
+console.log('....... I am trying to get strQuesVarsStorageKey: ', strQuesVarsStorageKey);
         
         if (!IS_PRODUCTION){return {}};
-console.log('....... I am trying to get strQuesVarsStorageKey: ', strQuesVarsStorageKey);
         jQuery.when(getEDValue(strQuesVarsStorageKey))
         .then(function (edValue) {
 console.log('Here is edValue', edValue);
