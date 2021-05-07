@@ -139,8 +139,8 @@ function UDFClass($, objFromMain) {
     // it will have the final values. If you want to see the object AT THE TIME the line of code happens,
     // you need to use something like this: console . log("Here's the obj right now:", logObj(theObject) );
     self.logObj = function(someObj) {
-        return JSON.parse(JSON.stringify(someObj));
-    }
+        return jQuery.isEmptyObject(someObj) ? {} : JSON.parse(JSON.stringify(someObj));
+    };
 
 
 
