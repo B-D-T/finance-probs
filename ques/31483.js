@@ -10,10 +10,11 @@ function fnQues31483 ($, objFromMain) {
 
         // FIX: This should be dynamic
         const calcVars = {
-            calcTheAns: 133
+            calcTheAns: {ansStuResp:133}
         };
 
         const displayVars = {
+            dispTheAns: calcVars.calcTheAns.ansStuResp
         };
 
         return udf.combineVarObjs(quesVars, calcVars, displayVars);
@@ -38,7 +39,7 @@ function fnQues31483 ($, objFromMain) {
             class="ansbox" type="number"
             data-ansboxkey="ansStuResp"
             placeholder="${obj.ansBoxMessage}"
-            value="${includeAnswers ? v.calcTheAns : ''}">
+            value="${includeAnswers ? v.dispTheAns : ''}">
         </div>
 
         `;
@@ -46,7 +47,7 @@ function fnQues31483 ($, objFromMain) {
 
         obj.solution = `
         <p>
-            There are ${v.calcTheAns} different schools in the list.
+            There are ${v.dispTheAns} different schools in the list.
         </p>
         `;
 

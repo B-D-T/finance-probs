@@ -18,13 +18,14 @@ function fnQues31423 ($, objFromMain) {
         };
 
         const calcVars = {
-            calcTheAns = {
+            calcTheAns: {
                 "ansStuResp": objAvgKillsByConf[quesVars.theConf]  // number like 234.13, 334.20
             }
         };
+        const ansVars = calcVars.calcTheAns;
 
         const displayVars = {
-            dispTheAns: calcVars["calcTheAns"].toFixed(4)
+            dispTheAns: ansVars.ansStuResp.toFixed(4)
         };
 
         return udf.combineVarObjs(quesVars, calcVars, displayVars);

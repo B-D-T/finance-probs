@@ -12,7 +12,6 @@ function fnQues31530 ($, objFromMain) {
         const calcVars = {
             calcTheAns: "Need answer here"
         };
-        // const ansVars = calcVars.calcTheAns;
 
         const displayVars = {
         };

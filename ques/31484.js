@@ -10,11 +10,11 @@ function fnQues31484 ($, objFromMain) {
 
         // FIX: This should be dynamic
         const calcVars = {
-            calcTheAns: 0.1240501
+            calcTheAns: {ansStuResp: 0.1240501}
         };
 
         const displayVars = {
-            dispTheAns: calcVars["calcTheAns"].toFixed(5)
+            dispTheAns: calcVars.calcTheAns.ansStuResp.toFixed(5)
         };
 
         return udf.combineVarObjs(quesVars, calcVars, displayVars);

@@ -12,11 +12,12 @@ function fnQues31532 ($, objFromMain) {
 
         // FIX: This should be dynamic
         const calcVars = {
-            calcTheAns: "WCC"
+            calcTheAns: {ansStuResp:"WCC"}
         };
 
         const displayVars = {
-            strHTMLAnsChoices: udf.buildDropdownOptions(quesVars.aryConfs)
+            strHTMLAnsChoices: udf.buildDropdownOptions(quesVars.aryConfs),
+            dispTheAns: calcVars.calcTheAns.ansStuResp
         };
 
         return udf.combineVarObjs(quesVars, calcVars, displayVars);
@@ -61,7 +62,7 @@ function fnQues31532 ($, objFromMain) {
 
         obj.solution = `
         <p>
-            The conference with the most non-seniors is ${v.calcTheAns}.
+            The conference with the most non-seniors is ${v.dispTheAns}.
         </p>
         `;
 
