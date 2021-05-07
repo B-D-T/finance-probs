@@ -265,25 +265,6 @@ console.log('****This is what will be written back into the embedded data for '+
         
             return dispQuesResp;
         }
-        
-        // Each student sees variables unique to that student (randomly generated).
-        // This function writes those to Qualtrics embedded data when the Question page is first generated.
-        // When the student leaves the Question page (even if he/she doesn't submit a response), 
-        // the student's answer will be combined with these variables and written as a different variable (e.g., strQues470VarsStorage) in the Qualtrics embedded data.
-        function storeQuesRespVars (theQuesVars, theAns, thePageContent) {
-            let objQuesResp = {
-                "quesNum": self.quesNum,
-                "objQuesVars": theQuesVars, // the property stores the variables as an object
-                "objPageContent": thePageContent // this is what the student sees. It's only for our reference, and maybe recreating the problems for students after the fact or in Python.
-            };
-            const strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage"; // strQues468VarsStorage
-            const strQuesVarsStorageVal = JSON.stringify(objQuesResp);
-console.log(":::: Hi. I'm storeQuesRespVars. I'm about to write the following to "+strQuesVarsStorageKey+":", strQuesVarsStorageVal);
-            if (IS_PRODUCTION) {
-console.log("Yup, I'm really doing it. I'm going to send "+strQuesVarsStorageKey+" to setEDValue. Here I go!");
-                setEDValue(strQuesVarsStorageKey, strQuesVarsStorageVal);
-            } else { console.log("No setEDValue for " + strQuesVarsStorageKey + ": " + strQuesVarsStorageVal) }
-        }
 
         // This function could live within the if(IS_PRODUCTION) section above, but I keep it here so it can be used when testing locally too.
         function createCustomInputBoxStuSubmit(varsObj, aryAnsboxKeys){
@@ -499,6 +480,25 @@ console.log("Writing objQuesVarsActual["+theKey+"]:",objQuesVarsActual[theKey]);
 //        return quesPrefix(objQuesVarsActual, quesNum, "remove");
 
     }
+
+    // Each student sees variables unique to that student (randomly generated).
+    // This function writes those to Qualtrics embedded data when the Question page is first generated.
+    // When the student leaves the Question page (even if he/she doesn't submit a response), 
+    // the student's answer will be combined with these variables and written as a different variable (e.g., strQues470VarsStorage) in the Qualtrics embedded data.
+    function storeQuesRespVars (theQuesVars, theAns, thePageContent) {
+        let objQuesResp = {
+            "quesNum": self.quesNum,
+            "objQuesVars": theQuesVars, // the property stores the variables as an object
+            "objPageContent": thePageContent // this is what the student sees. It's only for our reference, and maybe recreating the problems for students after the fact or in Python.
+        };
+        const strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage"; // strQues468VarsStorage
+        const strQuesVarsStorageVal = JSON.stringify(objQuesResp);
+console.log(":::: Hi. I'm storeQuesRespVars. I'm about to write the following to "+strQuesVarsStorageKey+":", strQuesVarsStorageVal);
+        if (IS_PRODUCTION) {
+console.log("Yup, I'm really doing it. I'm going to send "+strQuesVarsStorageKey+" to setEDValue. Here I go!");
+            setEDValue(strQuesVarsStorageKey, strQuesVarsStorageVal);
+        } else { console.log("No setEDValue for " + strQuesVarsStorageKey + ": " + strQuesVarsStorageVal) }
+    };
 
     // If the student has values already in the embedded data, we'll pre-populate the boxes with those. Otherwise, we'll leave the boxes empty.
     function fetchStuRespAnsbox(aryAnsboxKeys) {
