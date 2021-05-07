@@ -110,7 +110,8 @@ console.log('fetchStuRespAnsbox returned objStuRespAnsbox as',udf.logObj(objStuR
 
                 // Store the existing variables and question HTML as a stringified JSON variable (e.g., strQues468VarsStorage) in Qualtrics embedded data
                 // Later, when the page is submitted, we'll append the student's submission(s) to this variable.
-                const ansToStore = !varsObj.calcTheAns ? "n/a" : varsObj.calcTheAns;
+                let ansToStore = (typeof(varsObj)==="undefined") ? "n/a" : varsObj.calcTheAns;
+
 console.log('varsObj',udf.logObj(varsObj));
                 storeQuesRespVars(varsObj, ansToStore, objPageContent);
 
