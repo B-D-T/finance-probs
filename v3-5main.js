@@ -433,6 +433,7 @@ console.log("########## respPercCorrect received the following. stuResp:", stuRe
         .then((varsObj) => buildPage(varsObj));
 
     // If the variable is already in the embedded data, we'll use that. Otherwise, the code stores the variable in the embedded data based on our definition.
+    // objVars are the keys from that specific question (e.g., varPMT, calcTheAns, dispTheAns)
     function fetchQuesVars(objVars, quesNum = self.quesNum) {
         // Change the values so they're unique before long-term storage by adding a prefix to variable names
         // const objUniqueNames = quesPrefix(objVars, quesNum, "include");
@@ -448,7 +449,8 @@ console.log('objExistingEDforQues returned by getEDValueForQues:', udf.logObj(ob
         // If it comes back empty, that means we haven't stored anything yet and we should write the current question's variables.
         if (jQuery.isEmptyObject(objExistingEDforQues)) { // use new variables
             objQuesVarsActual = objVars;
-            return storeQuesRespVars(objVars, objVars.calcTheAns);
+            const storeTheVars = storeQuesRespVars(objVars, objVars.calcTheAns);
+console.log('storeTheVars',storeTheVars);
         } else { // Use the existing variables
             const objExistingEDQuesVars = objExistingEDforQues.objQuesVars;
             $.each(objVars, function (theKey, valueFromQues) {

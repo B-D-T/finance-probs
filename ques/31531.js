@@ -16,7 +16,7 @@ function fnQues31531 ($, objFromMain) {
         };
 
         return udf.combineVarObjs(quesVars, calcVars, displayVars);
-    }
+    };
 
     this.pageContent = function(v, includeAnswers=false) {
         let obj = {};
