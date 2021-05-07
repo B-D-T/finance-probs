@@ -37,10 +37,11 @@ console.log("Yo. Official setEDValue here. I'm about to write this key-value:",e
     // Fetches the stored variables for strQues####VarsStorage and returns them as a object
     function getEDValueForQues(edStorageKeyName) {
 console.log("getEDValueForQues("+edStorageKeyName+") running.");
+        let objEDStorageKey={};
         $.when(getEDValue(edStorageKeyName))
         .then(function (edValue) {
 console.log("getEDValue("+edStorageKeyName+") returned",edValue);
-            const objEDStorageKey = jQuery.isEmptyObject(edValue) ? {} : JSON.parse(edValue);
+            objEDStorageKey = jQuery.isEmptyObject(edValue) ? {} : JSON.parse(edValue);
             return objEDStorageKey;
             });
     };
@@ -67,7 +68,13 @@ console.log("getEDValue("+edStorageKeyName+") returned",edValue);
 
         // We pass the varsObj to the question itself (e.g., 468.js), which has the pageContent function.
         // That function returns an object with ansBoxMessage, stem, solution, and response; those are mostly just HTML. We duplicate that object here as objPageContent.
-        const objPageContent = ques.pageContent(varsObj);
+        let objPageContent = ques.pageContent(varsObj);
+        // We store each question's full HTML just for reference, which is lengthy b/c of all the white space.
+        // This next line removes some of that white space.
+        // It doesn't do much, but it's little easier on me; no one else ever knows the difference other than me when troubleshooting (or working with the data on the backend).
+        const slimText = (strToSlim) => strToSlim.replace(/\s\s\s|\t/g,'');
+        objPageContent.stem = slimText(objPageContent.stem);
+        objPageContent.solution = slimText(objPageContent.solution);
 
         // objPageContent is used to populate the HTML on the page itself. We also store it as part of the embedded data, even though it's wasteful to do so; I think it will make it easier to re-create student's questions for them after the fact or in other mediums (e.g., within Python)
         const divRoot = '#divQues' + self.quesNum;
@@ -449,7 +456,7 @@ console.log('objExistingEDforQues returned by getEDValueForQues:', udf.logObj(ob
         // If it comes back empty, that means we haven't stored anything yet and we should write the current question's variables.
         if (jQuery.isEmptyObject(objExistingEDforQues)) { // use new variables
             objQuesVarsActual = objVars;
-            const storeTheVars = storeQuesRespVars(objVars, objVars.calcTheAns);
+            const storeTheVars = storeQuesRespVars(objVars, objVars.calcTheAns); // I don't need storeTheVars as a variable
 console.log('storeTheVars',storeTheVars);
         } else { // Use the existing variables
             const objExistingEDQuesVars = objExistingEDforQues.objQuesVars;
@@ -501,7 +508,7 @@ console.log("Writing objQuesVarsActual["+theKey+"]:",objQuesVarsActual[theKey]);
 console.log(":::: Hi. I'm storeQuesRespVars. I'm about to write the following to "+strQuesVarsStorageKey+":", strQuesVarsStorageVal);
         if (IS_PRODUCTION) {
 console.log("Yup, I'm really doing it. I'm going to send "+strQuesVarsStorageKey+" to setEDValue. Here I go!");
-            setEDValue(strQuesVarsStorageKey, strQuesVarsStorageVal);
+            return setEDValue(strQuesVarsStorageKey, strQuesVarsStorageVal);
         } else { console.log("No setEDValue for " + strQuesVarsStorageKey + ": " + strQuesVarsStorageVal) }
     };
 
