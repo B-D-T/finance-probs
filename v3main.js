@@ -186,7 +186,7 @@ console.log('****This is what will be written back into the embedded data for '+
                     })
                     .done(function(strQuesRespED){
                         // Write quesResp to Embedded Data (assuming we're in production, although I don't think this function ever gets called during testing anyway).
-console.log("okay... here's what setEDValue is writing to ED (I hope):", strQuesRespED);
+// console.log("okay... here's what setEDValue is writing to ED (I hope):", strQuesRespED);
                         return setEDValue(strQuesVarsStorageKey,strQuesRespED);
                     });
 
