@@ -32,7 +32,7 @@ function mainFunc($) {
     // const setEDValue = (edKey, edValue) => Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue);
     function setEDValue(edKey, edValue) {
 console.log("Yo. Official setEDValue here. I'm about to write this key-value:",edKey,edValue);
-        Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue)
+        return Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue);
     };
 
     // Returns the question number as an integer, and sets the IS_QUES_PAGE variable
