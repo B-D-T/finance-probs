@@ -19,7 +19,7 @@ function quesNumGlobal() {
         const regexMatch = divID.match(/(divQues)(\d*)(\-*)/);
         const thisQuesNum = parseInt(regexMatch[2]);
         const capBudgQues = [467,468,469,470,471];
-        if ( capBudgQues.includes(thisQuesNum) || (thisQuesNum > 31400) ){IS_QUES_PAGE = true}
+        if ( capBudgQues.includes(thisQuesNum) || (thisQuesNum > 31400) ){IS_QUES_PAGE = true;};
 
         return thisQuesNum;
     }
@@ -175,7 +175,7 @@ console.log('varsObj',udf.logObj(varsObj));
                     if (respSubmitMethod=="QualtricsInputBox"){
 
                         // Sanitize student submission and convert empties to 0s
-                        const stuRespToReturn = prepareStudentSubmissionValue(qtrxInputBox.value)
+                        const stuRespToReturn = prepareStudentSubmissionValue(qtrxInputBox.value);
                         // This creates an object with one key:value pair, and the key is always "theStuResp"
                         objStuResp = {theStuResp: stuRespToReturn};
 
@@ -252,7 +252,7 @@ console.log(`Before I left the page, I wrote ${strQuesVarsStorageKey} to ED. Or 
                     strFeedback = objQuesResp["respFeedback"];
                 });
             } else { // TESTING solution page
-                strFeedback = "No feedback available in testing mode."
+                strFeedback = "No feedback available in testing mode.";
             }
 
             // I haven't messed with this much yet, but if I wanted,
@@ -273,7 +273,7 @@ console.log(`Before I left the page, I wrote ${strQuesVarsStorageKey} to ED. Or 
                 resultIcon = dispPercCorrect == "100%"
                     ? `<span style="color: green;">&#10004;</span>`
                     : `<span style="color: red;">&#10008;</span>`;
-                stuRespLocal = "Your answer is embedded in the question at the top of the page."
+                stuRespLocal = "Your answer is embedded in the question at the top of the page.";
             }
             catch (err) {
                 console.log("Error trying to set the dispPercCorrect variable");
@@ -355,7 +355,7 @@ console.log("########## respPercCorrect received the following. stuResp:", stuRe
             let ptsEarned = 0;
 
             // If the student submitted only one answer, convert it to an array
-            stuResp = !Array.isArray(stuResp) ? stuResp.split() : stuResp
+            stuResp = !Array.isArray(stuResp) ? stuResp.split() : stuResp;
 
             // For multi-answer questions, assign 1 point to each answer.
             // Students can earn a point each time through.
@@ -381,7 +381,7 @@ console.log("########## respPercCorrect received the following. stuResp:", stuRe
                         isCorrect = paramCorrectAns.test(respToEvaluate.toString()); // Returns true/false based on the regex
                     } else {
                         // Since paramCorrectAns isn't a number, and it's not a RegExp, it must be a string.
-                        if (!respToEvaluate){return 0};
+                        if (!respToEvaluate){return 0;};
                         isCorrect = respToEvaluate.toString().toLowerCase() == paramCorrectAns.toLowerCase();
                     };
                     return isCorrect ? 1 : 0;
@@ -476,7 +476,7 @@ console.log("########## respPercCorrect received the following. stuResp:", stuRe
 // 2021-05-07 I'm messing around here with objUniqueNames. I'm changing it to write & read ONLY from the strQues###VarsStorage variables. If I break everything, come back to the version before 20210508-0941.
         // $.each(objUniqueNames, function (theKey, valueFromQues) {
         // First, fetch the varsStorage variable and convert it to an object
-        const strEDQuesVarStorageCode = "strQues"+self.quesNum+"VarsStorage";
+        const strEDQuesVarStorageCode = "strQues"+quesNum+"VarsStorage";
         const objExistingEDforQues = getEDValueForQues(strEDQuesVarStorageCode);
 console.log('objExistingEDforQues returned by getEDValueForQues:', udf.logObj(objExistingEDforQues));
         // If it comes back empty, that means we haven't stored anything yet and we should write the current question's variables.
@@ -531,32 +531,41 @@ console.log("Writing objQuesVarsActual["+theKey+"]:",objQuesVarsActual[theKey]);
         };
         const strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage"; // strQues468VarsStorage
         const strQuesVarsStorageVal = JSON.stringify(objQuesResp);
-console.log(":::: Hi. I'm storeQuesRespVars. I'm about to write the following to "+strQuesVarsStorageKey+":", strQuesVarsStorageVal);
+
         if (IS_PRODUCTION) {
-console.log("Yup, I'm really doing it. I'm going to send "+strQuesVarsStorageKey+" to setEDValue. Here I go!");
+console.log("Yup, I'm really doing it. I'm going to send "+strQuesVarsStorageKey+" to setEDValue::", strQuesVarsStorageVal);
             $.when( setEDValue(strQuesVarsStorageKey, strQuesVarsStorageVal) )
             .then(()=>`${strQuesVarsStorageKey} has been written, in theory anyway}`);
-        } else { console.log("No setEDValue for " + strQuesVarsStorageKey + ": " + strQuesVarsStorageVal) }
+        } else { console.log("No setEDValue for " + strQuesVarsStorageKey + ": " + strQuesVarsStorageVal); }
     };
 
     // If the student has values already in the embedded data, we'll pre-populate the boxes with those. Otherwise, we'll leave the boxes empty.
     function fetchStuRespAnsbox(aryAnsboxKeys) {
 console.log("I'm fetchStuRespAnsbox, and I'm running for question #"+self.quesNum+" with aryAnsboxKeys as",aryAnsboxKeys);
+        // If there aren't any ansboxkeys, just return an empty object
+        if (!aryAnsboxKeys || aryAnsboxKeys.length===0) {
+console.log("There were no ansboxkeys for "+self.quesNum+", so fetchStuRespAnsbox is returning an empty object.");
+            return {};
+        };
+
         // Retrieve stored question information from Embedded data and convert it to an object
         const strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage";
 
         
         let objStuRespAnsbox = {};
         
-        if (!IS_PRODUCTION){return {}};
+        if (!IS_PRODUCTION){return {};};
         jQuery.when(getEDValue(strQuesVarsStorageKey))
         .then(function (edValue) {
 console.log('Here is edValue', edValue);
             // The storage key doesn't exist the first time the page is loaded, so we'll return an empty object
-            if (!edValue) { return {} };
+            if (!edValue) { 
+console.log("It appears that the storage key "+strQuesVarsStorageKey+" doesn't exist, so fetchStuRespAnsbox returns an empty object to objStuRespAnsbox.");
+                return {};
+            };
 
             const objQuesResp = JSON.parse(edValue);
-console.log('******** objQuesResp returned from embedded data is', udf.logObj(objQuesResp)); // This is coming back with the right stuff
+console.log('******** objQuesResp returned from embedded data is', udf.logObj(objQuesResp));
             // Student's submission(s) for the question
             const objStuResp = objQuesResp["objStuResp"];
 
@@ -565,27 +574,29 @@ console.log('******** objQuesResp returned from embedded data is', udf.logObj(ob
                 return {};
             } else {
                 jQuery.each(aryAnsboxKeys, function (idx, strAnsboxKey) {
-                    const origRespFromED=objStuResp[strAnsboxKey];
+console.log("Running for ", strAnsboxKey);
+                    const origRespFromED = objStuResp[strAnsboxKey];
                     let respFromED = parseFloat(origRespFromED);
                     // If parse throws an error, we assume the student response is text
-                    if (!respFromED) {respFromED = origRespFromED};
+                    if (!respFromED || isNaN(respFromED)) {respFromED = origRespFromED;};
                     // Populate the object with the student's response
-                    objStuRespAnsbox[strAnsboxKey] = respFromED
+                    objStuRespAnsbox[strAnsboxKey] = respFromED;
                 });
 
                 // If all the responses are 0, that probably means the student just clicked past the question without submitting an answer.
                 // We want them to see the placeholder text for that question, so we return null instead of 0.
-                const sumOfValues = Object.values(objStuRespAnsbox).reduce(function (a, b) {
-                    const curVal = !parseFloat(a) ? 0 : parseFloat(a);
-                    const newVal = !parseFloat(b) ? 0 : parseFloat(b);
-                    return curVal + newVal;
+                let numPseudoObjScore=0;
+                jQuery.each(objStuRespAnsbox, function(theKey,theVal){
+                    const parseAttempt = parseFloat(theVal);
+                    if (isNaN(parseAttempt)) { numPseudoObjScore += (theVal.toString().trim().length > 0) ? 1 : 0; } // Probably a string
+                    else { numPseudoObjScore += !parseAttempt ? 0 : 1; } // Probably a number
                 });
-                if (sumOfValues==0) { objStuRespAnsbox = {} };
+                if (numPseudoObjScore===0) { objStuRespAnsbox = {}; };
 
                 return objStuRespAnsbox;
             };
         })
-        .done(()=>{return objStuRespAnsbox});
+        .done(()=>{return objStuRespAnsbox;});
 
 // console.log('This is objStuRespAnsbox being returned from fetchStuRespAnsbox', udf.logObj(objStuRespAnsbox));
         return objStuRespAnsbox;
@@ -601,7 +612,7 @@ console.log('******** objQuesResp returned from embedded data is', udf.logObj(ob
         const addPrefix = (curKeyName) => strPrefix + curKeyName;
         const removePrefix = (curKeyName) => curKeyName.split(strPrefix)[1];
 
-        if (typeof caller === "string") { return action === "include" ? addPrefix(caller) : removePrefix(caller) };
+        if (typeof caller === "string") { return action === "include" ? addPrefix(caller) : removePrefix(caller); };
 
         if (typeof caller === "object") {
             let objToReturn = {};
@@ -632,7 +643,7 @@ console.log('******** objQuesResp returned from embedded data is', udf.logObj(ob
         // Once that final script is loaded (i.e., ONLY after the external 433.js is loaded),
         // it calls the function to start doing the rest of the work.
         const jsPaths = () => {
-            const baseURL = IS_PRODUCTION ? "https://b-d-t.github.io/finance-probs/" : "./"
+            const baseURL = IS_PRODUCTION ? "https://b-d-t.github.io/finance-probs/" : "./";
             let objJSPaths = {
                 udf: "supporting/v3user-defined-functions.js",
                 tvmexpl: "supporting/v3tvm-explanations.js",
@@ -649,10 +660,10 @@ console.log('******** objQuesResp returned from embedded data is', udf.logObj(ob
                         if (typeof objJSPaths['quesNum'] == 'undefined') {
                             objJSPaths['quesNum'] = self.quesNum;
                         }
-                        resolve(objJSPaths)
+                        resolve(objJSPaths);
                     });
             });
-        }
+        };
 
         let objJS = { "IS_PRODUCTION": IS_PRODUCTION };
         jsInfo = await jsPaths();
@@ -675,7 +686,7 @@ console.log('******** objQuesResp returned from embedded data is', udf.logObj(ob
         }));
         const capbudgLoad = () => new Promise(resolve => $.getScript(jsInfo.capbudg, () => {
             objJS.capbudg = new CapitalBudgeting($, objJS);
-            return resolve(objJS.capbudg)
+            return resolve(objJS.capbudg);
         }));
         const quesLoad = () => new Promise(resolve => $.getScript(jsInfo.ques, () => {
             // Get the name of the top-level function in the ques file that we loaded (e.g., fnQues470)
