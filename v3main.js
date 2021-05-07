@@ -469,15 +469,15 @@ console.log(`setEDValue ran. Now objQuesVarsActual[theKey] = valueFromQues ---> 
         let objStuRespAnsbox = {};
         
         if (!IS_PRODUCTION){return {}};
-
+console.log('....... I am trying to get strQuesVarsStorageKey: ', strQuesVarsStorageKey);
         jQuery.when(getEDValue(strQuesVarsStorageKey))
         .then(function (edValue) {
-
+console.log('Here is edValue', edValue);
             // The storage key doesn't exist the first time the page is loaded, so we'll return an empty object
             if (!edValue) { return {} };
 
             const objQuesResp = JSON.parse(edValue);
-console.log('############ objQuesResp returned from embedded data is', udf.logObj(objQuesResp)); // This is coming back with the right stuff
+console.log('******** objQuesResp returned from embedded data is', udf.logObj(objQuesResp)); // This is coming back with the right stuff
             // Student's submission(s) for the question
             const objStuResp = objQuesResp["objStuResp"];
 
