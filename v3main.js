@@ -67,11 +67,11 @@ function mainFunc($) {
         const aryAnsboxKeys = $(divRoot + '-stem input, ' + divRoot + '-stem select').map(function() {
             return jQuery(this).data('ansboxkey'); 
         }).get();
-
+console.log('aryAnsboxKeys', aryAnsboxKeys);
         // Pre-populate the boxes if the student has already submitted answers, clicks off, and then clicks back to this question again
         // Fetch an object with the student's previous responses to this question
         const objStuRespAnsbox = fetchStuRespAnsbox(aryAnsboxKeys);
-// console.log('fetchStuRespAnsbox returned objStuRespAnsbox as',udf.logObj(objStuRespAnsbox) );
+console.log('fetchStuRespAnsbox returned objStuRespAnsbox as',udf.logObj(objStuRespAnsbox) );
         // If the object comes back empty, do nothing. Otherwise, populate the answer boxes with the student's submissions.
         if (jQuery.isEmptyObject(objStuRespAnsbox)) {
             // Do nothing
