@@ -477,7 +477,7 @@ console.log(`setEDValue ran. Now objQuesVarsActual[theKey] = valueFromQues ---> 
             if (!edValue) { return {} };
 
             const objQuesResp = JSON.parse(edValue);
-// console.log('objQuesResp returned from embedded data is', udf.logObj(objQuesResp)); // This is coming back with the right stuff
+console.log('objQuesResp returned from embedded data is', udf.logObj(objQuesResp)); // This is coming back with the right stuff
             // Student's submission(s) for the question
             const objStuResp = objQuesResp["objStuResp"];
 
@@ -485,11 +485,22 @@ console.log(`setEDValue ran. Now objQuesVarsActual[theKey] = valueFromQues ---> 
                 // No student response data for that question, probably because it's the first time the page has loaded
                 return {};
             } else {
-                jQuery.each(aryAnsboxKeys, (idx, strAnsboxKey) => objStuRespAnsbox[strAnsboxKey] = parseFloat(objStuResp[strAnsboxKey]));
+                jQuery.each(aryAnsboxKeys, function (idx, strAnsboxKey) {
+                    const origRespFromED=objStuResp[strAnsboxKey];
+                    let respFromED = parseFloat(origRespFromED);
+                    // If parse throws an error, we assume the student response is text
+                    if (!respFromED) {respFromED = origRespFromED};
+                    // Populate the object with the student's response
+                    objStuRespAnsbox[strAnsboxKey] = respFromED
+                });
 
                 // If all the responses are 0, that probably means the student just clicked past the question without submitting an answer.
                 // We want them to see the placeholder text for that question, so we return null instead of 0.
-                const sumOfValues = Object.values(objStuRespAnsbox).reduce((a, b) => a + b);
+                const sumOfValues = Object.values(objStuRespAnsbox).reduce(function (a, b) {
+                    const curVal = !parseFloat(a) ? 0 : parseFloat(a);
+                    const newVal = !parseFloat(b) ? 0 : parseFloat(b);
+                    return curVal + newVal;
+                });
                 if (sumOfValues==0) { objStuRespAnsbox = {} };
 
                 return objStuRespAnsbox;
