@@ -437,16 +437,16 @@ console.log("########## respPercCorrect received the following. stuResp:", stuRe
     function fetchQuesVars(objVars, quesNum = self.quesNum) {
         // Change the values so they're unique before long-term storage by adding a prefix to variable names
         const objUniqueNames = quesPrefix(objVars, quesNum, "include");
-
+console.log('objUniqueNames is',udf.logObj(objUniqueNames));
         let objQuesVarsActual = {};
         if (!IS_PRODUCTION) { return objVars; };
         $.each(objUniqueNames, function (theKey, valueFromQues) {
             $.when(getEDValue(theKey)).then(function (edValue) {
-                // If the key exists within the embedded data, use that value
                 if (edValue) {
+                    // If the key exists within the embedded data, use that value
                     objQuesVarsActual[theKey] = edValue;
-                    // If the key does not exist within the ED, set it and return the same value that we started with
                 } else {
+                    // If the key does not exist within the ED, set it and return the same value that we started with
                     $.when(setEDValue(theKey, valueFromQues)).then(function () {
 console.log('objQuesVarsActual',udf.logObj(objQuesVarsActual));
 console.log(`setEDValue ran. Now objQuesVarsActual[theKey] = valueFromQues ---> objQuesVarsActual[${theKey}] = ${valueFromQues};`);
