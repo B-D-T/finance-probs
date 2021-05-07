@@ -50,7 +50,6 @@ function mainFunc($) {
     // It receives an object (varsObj) that contains all the variables for this question (quesVars, calcVars, and displayVars), either from Qualtrics embedded data or from the question definition (e.g., 468.js).
     // Those variables have the simple variable names, NOT the long, unique ones with prefixes. 
     function buildPage(varsObj) {
-        // const v = varsObj; // Do I need this? I don't think I do.
 
         // We pass the varsObj to the question itself (e.g., 468.js), which has the pageContent function.
         // That function returns an object with ansBoxMessage, stem, solution, and response; those are mostly just HTML. We duplicate that object here as objPageContent.
@@ -149,6 +148,7 @@ console.log('fetchStuRespAnsbox returned objStuRespAnsbox as',udf.logObj(objStuR
                         // There is NOT a Qualtrics input box on that page. In that case, we'll only look at our boxes (input and select).
 
                         const objCustomInputBoxStuSubmit = createCustomInputBoxStuSubmit(varsObj, aryAnsboxKeys);
+console.log(">> objCustomInputBoxStuSubmit is",objCustomInputBoxStuSubmit);
                         objStuResp = objCustomInputBoxStuSubmit.stuRespObject;
                         objCorrectAns = objCustomInputBoxStuSubmit.correctAnsObject;
                         percCorrect = objCustomInputBoxStuSubmit.thePercCorrect;
@@ -262,7 +262,7 @@ console.log('fetchStuRespAnsbox returned objStuRespAnsbox as',udf.logObj(objStuR
             };
             const strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage"; // strQues468VarsStorage
             const strQuesVarsStorageVal = JSON.stringify(objQuesResp);
-
+console.log(":::: Hi. I'm storeQuesRespVars. I'm about to write the following to "+strQuesVarsStorageKey+":", strQuesVarsStorageVal);
             // 
             if (IS_PRODUCTION) {
                 setEDValue(strQuesVarsStorageKey, strQuesVarsStorageVal);
@@ -461,7 +461,7 @@ console.log(`setEDValue ran. Now objQuesVarsActual[theKey] = valueFromQues ---> 
 
     // If the student has values already in the embedded data, we'll pre-populate the boxes with those. Otherwise, we'll leave the boxes empty.
     function fetchStuRespAnsbox(aryAnsboxKeys) {
-
+console.log("!!!!!!!!!!!!! I'm fetchStuRespAnsbox, and I'm running for question #"+self.quesNum+" with aryAnsboxKeys as",aryAnsboxKeys);
         // Retrieve stored question information from Embedded data and convert it to an object
         const strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage";
 
