@@ -33,7 +33,10 @@ function mainFunc($) {
     function setEDValue(edKey, edValue) {
 console.log("Yo. Official setEDValue here. I'm about to write this key-value:",edKey,edValue);
         $.when( Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue))
-        .then(()=>edValue);
+        .then(()=>{
+console.log(`Yo - still official setEDValue. Supposedly I did my job for ${edKey}.`);
+            return edValue;
+        });
     };
     // Fetches the stored variables for strQues####VarsStorage and returns them as a object
     function getEDValueForQues(edStorageKeyName) {
@@ -522,7 +525,8 @@ console.log("Writing objQuesVarsActual["+theKey+"]:",objQuesVarsActual[theKey]);
 console.log(":::: Hi. I'm storeQuesRespVars. I'm about to write the following to "+strQuesVarsStorageKey+":", strQuesVarsStorageVal);
         if (IS_PRODUCTION) {
 console.log("Yup, I'm really doing it. I'm going to send "+strQuesVarsStorageKey+" to setEDValue. Here I go!");
-            return setEDValue(strQuesVarsStorageKey, strQuesVarsStorageVal);
+            $.when( setEDValue(strQuesVarsStorageKey, strQuesVarsStorageVal) )
+            .then(()=>`${strQuesVarsStorageKey} has been written, in theory anyway}`);
         } else { console.log("No setEDValue for " + strQuesVarsStorageKey + ": " + strQuesVarsStorageVal) }
     };
 
