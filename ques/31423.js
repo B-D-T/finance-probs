@@ -49,8 +49,7 @@ function fnQues31423 ($, objFromMain) {
             <input
             class="ansbox" type="number"
             data-ansboxkey="ansStuResp"
-            placeholder="${obj.ansBoxMessage}"
-            value="${includeAnswers ? v.dispTheAns : ''}">
+            placeholder="${obj.ansBoxMessage}">
         </div>
 
         `;
