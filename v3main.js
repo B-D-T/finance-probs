@@ -311,7 +311,7 @@ function mainFunc($) {
         // Pass a single submission (and answer) to check or pass arrays of submissions (and correct answers).
         // You can pass a number, string, or RegExp as the correctAns. E.g., const theRegex = new RegExp("^abc$", "ig"); respPercCorrect("ab", theRegex);
         function respPercCorrect(stuResp, correctAns, rawTolerance) {
-// console.log("########## respPercCorrect received the following. stuResp:", stuResp, "correctAns:",correctAns);
+console.log("########## respPercCorrect received the following. stuResp:", stuResp, "correctAns:",correctAns);
             // Return 0 if stuResp is null or empty (but allow stuResp = 0 to continue)
             if (stuResp === null || stuResp === "") { return 0; }
 
@@ -348,6 +348,7 @@ function mainFunc($) {
                         isCorrect = paramCorrectAns.test(respToEvaluate.toString()); // Returns true/false based on the regex
                     } else {
                         // Since paramCorrectAns isn't a number, and it's not a RegExp, it must be a string.
+                        if (!respToEvaluate){return 0};
                         isCorrect = respToEvaluate.toString().toLowerCase() == paramCorrectAns.toLowerCase();
                     };
                     return isCorrect ? 1 : 0;
