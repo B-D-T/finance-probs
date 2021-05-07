@@ -11,10 +11,9 @@ function fnQues31423 ($, objFromMain) {
 
         const listConferences = Object.keys(objAvgKillsByConf);
 
-        const idxConfPosToReturn = udf.uRand(0, listConferences.length - 1, 1); 
-
         const quesVars = {
-            "theConf":  listConferences[idxConfPosToReturn] // string e.g., "Big 12", "SoCon"
+            idxConfPosToReturn: udf.uRand(0, listConferences.length - 1, 1),
+            get theConf() { return listConferences[this.idxConfPosToReturn]} // string e.g., "Big 12", "SoCon"
         };
 
         const calcVars = {
