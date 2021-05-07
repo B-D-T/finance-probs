@@ -24,6 +24,10 @@ function quesNumGlobal() {
         return thisQuesNum;
     }
 }
+// DELETE ME. FOR TESTING ONLY.
+if (IS_QUES_PAGE && IS_PRODUCTION){
+console.log("%%%%%%%%%%%% Checking up on strQues31423VarsStorage: %%%%%%%%%%% ", Qualtrics.SurveyEngine.getEmbeddedData("strQues31423VarsStorage"));
+}
 
 function mainFunc($) {
     "use strict";
@@ -55,7 +59,7 @@ console.log("getEDValue("+edStorageKeyName+") returned",edValue);
     self.quesNum = quesNumGlobal(); // FIX: I need a better way to do the quesNum. 
 
     if (typeof IS_QUES_PAGE === 'undefined' || IS_QUES_PAGE === false) {
-        console.log('Not a v3 problem. Cancelling any further v3 references and code.');
+        console.log('Not a v3 problem. Cancelling any further v3 references and code on this page.');
         return "Cancelling all code";
     };
 
