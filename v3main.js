@@ -110,6 +110,7 @@ console.log('fetchStuRespAnsbox returned objStuRespAnsbox as',udf.logObj(objStuR
 
                 // Store the existing variables and question HTML as a stringified JSON variable (e.g., strQues468VarsStorage) in Qualtrics embedded data
                 // Later, when the page is submitted, we'll append the student's submission(s) to this variable.
+console.log('varsObj',varsObj);
                 storeQuesRespVars(varsObj, varsObj.calcTheAns, objPageContent);
 
                 // addOnPageSubmit is a Qualtrics function that accepts an optional parameter called 'type' (which we call 'submitType'). https://s.qualtrics.com/WRAPI/QuestionAPI/classes/Qualtrics%20JavaScript%20Question%20API.html#method_addOnPageSubmit
