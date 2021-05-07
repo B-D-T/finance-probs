@@ -85,6 +85,7 @@ function UDFClass($, objFromMain) {
             decimalPlaces2: "Include at least 2 decimal places in your answer",
             decimalPlaces4: "Include at least 4 decimal places in your answer",
             writeOutNums: "Write out numbers. E.g., write 12500000; don't write: '12.5'; '12.5 million'; 12,500,000; etc.",
+            excelFormulaNoEqualsSign: "Do NOT include the equals sign at the start. Eg, write SUM(1,2) not =SUM(1,2)",
             copyPasteFromWord: "Write your response in Word, then copy-paste into here",
             usePositiveIfAnsCouldBePosOrNeg: `<p>
                 If the solution could be a positive or negative value,
@@ -99,7 +100,39 @@ function UDFClass($, objFromMain) {
         return objAnsBoxMessages[theKey];
     }
 
+    // This returns a text string of <option> values to build a <select> box.
+    // The first parameter can be an object or array.
+    self.buildDropdownOptions = function (paramOptions, blnShowTopBlank = true){
 
+        // If the visible choice should be empty, start by putting a blank
+        let aryOptionValues = blnShowTopBlank ? ['emptyspace'] : [];
+        let aryOptionHTMLs = blnShowTopBlank ? [''] : [];
+
+        // Check if input parameter is an array or an object
+        if (Array.isArray(paramOptions)) {
+            // If paramOptions is an array, set the option 'value' and the HTML to be the same thing
+            jQuery.each(paramOptions, function(idx, curAryElement){
+                aryOptionValues.push(curAryElement);
+                aryOptionHTMLs.push(curAryElement);
+            });
+        } else { // it's an object
+            // If paramOptions is an object, the keys are the 'value' attribute in the option tag and the object's values are the visible HTML
+            jQuery.each(paramOptions, function(k,v){
+                aryOptionValues.push(k);
+                aryOptionHTMLs.push(v);
+            });
+        }
+        
+        let strOptionsHTML = '';
+        jQuery.each(aryOptionValues, function(idx) {
+            const theOptionVal = aryOptionValues[idx];
+            const theOptionHTML = aryOptionHTMLs[idx];
+            strOptionsHTML += `<option value="${theOptionVal}">${theOptionHTML}</option>`;
+        });
+
+        return strOptionsHTML;
+
+    };
 
     // When you use console . log( someObj), it passes a REFERENCE to someObj.
     // That means someObj will change as the code is running, and by the time you look at it,

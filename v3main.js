@@ -14,13 +14,12 @@ function quesNumGlobal() {
         IS_QUES_PAGE = false;
         return undefined;
     } else {
-        // Right now this only works for capital budgeting questions.
+        // Right now this only works for capital budgeting questions and questions from Sport Data Analytics (IDs >31400)
         // If students are working on any earlier questions, quit out of here by setting IS_QUES_PAGE to false.
         const regexMatch = divID.match(/(divQues)(\d*)(\-*)/);
         const thisQuesNum = parseInt(regexMatch[2]);
         const capBudgQues = [467,468,469,470,471];
-        IS_QUES_PAGE = capBudgQues.includes(thisQuesNum);
-// console.log('from v3main: QuesNum:',thisQuesNum, 'IS_QUES_PAGE:',IS_QUES_PAGE)
+        if ( capBudgQues.includes(thisQuesNum) || (thisQuesNum > 31400) ){IS_QUES_PAGE = true}
 
         return thisQuesNum;
     }
@@ -62,10 +61,10 @@ function mainFunc($) {
         $(divRoot + '-stem').html(objPageContent.stem);
         $(divRoot + '-solution').html(objPageContent.solution);
 
-        // Create aryAnsboxKeys, an array of finance variable names from the data-ansboxkey values.
+        // Create aryAnsboxKeys, an array of variable names from the data-ansboxkey values.
         // These are in the order in which they appear on the page (though it doesn't matter what order they're in, as long as the order stays constant).
         // Sample data returned: ["ansPaybackPeriodReg", "ansPaybackPeriodDisc", "ansNPV"]
-        const aryAnsboxKeys = $(divRoot + '-stem input').map(function() {
+        const aryAnsboxKeys = $(divRoot + '-stem input, ' + divRoot + '-stem select').map(function() {
             return jQuery(this).data('ansboxkey'); 
         }).get();
 
@@ -79,7 +78,7 @@ function mainFunc($) {
             console.log('objStuRespAnsbox returned empty from fetchStuRespAnsbox');
         } else {
             jQuery.each(aryAnsboxKeys, (idx, theAnsboxValue) => { 
-                // Return the full element that has this finance variable as the value of data-ansboxKey. This is the <input> box.
+                // Return the full element that has this finance variable as the value of data-ansboxKey. This is the <input> or <select> box.
                 const objTheElement = document.querySelectorAll(`[data-ansboxkey='${theAnsboxValue}']`)[0];
                 objTheElement.value = objStuRespAnsbox[theAnsboxValue];
             });
@@ -147,7 +146,7 @@ function mainFunc($) {
                         percCorrect = respPercCorrect(objStuResp.theStuResp, objCorrectAns.theAns);
 
                     } else { // respSubmitMethod == CustomInputBoxes
-                        // There is NOT a Qualtrics input box on that page. In that case, we'll only look at our boxes.
+                        // There is NOT a Qualtrics input box on that page. In that case, we'll only look at our boxes (input and select).
 
                         const objCustomInputBoxStuSubmit = createCustomInputBoxStuSubmit(varsObj, aryAnsboxKeys);
                         objStuResp = objCustomInputBoxStuSubmit.stuRespObject;
@@ -193,18 +192,29 @@ function mainFunc($) {
                 console.log('objStuResp',objStuResp); console.log('objCorrectAns',objCorrectAns); console.log('percCorrect',percCorrect);
             };
         } else { // This is a Solution page
-            // Retrieve stored question information from Embedded data and convert it to an object
-            let strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage";
-
             let strFeedback='';
-            // Once the old data have been read into memory, append the results based on the student's responses
-            jQuery.when(getEDValue(strQuesVarsStorageKey)).then(function (edValue) {
-                let objQuesResp = JSON.parse(edValue);
-                strFeedback = objQuesResp["respFeedback"];
-            });
 
-            $(divRoot + '-response').html(strFeedback, objPageContent.response);
+            if (IS_PRODUCTION) {
 
+                // Retrieve stored question information from Embedded data and convert it to an object
+                let strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage";
+
+                // Once the old data have been read into memory, append the results based on the student's responses
+                jQuery.when(getEDValue(strQuesVarsStorageKey)).then(function (edValue) {
+                    let objQuesResp = JSON.parse(edValue);
+                    strFeedback = objQuesResp["respFeedback"];
+                });
+            } else { // TESTING solution page
+                strFeedback = "No feedback available in testing mode."
+            }
+
+            // I haven't messed with this much yet, but if I wanted,
+            // I could include responses from the questions themselves (e.g., based on certain student answers).
+            // Just add obj.response=`Some text to show user`; to each question file (e.g., 471.js)
+            const strQuesSpecificResponse = !objPageContent.response ? '' : objPageContent.response;
+            
+            $(divRoot + '-response').html(strFeedback + '<br />' + strQuesSpecificResponse);
+    
         } // End of solution page
 
         // Returns HTML for displaying score to students
@@ -270,11 +280,19 @@ function mainFunc($) {
             // aryStuSubmissions is an array of the student's answers in the same order as aryAnsboxKeys.
             // Sample output when the middle field is left blank: ["123", 0, "789"]
             const aryStuSubmissions = aryAnsboxKeys.map(function(theAnsboxValue) { 
-                // Return the full element that has this finance variable as the value of data-ansboxKey. This is the <input> box.
+                // Return the full element that has this variable as the value of data-ansboxKey. This is the <input> or <select> box.
                 const objTheElement = document.querySelectorAll(`[data-ansboxkey='${theAnsboxValue}']`)[0];
-                // Sanitize the student's response before going any further.
-                const sanitizedStuResp = sanitizeInput(objTheElement.value);
-                // If the input box is empty, return a 0
+
+                // If it's a select box or Excel formula, use it as is. Otherwise, sanitize the student's response before going any further.
+                let sanitizedStuResp = '';
+                if (jQuery(objTheElement).is("select") || jQuery(objTheElement).hasClass("excel-formula") ) {
+                    // We don't want to sanitize Excel formulas because we'll lose key parts of the formula itself
+                    sanitizedStuResp = objTheElement.value;
+                } else {
+                    sanitizedStuResp = sanitizeInput(objTheElement.value);
+                };
+
+                // If the input/select box is empty, return a 0
                 return !sanitizedStuResp ? 0 : sanitizedStuResp;
             });
 //console.log('createCustomInputBoxStuSubmit has aryStuSubmissions as', aryStuSubmissions);
@@ -291,6 +309,7 @@ function mainFunc($) {
         };
 
         // Pass a single submission (and answer) to check or pass arrays of submissions (and correct answers).
+        // You can pass a number, string, or RegExp as the correctAns. E.g., const theRegex = new RegExp("^abc$", "ig"); respPercCorrect("ab", theRegex);
         function respPercCorrect(stuResp, correctAns, rawTolerance) {
 // console.log("########## respPercCorrect received the following. stuResp:", stuResp, "correctAns:",correctAns);
             // Return 0 if stuResp is null or empty (but allow stuResp = 0 to continue)
@@ -316,8 +335,24 @@ function mainFunc($) {
             return ptsEarned / ptsPossible;
 
             function percCorrect(respToEvaluate, paramCorrectAns, rawTolerance) {
+                
                 let curCorrectAns = parseFloat(paramCorrectAns);
+                let isCorrect;
 
+                // If using parseFloat creates an NaN error,
+                // we assume that the correct answer is a string and compare string to the RegEx (or the other string).
+                // Otherwise, we continue with the code and evaluate the numbers.
+                if (!curCorrectAns){
+                    const blnCorrectAnsIsRegex = paramCorrectAns instanceof RegExp;
+                    if (blnCorrectAnsIsRegex){
+                        isCorrect = paramCorrectAns.test(respToEvaluate.toString()); // Returns true/false based on the regex
+                    } else {
+                        // Since paramCorrectAns isn't a number, and it's not a RegExp, it must be a string.
+                        isCorrect = respToEvaluate.toString().toLowerCase() == paramCorrectAns.toLowerCase();
+                    };
+                    return isCorrect ? 1 : 0;
+                }
+                
                 // If a rawTolerance is passed, the code will accept answers +/- that amount.
                 // Otherwise, it uses a percent difference (i.e., curCorrectAns +/- 1.25% ).
                 // The default is 0.0125 (2^-3) because the binary system is happier with that.
@@ -325,7 +360,7 @@ function mainFunc($) {
 
                 // Clean text in the student's answer
                 const numRespToEvaluate = convertRespToNum(respToEvaluate);
-                const isCorrect = Math.abs(numRespToEvaluate - curCorrectAns) <= toleranceAmt; // must use <= to allow for 0 values
+                isCorrect = Math.abs(numRespToEvaluate - curCorrectAns) <= toleranceAmt; // must use <= to allow for 0 values
 
                 return isCorrect ? 1 : 0;
             }

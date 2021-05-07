@@ -1,0 +1,187 @@
+
+/*
+Styles that can be used by any of the Qualtrics surveys
+that have questions for students.
+I built this for the Final Exam in Sport Data Analytics (Spring 2021),
+but I probably should have built it long ago to use for the
+Sport Finance Problem Sets.
+
+It duplicates many of the styles from Blackboard_Omnistyle.css.
+
+*/
+
+/* Small print at the end of a paragraph */
+.small-text-below-paragraph{
+    font-size:0.8em;
+    margin-top: 0px;
+}
+
+.code-in-line{
+    font-family: 'Courier New', Courier, monospace;
+    color: rgb(37, 23, 124);
+}
+
+/* Aligns the image on the right side. 
+Text will wrap around on left until reaching the bottom of the image.
+Then, the text will extend under the image.
+Sample: <div><img class="wrap-on-left" /><p>Some text</p></div>
+*/
+.wrap-on-left{
+    float:right; 
+    margin: 10px 10px 20px 20px;
+}
+.wrap-on-right{
+    float:left; 
+    margin: 10px 20px 20px 10px;
+}
+
+
+/* Header for page of questions that uses this dataset */
+.dataset-name{
+    color:#1abc9c;
+}
+    .dataset-name.heading{
+        font-size:1.8em;
+        font-weight: bold;
+        margin-bottom: 1.5em;
+        line-height: 1.1;
+    }
+    .dataset-name.reminder{
+        font-size: 0.9;
+        margin: 20px auto;
+    }
+
+/* Background information to understand what is asked in the question */
+.BackgroundInfo{
+    font-size: 0.9em;
+    font-style: italic;
+    color: rgb(155, 100, 0);
+}
+
+/* Instructions to students on how to format the response for that question (e.g., decimal places) */
+.ResponseInstructions{
+    font-size: 0.8em;
+    font-style: italic;
+    color: grey;
+    margin-top: 10px;
+    line-height: 1.1;
+}
+
+/*
+################################### 
+          T A B L E
+
+    G e n e r i c  t a b l e
+        s t y l i n g 
+
+################################### 
+*/
+
+table.bdttable {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  table.bdttable td, table.bdttable th {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  .bdttable tr:nth-child(odd){background-color: #f2f2f2;}
+  
+  .bdttable tr:hover {background-color: #ddd;}
+  
+  .bdttable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #881c1c;
+    color: white;
+  }
+
+
+/*
+################################### 
+          A N S B O X
+
+    Styling the custom input boxes
+    created for student responses
+
+    Every box (input or select)
+    MUST have 'ansbox' as
+    a class (the jQuery code uses it),
+    so that's why it's part of all
+    the classes here.
+
+################################### 
+*/
+
+.ansbox {
+    max-width:95%;
+    margin-top: 20px;
+}
+
+    input.ansbox::placeholder{
+        color: darkgray;
+        font-size: 0.8em;
+    }
+
+    /* This class is used for styling AND to determine which student responses should NOT be sanitized */
+    .ansbox.excel-formula{
+        width:675px;
+        font-family: 'Lucida Console', Monaco, monospace;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ ############################
+ QUALTRICS: Custom nav buttons
+ (not sure if these are in use)
+ ############################
+*/
+
+
+.MyNavButtons{
+    align-items: flex-start;
+    font-size: 11pt;
+    cursor: pointer;
+    text-align: center;
+    -webkit-appearance: none;
+    background-color: rgb(136, 28, 28);
+    border-width: initial;
+    border-style: solid;
+    border-color: rgb(136, 28, 28);
+    border-radius: 4px;
+    padding: 8px 20px;
+    margin: 0px;
+    text-decoration: none;
+}
+
+#MyPrevButton{
+    float: left;
+    color: rgb(255, 255, 255);
+}
+#MyNextButton{
+    float: right;
+    color: rgb(255, 255, 255);
+}
+
+#MyNextButton:hover, #MyPrevButton:hover {
+    color: rgb(00,00,00);
+    background-color: rgb(193,168,117);
+  }

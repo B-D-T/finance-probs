@@ -29,7 +29,7 @@ function fnQues469 ($, objFromMain) {
                 ansIRR: capbudg.financeIRR(quesVars.varInvTL01)
             }
         };
-        const strNoIRRFound = `This code was unable to calculate a IRR for the investment`;
+        const strNoIRRFound = `This code was unable to calculate an IRR for the investment`;
         const displayVars = {
             dispIRRInv01: Number(calcVars.calcTheAns.ansIRR) ? udf.uRound(calcVars.calcTheAns.ansIRR,6) : strNoIRRFound
         };

@@ -56,9 +56,6 @@ but it probably can be useful in many other places too.  */
         font-size:0.8em;
     }
 
-.capbudg-variables-container *{
-    /* border: 1px solid red; */
-}
 .capbudg-variables-container{
     width: fit-content;
     padding-bottom: 15px;
@@ -136,7 +133,10 @@ but it probably can be useful in many other places too.  */
     background-color: transparent;
 }
 
-
+/*REMOVE THIS (after testing)
+IT'S PART OF OMNISTYLE NOW
+Small print at the end of a paragraph 
+*/
 .small-text-below-paragraph{
     font-size:0.8em;
     margin-top: 0px;
