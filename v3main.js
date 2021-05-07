@@ -441,7 +441,9 @@ console.log('objUniqueNames is',udf.logObj(objUniqueNames));
         let objQuesVarsActual = {};
         if (!IS_PRODUCTION) { return objVars; };
         $.each(objUniqueNames, function (theKey, valueFromQues) {
+console.log("About to go fetch " + theKey + " key in objUniqueNames:",valueFromQues);
             $.when(getEDValue(theKey)).then(function (edValue) {
+console.log("When I tried to fetch "+theKey+", this is what came back from getEDValue:",edValue);
                 if (edValue) {
                     // If the key exists within the embedded data, use that value
                     objQuesVarsActual[theKey] = edValue;
