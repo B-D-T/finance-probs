@@ -162,7 +162,8 @@ console.log(">> objCustomInputBoxStuSubmit is",objCustomInputBoxStuSubmit);
 
                     // Once the old data have been read into memory, append the results based on the student's responses
                     jQuery.when(getEDValue(strQuesVarsStorageKey))
-                    .then(function (edValue) {    
+                    .then(function (edValue) {
+console.log("Hey there. This is what came back from getEDValue(strQuesVarsStorageKey):",edValue);
                         let objQuesResp = JSON.parse(edValue);
 
                         // Student's submission(s) for the question
