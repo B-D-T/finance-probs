@@ -32,7 +32,8 @@ function mainFunc($) {
     // const setEDValue = (edKey, edValue) => Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue);
     function setEDValue(edKey, edValue) {
 console.log("Yo. Official setEDValue here. I'm about to write this key-value:",edKey,edValue);
-        return Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue);
+        $.when( Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue))
+        .then(()=>edValue);
     };
     // Fetches the stored variables for strQues####VarsStorage and returns them as a object
     function getEDValueForQues(edStorageKeyName) {
@@ -73,18 +74,21 @@ console.log("getEDValue("+edStorageKeyName+") returned",edValue);
         // This next line removes some of that white space.
         // It doesn't do much, but it's little easier on me; no one else ever knows the difference other than me when troubleshooting (or working with the data on the backend).
         $.each( objPageContent, function( theKey, theValue ) {
-            if (typeof theValue == "string") {theValue.replace(/\s\s\s|\t/g,'');}
-            // remove non-printable and other non-valid JSON chars
-            theValue = theValue.replace(/\\n/g, "\\n")
-                .replace(/\\'/g, "\\'")
-                .replace(/\\"/g, '\\"')
-                .replace(/\\&/g, "\\&")
-                .replace(/\\r/g, "\\r")
-                .replace(/\\t/g, "\\t")
-                .replace(/\\b/g, "\\b")
-                .replace(/\\f/g, "\\f");
-                theValue = theValue.replace(/[\u0000-\u0019]+/g,""); 
+            if (typeof theValue == "string") {
+                theValue = theValue.replace(/\s\s\s|\t/g,'');
+                // remove non-printable and other non-valid JSON chars
+                theValue = theValue.replace(/\\n/g, "\\n")
+                    .replace(/\\'/g, "\\'")
+                    .replace(/\\"/g, '\\"')
+                    .replace(/\\&/g, "\\&")
+                    .replace(/\\r/g, "\\r")
+                    .replace(/\\t/g, "\\t")
+                    .replace(/\\b/g, "\\b")
+                    .replace(/\\f/g, "\\f");
+                    theValue = theValue.replace(/[\u0000-\u0019]+/g,"");
+            };
         });
+
 
         // objPageContent is used to populate the HTML on the page itself. We also store it as part of the embedded data, even though it's wasteful to do so; I think it will make it easier to re-create student's questions for them after the fact or in other mediums (e.g., within Python)
         const divRoot = '#divQues' + self.quesNum;
