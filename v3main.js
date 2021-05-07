@@ -30,7 +30,7 @@ function mainFunc($) {
     const self = this;
     const getEDValue = (edKey) => Qualtrics.SurveyEngine.getEmbeddedData(edKey);
     // const setEDValue = (edKey, edValue) => Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue);
-    const setEDValue = function (edKey, edValue) {
+    function setEDValue(edKey, edValue) {
 console.log("Yo. Official setEDValue here. I'm about to write this key-value:",edKey,edValue);
         Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue)
     };
@@ -269,8 +269,8 @@ console.log("okay... here's what setEDValue is writing to ED (I hope):", strQues
             const strQuesVarsStorageKey = "strQues" + self.quesNum + "VarsStorage"; // strQues468VarsStorage
             const strQuesVarsStorageVal = JSON.stringify(objQuesResp);
 console.log(":::: Hi. I'm storeQuesRespVars. I'm about to write the following to "+strQuesVarsStorageKey+":", strQuesVarsStorageVal);
-            // 
             if (IS_PRODUCTION) {
+console.log("Yup, I'm really doing it. I'm going to send "+strQuesVarsStorageKey+" to setEDValue. Here I go!");
                 setEDValue(strQuesVarsStorageKey, strQuesVarsStorageVal);
             } else { console.log("No setEDValue for " + strQuesVarsStorageKey + ": " + strQuesVarsStorageVal) }
         }
@@ -456,7 +456,7 @@ console.log("When I tried to fetch "+theKey+", this is what came back from getED
                     // If the key does not exist within the ED, set it and return the same value that we started with
                     $.when(setEDValue(theKey, valueFromQues)).then(function () {
 console.log('objQuesVarsActual',udf.logObj(objQuesVarsActual));
-console.log(`setEDValue ran. Now objQuesVarsActual[theKey] = valueFromQues ---> objQuesVarsActual[${theKey}] = ${valueFromQues};`);
+// console.log(`setEDValue ran. Now objQuesVarsActual[theKey] = valueFromQues ---> objQuesVarsActual[${theKey}] = ${valueFromQues};`);
                         objQuesVarsActual[theKey] = valueFromQues;
                     });
                 };
@@ -475,7 +475,6 @@ console.log("I'm fetchStuRespAnsbox, and I'm running for question #"+self.quesNu
 
         
         let objStuRespAnsbox = {};
-console.log('I am trying to get strQuesVarsStorageKey: ', strQuesVarsStorageKey);
         
         if (!IS_PRODUCTION){return {}};
         jQuery.when(getEDValue(strQuesVarsStorageKey))
