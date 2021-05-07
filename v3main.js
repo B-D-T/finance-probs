@@ -36,9 +36,11 @@ console.log("Yo. Official setEDValue here. I'm about to write this key-value:",e
     };
     // Fetches the stored variables for strQues####VarsStorage and returns them as a object
     function getEDValueForQues(edStorageKeyName) {
+console.log("getEDValueForQues("+edStorageKeyName+") running.");
         $.when(getEDValue(edStorageKeyName))
         .then(function (edValue) {
-            const objEDStorageKey = jQuery.isEmptyObject(edValue) ? {} : JSON.parse(edStorageKeyName);
+console.log("getEDValue("+edStorageKeyName+") returned",edValue);
+            const objEDStorageKey = jQuery.isEmptyObject(edValue) ? {} : JSON.parse(edValue);
             return objEDStorageKey;
             });
     };
@@ -458,7 +460,7 @@ console.log("########## respPercCorrect received the following. stuResp:", stuRe
         // First, fetch the varsStorage variable and convert it to an object
         const strEDQuesVarStorageCode = "strQues"+self.quesNum+"VarsStorage";
         const objExistingEDforQues = getEDValueForQues(strEDQuesVarStorageCode);
-console.log('objExistingEDforQues', udf.logObj(objExistingEDforQues));
+console.log('objExistingEDforQues returned by getEDValueForQues:', udf.logObj(objExistingEDforQues));
         // If it comes back empty, that means we haven't stored anything yet and we should write the current question's variables.
         if (jQuery.isEmptyObject(objExistingEDforQues)) { // use new variables
             objQuesVarsActual = objVars;
