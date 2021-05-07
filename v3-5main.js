@@ -25,9 +25,7 @@ function quesNumGlobal() {
     }
 }
 // DELETE ME. FOR TESTING ONLY.
-if (IS_QUES_PAGE && IS_PRODUCTION){
 console.log("%%%%%%%%%%%% Checking up on strQues31423VarsStorage: %%%%%%%%%%% ", Qualtrics.SurveyEngine.getEmbeddedData("strQues31423VarsStorage"));
-}
 
 function mainFunc($) {
     "use strict";
