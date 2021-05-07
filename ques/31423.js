@@ -18,7 +18,9 @@ function fnQues31423 ($, objFromMain) {
         };
 
         const calcVars = {
-            calcTheAns: objAvgKillsByConf[quesVars.theConf] // number like 234.13, 334.20
+            calcTheAns = {
+                "ansStuResp": objAvgKillsByConf[quesVars.theConf]  // number like 234.13, 334.20
+            }
         };
 
         const displayVars = {
