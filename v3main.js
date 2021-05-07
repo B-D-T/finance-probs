@@ -34,6 +34,11 @@ function mainFunc($) {
 console.log("Yo. Official setEDValue here. I'm about to write this key-value:",edKey,edValue);
         return Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue);
     };
+    // Fetches the stored variables for strQues####VarsStorage and returns them as a object
+    function getEDValueForQues(edStorageKeyName) {
+        $.when(getEDValue(edStorageKeyName))
+        .then(function (edValue) {return JSON.parse(edStorageKeyName);})
+    };
 
     // Returns the question number as an integer, and sets the IS_QUES_PAGE variable
     // E.g., self.quesNum = 470
@@ -441,30 +446,53 @@ console.log("########## respPercCorrect received the following. stuResp:", stuRe
     // If the variable is already in the embedded data, we'll use that. Otherwise, the code stores the variable in the embedded data based on our definition.
     function fetchQuesVars(objVars, quesNum = self.quesNum) {
         // Change the values so they're unique before long-term storage by adding a prefix to variable names
-        const objUniqueNames = quesPrefix(objVars, quesNum, "include");
-console.log('objUniqueNames is',udf.logObj(objUniqueNames));
+        // const objUniqueNames = quesPrefix(objVars, quesNum, "include");
+// console.log('objUniqueNames is',udf.logObj(objUniqueNames));
         let objQuesVarsActual = {};
         if (!IS_PRODUCTION) { return objVars; };
-        $.each(objUniqueNames, function (theKey, valueFromQues) {
-console.log("About to go fetch " + theKey + " key in objUniqueNames. Here's what I think it is now, but that could be overwritten:",valueFromQues);
-            $.when(getEDValue(theKey)).then(function (edValue) {
-console.log("When I tried to fetch "+theKey+", this is what came back from getEDValue:",edValue);
-                if (edValue) {
-                    // If the key exists within the embedded data, use that value
-                    objQuesVarsActual[theKey] = edValue;
-                } else {
-                    // If the key does not exist within the ED, set it and return the same value that we started with
-                    $.when(setEDValue(theKey, valueFromQues)).then(function () {
-console.log('objQuesVarsActual',udf.logObj(objQuesVarsActual));
-// console.log(`setEDValue ran. Now objQuesVarsActual[theKey] = valueFromQues ---> objQuesVarsActual[${theKey}] = ${valueFromQues};`);
-                        objQuesVarsActual[theKey] = valueFromQues;
-                    });
-                };
+// 2021-05-07 I'm messing around here with objUniqueNames. I'm changing it to write & read ONLY from the strQues###VarsStorage variables. If I break everything, come back to the version before 20210508-0941.
+        // $.each(objUniqueNames, function (theKey, valueFromQues) {
+        // First, fetch the varsStorage variable and convert it to an object
+        const strEDQuesVarStorageCode = "strQues"+self.quesNum+"VarsStorage";
+        const objExistingEDforQues = getEDValueForQues(strEDQuesVarStorageCode);
+console.log('objExistingEDforQues', udf.logObj(objExistingEDforQues));
+        // If it comes back empty, that means we haven't stored anything yet and we should write the current question's variables.
+        if (jQuery.isEmptyObject(objExistingEDforQues)) { // use new variables
+            objQuesVarsActual = objVars;
+            return storeQuesRespVars(objVars, objVars.calcTheAns);
+        } else { // Use the existing variables
+            const objExistingEDQuesVars = objExistingEDforQues.objQuesVars;
+            $.each(objVars, function (theKey, valueFromQues) {
+                const newVal = objExistingEDQuesVars[theKey];
+console.log('newVal is',newVal, "and valueFromQues is",valueFromQues);
+                objQuesVarsActual[theKey] = newVal || valueFromQues; // valueFromQues is the same as objVars[theKey]
+console.log("Writing objQuesVarsActual["+theKey+"]:",objQuesVarsActual[theKey]);
             });
-        });
+        };
 
-        // Remove the prefixes and return the object with the correct values
-        return quesPrefix(objQuesVarsActual, quesNum, "remove");
+        return objQuesVarsActual;
+
+//        $.each(objVars, function (theKey, valueFromQues) {
+// console.log("About to go fetch " + theKey + " key in objVars. Here's what I think it is now, but that could be overwritten:",valueFromQues);
+//            $.when(getEDValue(theKey)).then(function (edValue) {
+// console.log("When I tried to fetch "+theKey+", this is what came back from getEDValue:",edValue);
+//                if (edValue) {
+//                  // If the key exists within the embedded data, use that value
+//                    objQuesVarsActual[theKey] = edValue;
+//              } else {
+//                  // If the key does not exist within the ED, set it and return the same value that we started with
+//                  $.when(setEDValue(theKey, valueFromQues)).then(function () {
+//console.log('objQuesVarsActual',udf.logObj(objQuesVarsActual));
+// console.log(`setEDValue ran. Now objQuesVarsActual[theKey] = valueFromQues ---> objQuesVarsActual[${theKey}] = ${valueFromQues};`);
+//                        objQuesVarsActual[theKey] = valueFromQues;
+//                    });
+//                };
+//            });
+//        });
+
+//        // Remove the prefixes and return the object with the correct values
+//        return quesPrefix(objQuesVarsActual, quesNum, "remove");
+
     }
 
     // If the student has values already in the embedded data, we'll pre-populate the boxes with those. Otherwise, we'll leave the boxes empty.
