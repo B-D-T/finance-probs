@@ -163,7 +163,7 @@ console.log('varsObj',udf.logObj(varsObj));
                     
                     // If the Qualtrics input box exists, pull the student's submitted answers from there.
                     // Otherwise, pull the submissions from the fields we create as part of the code (e.g., for the multipart capital budgeting problems).
-                    // Any field we create must be an 'input' element with a "data-ansboxkey" HTML attribute that is unique for that page (e.g., the same page cannot have two "ansIRR" boxes)
+                    // Any field we create must be an 'input' or 'select' element with a "data-ansboxkey" HTML attribute that is unique for that page (e.g., the same page cannot have two "ansIRR" boxes)
 
                     // Check if there is an input box with that id on the page.
                     // If it doesn't exist, qtrxInputBox returns null and we assume that the page only has our boxes.
@@ -342,16 +342,16 @@ console.log("thePercCorrect",thePercCorrect);
         // You can pass a number, string, or RegExp as the correctAns. E.g., const theRegex = new RegExp("^abc$", "ig"); respPercCorrect("ab", theRegex);
         function respPercCorrect(stuResp, correctAns, rawTolerance) {
 console.log("########## respPercCorrect received the following. stuResp:", stuResp, "correctAns:",correctAns);
-            if (typeof correctAns === "undefined" || isNaN(correctAns)){
-                console.log("No correct answer provided for question "+self.quesNum+". respPercCorrect returned 0, but you may need to double check the submission.");
-                return 0;
-            }
-
             // Return 0 if stuResp is null or empty (but allow stuResp = 0 to continue)
             if (stuResp === null || stuResp === "") { return 0; }
 
+            // If the correctAns is null, return 0 and log a msg in the console
+            if (isNullCorrectAns(correctAns)){return 0};
+
             // If this is only checking a single value, run the check and return 1/0
-            if (!Array.isArray(correctAns)) { return percCorrect(stuResp, correctAns, rawTolerance); }
+            if (!Array.isArray(correctAns)) {
+                return percCorrect(stuResp, correctAns, rawTolerance);
+            }
 
             let ptsPossible = 0;
             let ptsEarned = 0;
@@ -411,6 +411,31 @@ console.log("########## respPercCorrect received the following. stuResp:", stuRe
                 });
 
                 return parseFloat(resp);
+            }
+
+            
+            // Check for empty correct answers
+            function isNullCorrectAns(paramCorrectAns) {
+                let blnIsNullAns = false;
+                if (typeof paramCorrectAns === "undefined") {blnIsNullAns = true;}
+                if (!Array.isArray(paramCorrectAns)) {
+                    if (typeof paramCorrectAns === "object") {
+                        console.log("This is weird. isEmptyCorrectAns shouldn't see objects, since we convert them into arrays before passing to respPercCorrect.");
+                        blnIsNullAns = true;
+                    } else { // single value
+                        if (!parseFloat(paramCorrectAns)) { // is a string
+                            if (paramCorrectAns.toString().length === 0) { blnIsNullAns = true; }
+                        } else { // is a number
+                            if (isNaN(paramCorrectAns) || paramCorrectAns.toString().length === 0) { blnIsNullAns = true;}
+                        }
+                    }
+                } else { // array
+                    if (paramCorrectAns.length === 0) { blnIsNullAns = true;  }
+                }
+                if (blnIsNullAns) {
+                    console.log("No correct answer provided for question  + self.quesNum + . respPercCorrect returned 0, but you may need to double check the submission.");
+                }
+                return blnIsNullAns;
             }
         }
 
