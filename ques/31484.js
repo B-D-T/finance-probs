@@ -20,7 +20,7 @@ function fnQues31484 ($, objFromMain) {
         return udf.combineVarObjs(quesVars, calcVars, displayVars);
     }
 
-    this.pageContent = function(v, includeAnswers=false) {
+    this.pageContent = function(v) {
         let obj = {};
 
         obj.ansBoxMessage = udf.ansBoxMessages("decimalPlaces4");
@@ -39,8 +39,7 @@ function fnQues31484 ($, objFromMain) {
             <input
             class="ansbox" type="number"
             data-ansboxkey="ansStuResp"
-            placeholder="${obj.ansBoxMessage}"
-            value="${includeAnswers ? v.dispTheAns : ''}">
+            placeholder="${obj.ansBoxMessage}">
         </div>
 
         `;

@@ -18,7 +18,7 @@ function fnQues31531 ($, objFromMain) {
         return udf.combineVarObjs(quesVars, calcVars, displayVars);
     };
 
-    this.pageContent = function(v, includeAnswers=false) {
+    this.pageContent = function(v) {
         let obj = {};
 
         obj.ansBoxMessage = '';
@@ -40,7 +40,6 @@ function fnQues31531 ($, objFromMain) {
               and a kill is a type of point earned.
           </div>
         </div>
-
         `;
 
 
@@ -48,7 +47,7 @@ function fnQues31531 ($, objFromMain) {
 
         return obj;
 
-    } // end of pageContent
+    }; // end of pageContent
 
 }
 

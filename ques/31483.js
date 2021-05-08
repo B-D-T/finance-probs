@@ -18,9 +18,9 @@ function fnQues31483 ($, objFromMain) {
         };
 
         return udf.combineVarObjs(quesVars, calcVars, displayVars);
-    }
+    };
 
-    this.pageContent = function(v, includeAnswers=false) {
+    this.pageContent = function(v) {
         let obj = {};
 
         obj.ansBoxMessage = udf.ansBoxMessages();
@@ -38,8 +38,7 @@ function fnQues31483 ($, objFromMain) {
             <input
             class="ansbox" type="number"
             data-ansboxkey="ansStuResp"
-            placeholder="${obj.ansBoxMessage}"
-            value="${includeAnswers ? v.dispTheAns : ''}">
+            placeholder="${obj.ansBoxMessage}">
         </div>
 
         `;
@@ -53,7 +52,7 @@ function fnQues31483 ($, objFromMain) {
 
         return obj;
 
-    } // end of pageContent
+    }; // end of pageContent
 
 }
 

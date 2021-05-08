@@ -18,7 +18,7 @@ function fnQues31530 ($, objFromMain) {
         return udf.combineVarObjs(quesVars, calcVars, displayVars);
     }
 
-    this.pageContent = function(v, includeAnswers=false) {
+    this.pageContent = function(v) {
         let obj = {};
 
         obj.ansBoxMessage = udf.ansBoxMessages("excelFormulaNoEqualsSign");
@@ -49,8 +49,7 @@ function fnQues31530 ($, objFromMain) {
             <input
             class="ansbox excel-formula" type="text"
             data-ansboxkey="ansStuResp"
-            placeholder="${obj.ansBoxMessage}"
-            value="${includeAnswers ? 'Solutions vary' : ''}">
+            placeholder="${obj.ansBoxMessage}">
         </div>
         <div class="ResponseInstructions" style="margin-top:20px;">
             Do NOT include the equals sign at the start.

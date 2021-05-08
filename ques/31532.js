@@ -16,14 +16,16 @@ function fnQues31532 ($, objFromMain) {
         };
 
         const displayVars = {
-            strHTMLAnsChoices: udf.buildDropdownOptions(quesVars.aryConfs),
             dispTheAns: calcVars.calcTheAns.ansStuResp
         };
 
         return udf.combineVarObjs(quesVars, calcVars, displayVars);
-    }
+    };
 
-    this.pageContent = function(v, includeAnswers=false) {
+    this.pageContent = function(v) {
+
+        const strHTMLAnsChoices = udf.buildDropdownOptions(v.aryConfs);
+
         let obj = {};
 
         obj.ansBoxMessage = udf.ansBoxMessages("decimalPlaces4");
@@ -54,7 +56,7 @@ function fnQues31532 ($, objFromMain) {
             <select
               class="ansbox" id="stuRespSelect"
               data-ansboxkey="ansStuResp">     
-              ${v.strHTMLAnsChoices}  
+              ${strHTMLAnsChoices}  
             </select>
         </div>
         `;
@@ -68,7 +70,7 @@ function fnQues31532 ($, objFromMain) {
 
         return obj;
 
-    } // end of pageContent
+    }; // end of pageContent
 
 }
 

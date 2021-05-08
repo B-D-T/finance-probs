@@ -64,7 +64,7 @@ function UDFClass($, objFromMain) {
         rand += min;
         rand /= adjFactor;
         return rand;
-    }
+    };
 
     // Use scientific notation trick to improve rounding accuracy
     self.uRound = (value, decimals) => Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
@@ -97,9 +97,9 @@ function UDFClass($, objFromMain) {
             ansreminderDefault: "Enter your response carefully.", // Default text
         };
         // Return the default message if the caller asks for a non-existent key
-        const theKey = msgKeyToReturn in objAnsBoxMessages ? msgKeyToReturn : "ansreminderDefault"
+        const theKey = msgKeyToReturn in objAnsBoxMessages ? msgKeyToReturn : "ansreminderDefault";
         return objAnsBoxMessages[theKey];
-    }
+    };
 
     // This returns a text string of <option> values to build a <select> box.
     // The first parameter can be an object or array.
@@ -163,7 +163,7 @@ function UDFClass($, objFromMain) {
             try { return origPaybackPeriod(aryCashFlow); }
             catch (error) { return error.message; }
 
-        }
+        };
 
         function origIRR(aryCashFlow) {
             // https://github.com/ebradyjobory/finance.js#internal-rate-of-return-irrfinanceirrinitial-investment-cash-flows
@@ -196,7 +196,7 @@ function UDFClass($, objFromMain) {
         function seekZero(fn) {
             let x = 1;
             while (fn(x) > 0) { x += 1; }
-            while (fn(x) < 0) { x -= 0.01 }
+            while (fn(x) < 0) { x -= 0.01; }
             return x + 0.01;
         }
 
@@ -214,7 +214,7 @@ function UDFClass($, objFromMain) {
             // for uneven cash flows (I removed the section on even cash flows)
             let cumulativeCashFlow = aryCashFlow[0];
             let yearsCounter = 0;
-            for (i = 1; i <= aryCashFlow.length; i++) {
+            for (let i = 1; i <= aryCashFlow.length; i++) {
                 cumulativeCashFlow += aryCashFlow[i];
                 if (cumulativeCashFlow > 0) {
                     yearsCounter += Math.abs((cumulativeCashFlow - aryCashFlow[i]) / aryCashFlow[i]);
