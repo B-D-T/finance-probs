@@ -24,11 +24,11 @@ function fnQues31532 ($, objFromMain) {
 
     this.pageContent = function(v) {
 
-        const strHTMLAnsChoices = udf.buildDropdownOptions(v.aryConfs);
+        // const strHTMLAnsChoices = udf.buildDropdownOptions(v.aryConfs);
 
         let obj = {};
 
-        obj.ansBoxMessage = udf.ansBoxMessages("decimalPlaces4");
+        obj.ansBoxMessage = udf.ansBoxMessages("");
 
         obj.stem = `
         <div class="dataset-name heading">
@@ -45,21 +45,22 @@ function fnQues31532 ($, objFromMain) {
                 you want to find the conference with the most returning players.
             </p>
             <p>
-                Of the choices in the dropdown list below,
+                Of the choices shown here below,
                 which conference has the most
                 <b>non-seniors</b> on this year's list?
                 (Non-senior means the class is Jr., So., or Fr.)
             </p>
         </div>
         
-        <div class="resp">
-            <select
-              class="ansbox" id="stuRespSelect"
-              data-ansboxkey="ansStuResp">     
-              ${strHTMLAnsChoices}  
-            </select>
-        </div>
         `;
+
+        // <div class="resp">
+        //     <select
+        //     class="ansbox" id="stuRespSelect"
+        //     data-ansboxkey="ansStuResp">     
+        //     ${strHTMLAnsChoices}  
+        //     </select>
+        // </div>
 
 
         obj.solution = `

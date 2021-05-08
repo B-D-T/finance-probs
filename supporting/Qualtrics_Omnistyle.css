@@ -67,6 +67,11 @@ Sample: <div><img class="wrap-on-left" /><p>Some text</p></div>
     line-height: 1.1;
 }
 
+/* E.g., used for workbook formatting question where choices aren't needed (q31430z */
+.AnsNotApplicable{
+    color:grey;
+    text-decoration: line-through;
+}
 /*
 ################################### 
           T A B L E

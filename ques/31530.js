@@ -45,12 +45,6 @@ function fnQues31530 ($, objFromMain) {
                 Copy the formula you used and submit it below.
             </p>
         </div>
-        <div class="resp">
-            <input
-            class="ansbox excel-formula" type="text"
-            data-ansboxkey="ansStuResp"
-            placeholder="${obj.ansBoxMessage}">
-        </div>
         <div class="ResponseInstructions" style="margin-top:20px;">
             Do NOT include the equals sign at the start.
             E.g., write
@@ -63,6 +57,12 @@ function fnQues31530 ($, objFromMain) {
 
         `;
 
+        // <div class="resp">
+        // <input
+        // class="ansbox excel-formula" type="text"
+        // data-ansboxkey="ansStuResp"
+        // placeholder="${obj.ansBoxMessage}">
+        // </div>
 
         obj.solution = `
         <p>

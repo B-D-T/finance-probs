@@ -45,16 +45,17 @@ function fnQues31423 ($, objFromMain) {
             What is the average number of kills for players
             from the ${v.theConf} conference?
         </div>
-        
-        <div class="resp">
-            <input
-            class="ansbox" type="number"
-            data-ansboxkey="ansStuResp"
-            placeholder="${obj.ansBoxMessage}">
-        </div>
+
 
         `;
 
+                
+        // <div class="resp">
+        //     <input
+        //     class="ansbox" type="number"
+        //     data-ansboxkey="ansStuResp"
+        //     placeholder="${obj.ansBoxMessage}">
+        // </div>
 
         obj.solution = `
         <p>

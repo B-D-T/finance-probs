@@ -33,16 +33,16 @@ function fnQues31483 ($, objFromMain) {
         <div>
             How many different schools have players on this list?
         </div>
-        
-        <div class="resp">
-            <input
-            class="ansbox" type="number"
-            data-ansboxkey="ansStuResp"
-            placeholder="${obj.ansBoxMessage}">
-        </div>
+
 
         `;
-
+        
+        // <div class="resp">
+        //     <input
+        //     class="ansbox" type="number"
+        //     data-ansboxkey="ansStuResp"
+        //     placeholder="${obj.ansBoxMessage}">
+        // </div>
 
         obj.solution = `
         <p>

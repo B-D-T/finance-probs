@@ -34,16 +34,16 @@ function fnQues31484 ($, objFromMain) {
             What is the correlation between Height and Kills,
             assuming a linear relationship between the two variables?
         </div>
-        
-        <div class="resp">
-            <input
-            class="ansbox" type="number"
-            data-ansboxkey="ansStuResp"
-            placeholder="${obj.ansBoxMessage}">
-        </div>
 
         `;
-
+        
+                
+        // <div class="resp">
+        //     <input
+        //     class="ansbox" type="number"
+        //     data-ansboxkey="ansStuResp"
+        //     placeholder="${obj.ansBoxMessage}">
+        // </div>
 
         obj.solution = `
         <p>
