@@ -433,7 +433,7 @@ console.log("########## respPercCorrect received the following. stuResp:", stuRe
                     if (paramCorrectAns.length === 0) { blnIsNullAns = true;  }
                 }
                 if (blnIsNullAns) {
-                    console.log("No correct answer provided for question  + self.quesNum + . respPercCorrect returned 0, but you may need to double check the submission.");
+                    console.log("No correct answer provided for question " + self.quesNum + ". respPercCorrect returned 0, but you may need to double check the submission.");
                 }
                 return blnIsNullAns;
             }

@@ -2,6 +2,7 @@ function fnQues31423 ($, objFromMain) {
     "use strict";
 
     const udf = objFromMain.udf;
+    const capbudg = objFromMain.capbudg;
     
     this.defineVariables = function(){
         
@@ -12,25 +13,25 @@ function fnQues31423 ($, objFromMain) {
         const listConferences = Object.keys(objAvgKillsByConf);
 
         const quesVars = {
-            idxConfPosToReturn: udf.uRand(0, listConferences.length - 1, 1),
-            get theConf() { return listConferences[this.idxConfPosToReturn]} // string e.g., "Big 12", "SoCon"
+            "idxConfPosToReturn": udf.uRand(0, listConferences.length - 1, 1),
+            get theConf() { return listConferences[this.idxConfPosToReturn];} // string e.g., "Big 12", "SoCon"
         };
 
         const calcVars = {
-            calcTheAns: {
+            "calcTheAns": {
                 "ansStuResp": objAvgKillsByConf[quesVars.theConf]  // number like 234.13, 334.20
             }
         };
         const ansVars = calcVars.calcTheAns;
 
         const displayVars = {
-            dispTheAns: ansVars.ansStuResp.toFixed(4)
+            "dispTheAns": ansVars.ansStuResp.toFixed(4)
         };
 
         return udf.combineVarObjs(quesVars, calcVars, displayVars);
-    }
+    };
 
-    this.pageContent = function(v, includeAnswers=false) {
+    this.pageContent = function(v) {
         let obj = {};
 
         obj.ansBoxMessage = udf.ansBoxMessages("decimalPlaces2");
@@ -64,7 +65,7 @@ function fnQues31423 ($, objFromMain) {
 
         return obj;
 
-    } // end of pageContent
+    }; // end of pageContent
 
 }
 
