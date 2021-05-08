@@ -47,8 +47,11 @@ function fnQues31532 ($, objFromMain) {
             <p>
                 Of the choices shown here below,
                 which conference has the most
-                <b>non-seniors</b> on this year's list?
-                (Non-senior means the class is Jr., So., or Fr.)
+                <b>non-seniors</b> on this year's list?<br/>
+                <span class="small-text-below-paragraph">
+                    Non-senior means the class is Jr., So., or Fr.
+                We'll also assume that anyone whose class year
+                is unknown (--) is <i>not</i> a senior.</span>
             </p>
         </div>
         
