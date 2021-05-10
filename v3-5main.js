@@ -5,6 +5,9 @@
 if (typeof IS_PRODUCTION == 'undefined') {var IS_PRODUCTION = true;}
 IS_PRODUCTION = !window.Qualtrics === false;
 
+// Change this to true to turn on lots of console.log statements
+TROUBLESHOOTING_MODE = false;
+
 if (typeof IS_QUES_PAGE == 'undefined') {var IS_QUES_PAGE;}
 
 function quesNumGlobal() {
@@ -33,20 +36,20 @@ function mainFunc($) {
     const getEDValue = (edKey) => Qualtrics.SurveyEngine.getEmbeddedData(edKey);
     // const setEDValue = (edKey, edValue) => Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue);
     function setEDValue(edKey, edValue) {
-console.log("Yo. Official setEDValue here. I'm about to write this key-value:",edKey,edValue);
+    if (TROUBLESHOOTING_MODE) {console.log("Yo. Official setEDValue here. I'm about to write this key-value:",edKey,edValue);};
         $.when( Qualtrics.SurveyEngine.setEmbeddedData(edKey, edValue))
         .then(()=>{
-console.log(`Yo - still official setEDValue. Supposedly I did my job for ${edKey}.`);
+            if (TROUBLESHOOTING_MODE) {console.log(`Yo - still official setEDValue. Supposedly I did my job for ${edKey}.`);};
             return edValue;
         });
     };
     // Fetches the stored variables for strQues####VarsStorage and returns them as a object
     function getEDValueForQues(edStorageKeyName) {
-console.log("getEDValueForQues("+edStorageKeyName+") running.");
+        if (TROUBLESHOOTING_MODE){console.log("getEDValueForQues("+edStorageKeyName+") running.");};
         let objEDStorageKey={};
         $.when(getEDValue(edStorageKeyName))
         .then(function (edValue) {
-console.log("getEDValue("+edStorageKeyName+") returned",edValue);
+            if (TROUBLESHOOTING_MODE){console.log("getEDValue("+edStorageKeyName+") returned",edValue);};
             objEDStorageKey = jQuery.isEmptyObject(edValue) ? {} : JSON.parse(edValue);
             return objEDStorageKey;
             });
@@ -106,11 +109,11 @@ console.log("getEDValue("+edStorageKeyName+") returned",edValue);
         const aryAnsboxKeys = $(divRoot + '-stem input, ' + divRoot + '-stem select').map(function() {
             return jQuery(this).data('ansboxkey'); 
         }).get();
-console.log('aryAnsboxKeys', aryAnsboxKeys);
+        if (TROUBLESHOOTING_MODE){console.log('aryAnsboxKeys', aryAnsboxKeys);};
         // Pre-populate the boxes if the student has already submitted answers, clicks off, and then clicks back to this question again
         // Fetch an object with the student's previous responses to this question
         const objStuRespAnsbox = fetchStuRespAnsbox(aryAnsboxKeys);
-console.log('fetchStuRespAnsbox returned objStuRespAnsbox as',udf.logObj(objStuRespAnsbox) );
+        if (TROUBLESHOOTING_MODE){console.log('fetchStuRespAnsbox returned objStuRespAnsbox as',udf.logObj(objStuRespAnsbox) );};
         // If the object comes back empty, do nothing. Otherwise, populate the answer boxes with the student's submissions.
         if (jQuery.isEmptyObject(objStuRespAnsbox)) {
             // Do nothing
@@ -130,15 +133,13 @@ console.log('fetchStuRespAnsbox returned objStuRespAnsbox as',udf.logObj(objStuR
             // Returned true, which means it did NOT find the response DIV.
             // Thus, we know this is a Question page and we want to write variables from it to Qualtrics embedded data. 
 
-// console.log('varsObj:', varsObj);
-
             if (IS_PRODUCTION) {
 
                 // Store the existing variables and question HTML as a stringified JSON variable (e.g., strQues468VarsStorage) in Qualtrics embedded data
                 // Later, when the page is submitted, we'll append the student's submission(s) to this variable.
                 let ansToStore = (typeof(varsObj)==="undefined") ? "n/a" : varsObj.calcTheAns;
 
-console.log('varsObj',udf.logObj(varsObj));
+                if (TROUBLESHOOTING_MODE){console.log('varsObj',udf.logObj(varsObj));};
                 storeQuesRespVars(varsObj, ansToStore, objPageContent);
 
                 // addOnPageSubmit is a Qualtrics function that accepts an optional parameter called 'type' (which we call 'submitType'). https://s.qualtrics.com/WRAPI/QuestionAPI/classes/Qualtrics%20JavaScript%20Question%20API.html#method_addOnPageSubmit
@@ -191,7 +192,7 @@ console.log('varsObj',udf.logObj(varsObj));
                         // There is NOT a Qualtrics input box on that page. In that case, we'll only look at our boxes (input and select).
 
                         const objCustomInputBoxStuSubmit = createCustomInputBoxStuSubmit(varsObj, aryAnsboxKeys);
-console.log(">> objCustomInputBoxStuSubmit is",objCustomInputBoxStuSubmit);
+                        if (TROUBLESHOOTING_MODE){console.log(">> objCustomInputBoxStuSubmit is",objCustomInputBoxStuSubmit);};
                         objStuResp = objCustomInputBoxStuSubmit.stuRespObject;
                         objCorrectAns = objCustomInputBoxStuSubmit.correctAnsObject;
                         percCorrect = objCustomInputBoxStuSubmit.thePercCorrect;
@@ -206,7 +207,7 @@ console.log(">> objCustomInputBoxStuSubmit is",objCustomInputBoxStuSubmit);
                     // Once the old data have been read into memory, append the results based on the student's responses
                     jQuery.when(getEDValue(strQuesVarsStorageKey))
                     .then(function (edValue) {
-console.log("Hey there. This is what came back from getEDValue(strQuesVarsStorageKey):",edValue);
+                        if (TROUBLESHOOTING_MODE){console.log("Hey there. This is what came back from getEDValue(strQuesVarsStorageKey):",edValue);};
                         let objQuesResp = JSON.parse(edValue);
 
                         // Student's submission(s) for the question
@@ -219,16 +220,16 @@ console.log("Hey there. This is what came back from getEDValue(strQuesVarsStorag
 
                         // Store feedback that will be shown to user when they see the Solution
                         objQuesResp["respFeedback"] = feedbackToShow(objQuesResp);
-console.log('****This is what will be written back into the embedded data for '+strQuesVarsStorageKey+' after student submits (in theory):', udf.logObj(objQuesResp));
+                        if (TROUBLESHOOTING_MODE){console.log('****This is what will be written back into the embedded data for '+strQuesVarsStorageKey+' after student submits (in theory):', udf.logObj(objQuesResp));};
                         const strQuesRespED = JSON.stringify(objQuesResp);
                         return strQuesRespED;
                     })
                     .done(function(strQuesRespED){
                         // Write quesResp to Embedded Data (assuming we're in production, although I don't think this function ever gets called during testing anyway).
-//  console.log("okay... here's what setEDValue is writing to ED (I hope):", strQuesRespED);
+                        if (TROUBLESHOOTING_MODE){console.log("okay... here's what setEDValue is writing to ED (I hope):", strQuesRespED);};
                         $.when( setEDValue(strQuesVarsStorageKey,strQuesRespED) )
                         .then( ()=> {
-console.log(`Before I left the page, I wrote ${strQuesVarsStorageKey} to ED. Or tried to, anyway.`);
+                            if (TROUBLESHOOTING_MODE){console.log(`Before I left the page, I wrote ${strQuesVarsStorageKey} to ED. Or tried to, anyway.`);};
                             return "Leaving page.";
                         });
                     });
@@ -238,7 +239,7 @@ console.log(`Before I left the page, I wrote ${strQuesVarsStorageKey} to ED. Or 
                 let objStuResp={}; let objCorrectAns={}; let percCorrect=0;
                 const objCustomInputBoxStuSubmit = createCustomInputBoxStuSubmit(varsObj, aryAnsboxKeys);
                 objStuResp = objCustomInputBoxStuSubmit.stuRespObject; objCorrectAns = objCustomInputBoxStuSubmit.correctAnsObject; percCorrect = objCustomInputBoxStuSubmit.thePercCorrect;
-                console.log('objStuResp',objStuResp); console.log('objCorrectAns',objCorrectAns); console.log('percCorrect',percCorrect);
+                if (TROUBLESHOOTING_MODE){console.log('objStuResp',objStuResp); console.log('objCorrectAns',objCorrectAns); console.log('percCorrect',percCorrect);};
             };
         } else { // This is a Solution page
             let strFeedback='';
@@ -325,7 +326,7 @@ console.log(`Before I left the page, I wrote ${strQuesVarsStorageKey} to ED. Or 
                 // If the input/select box is empty, return a 0
                 return !sanitizedStuResp ? 0 : sanitizedStuResp;
             });
-//console.log('createCustomInputBoxStuSubmit has aryStuSubmissions as', aryStuSubmissions);
+            if (TROUBLESHOOTING_MODE){console.log('createCustomInputBoxStuSubmit has aryStuSubmissions as', aryStuSubmissions);};
 
             // Convert two arrays into an object of key:value pairs where the finance variables are the keys and other info are the values (e.g., the student's responses) 
             const stuRespObject = Object.fromEntries(aryAnsboxKeys.map((_, idx) => [aryAnsboxKeys[idx], aryStuSubmissions[idx]]));
@@ -334,19 +335,19 @@ console.log(`Before I left the page, I wrote ${strQuesVarsStorageKey} to ED. Or 
             // Determine points earned for the question.
             // Each part of the question (i.e., ansbox) is worth the same amount; e.g., if there are 4 ansbox input spaces, each is worth 25% of the question overall.
             const thePercCorrect = respPercCorrect(aryStuSubmissions, aryCorrectAnswers);
-console.log("thePercCorrect",thePercCorrect);
+            if (TROUBLESHOOTING_MODE){console.log("thePercCorrect",thePercCorrect);};
             return {stuRespObject, correctAnsObject, thePercCorrect};
         };
 
         // Pass a single submission (and answer) to check or pass arrays of submissions (and correct answers).
         // You can pass a number, string, or RegExp as the correctAns. E.g., const theRegex = new RegExp("^abc$", "ig"); respPercCorrect("ab", theRegex);
         function respPercCorrect(stuResp, correctAns, rawTolerance) {
-console.log("########## respPercCorrect received the following. stuResp:", stuResp, "correctAns:",correctAns);
+            if (TROUBLESHOOTING_MODE){console.log("########## respPercCorrect received the following. stuResp:", stuResp, "correctAns:",correctAns);}
             // Return 0 if stuResp is null or empty (but allow stuResp = 0 to continue)
             if (stuResp === null || stuResp === "") { return 0; }
 
             // If the correctAns is null, return 0 and log a msg in the console
-            if (isNullCorrectAns(correctAns)){return 0};
+            if (isNullCorrectAns(correctAns)){return 0;};
 
             // If this is only checking a single value, run the check and return 1/0
             if (!Array.isArray(correctAns)) {
@@ -497,7 +498,7 @@ console.log("########## respPercCorrect received the following. stuResp:", stuRe
     function fetchQuesVars(objVars, quesNum = self.quesNum) {
         // Change the values so they're unique before long-term storage by adding a prefix to variable names
         // const objUniqueNames = quesPrefix(objVars, quesNum, "include");
-// console.log('objUniqueNames is',udf.logObj(objUniqueNames));
+        if (TROUBLESHOOTING_MODE){console.log('objUniqueNames is',udf.logObj(objUniqueNames));};
         let objQuesVarsActual = {};
         if (!IS_PRODUCTION) { return objVars; };
 // 2021-05-07 I'm messing around here with objUniqueNames. I'm changing it to write & read ONLY from the strQues###VarsStorage variables. If I break everything, come back to the version before 20210508-0941.
@@ -505,19 +506,19 @@ console.log("########## respPercCorrect received the following. stuResp:", stuRe
         // First, fetch the varsStorage variable and convert it to an object
         const strEDQuesVarStorageCode = "strQues"+quesNum+"VarsStorage";
         const objExistingEDforQues = getEDValueForQues(strEDQuesVarStorageCode);
-console.log('objExistingEDforQues returned by getEDValueForQues:', udf.logObj(objExistingEDforQues));
+        if (TROUBLESHOOTING_MODE){console.log('objExistingEDforQues returned by getEDValueForQues:', udf.logObj(objExistingEDforQues));};
         // If it comes back empty, that means we haven't stored anything yet and we should write the current question's variables.
         if (jQuery.isEmptyObject(objExistingEDforQues)) { // use new variables
             objQuesVarsActual = objVars;
             const storeTheVars = storeQuesRespVars(objVars, objVars.calcTheAns); // I don't need storeTheVars as a variable
-console.log('storeTheVars',storeTheVars);
+            if (TROUBLESHOOTING_MODE){console.log('storeTheVars',storeTheVars);};
         } else { // Use the existing variables
             const objExistingEDQuesVars = objExistingEDforQues.objQuesVars;
             $.each(objVars, function (theKey, valueFromQues) {
                 const newVal = objExistingEDQuesVars[theKey];
-console.log('newVal is',newVal, "and valueFromQues is",valueFromQues);
+                if (TROUBLESHOOTING_MODE){console.log('newVal is',newVal, "and valueFromQues is",valueFromQues);};
                 objQuesVarsActual[theKey] = newVal || valueFromQues; // valueFromQues is the same as objVars[theKey]
-console.log("Writing objQuesVarsActual["+theKey+"]:",objQuesVarsActual[theKey]);
+                if (TROUBLESHOOTING_MODE){console.log("Writing objQuesVarsActual["+theKey+"]:",objQuesVarsActual[theKey]);};
             });
         };
 
@@ -560,7 +561,7 @@ console.log("Writing objQuesVarsActual["+theKey+"]:",objQuesVarsActual[theKey]);
         const strQuesVarsStorageVal = JSON.stringify(objQuesResp);
 
         if (IS_PRODUCTION) {
-console.log("Yup, I'm really doing it. I'm going to send "+strQuesVarsStorageKey+" to setEDValue::", strQuesVarsStorageVal);
+            if (TROUBLESHOOTING_MODE){console.log("Yup, I'm really doing it. I'm going to send "+strQuesVarsStorageKey+" to setEDValue::", strQuesVarsStorageVal);};
             $.when( setEDValue(strQuesVarsStorageKey, strQuesVarsStorageVal) )
             .then(()=>`${strQuesVarsStorageKey} has been written, in theory anyway}`);
         } else { console.log("No setEDValue for " + strQuesVarsStorageKey + ": " + strQuesVarsStorageVal); }
@@ -568,10 +569,10 @@ console.log("Yup, I'm really doing it. I'm going to send "+strQuesVarsStorageKey
 
     // If the student has values already in the embedded data, we'll pre-populate the boxes with those. Otherwise, we'll leave the boxes empty.
     function fetchStuRespAnsbox(aryAnsboxKeys) {
-console.log("I'm fetchStuRespAnsbox, and I'm running for question #"+self.quesNum+" with aryAnsboxKeys as",aryAnsboxKeys);
+        if (TROUBLESHOOTING_MODE){console.log("I'm fetchStuRespAnsbox, and I'm running for question #"+self.quesNum+" with aryAnsboxKeys as",aryAnsboxKeys);};
         // If there aren't any ansboxkeys, just return an empty object
         if (!aryAnsboxKeys || aryAnsboxKeys.length===0) {
-console.log("There were no ansboxkeys for "+self.quesNum+", so fetchStuRespAnsbox is returning an empty object.");
+            if (TROUBLESHOOTING_MODE){console.log("There were no ansboxkeys for "+self.quesNum+", so fetchStuRespAnsbox is returning an empty object.");};
             return {};
         };
 
@@ -584,15 +585,15 @@ console.log("There were no ansboxkeys for "+self.quesNum+", so fetchStuRespAnsbo
         if (!IS_PRODUCTION){return {};};
         jQuery.when(getEDValue(strQuesVarsStorageKey))
         .then(function (edValue) {
-console.log('Here is edValue', edValue);
+            if (TROUBLESHOOTING_MODE){console.log('Here is edValue', edValue);};
             // The storage key doesn't exist the first time the page is loaded, so we'll return an empty object
             if (!edValue) { 
-console.log("It appears that the storage key "+strQuesVarsStorageKey+" doesn't exist, so fetchStuRespAnsbox returns an empty object to objStuRespAnsbox.");
+                if (TROUBLESHOOTING_MODE){console.log("It appears that the storage key "+strQuesVarsStorageKey+" doesn't exist, so fetchStuRespAnsbox returns an empty object to objStuRespAnsbox.");};
                 return {};
             };
 
             const objQuesResp = JSON.parse(edValue);
-console.log('******** objQuesResp returned from embedded data is', udf.logObj(objQuesResp));
+            if (TROUBLESHOOTING_MODE){console.log('******** objQuesResp returned from embedded data is', udf.logObj(objQuesResp));};
             // Student's submission(s) for the question
             const objStuResp = objQuesResp["objStuResp"];
 
@@ -601,7 +602,7 @@ console.log('******** objQuesResp returned from embedded data is', udf.logObj(ob
                 return {};
             } else {
                 jQuery.each(aryAnsboxKeys, function (idx, strAnsboxKey) {
-console.log("Running for ", strAnsboxKey);
+                    if (TROUBLESHOOTING_MODE){console.log("Running for ", strAnsboxKey);};
                     const origRespFromED = objStuResp[strAnsboxKey];
                     let respFromED = parseFloat(origRespFromED);
                     // If parse throws an error, we assume the student response is text
@@ -624,8 +625,7 @@ console.log("Running for ", strAnsboxKey);
             };
         })
         .done(()=>{return objStuRespAnsbox;});
-
-// console.log('This is objStuRespAnsbox being returned from fetchStuRespAnsbox', udf.logObj(objStuRespAnsbox));
+        if (TROUBLESHOOTING_MODE){console.log('This is objStuRespAnsbox being returned from fetchStuRespAnsbox', udf.logObj(objStuRespAnsbox));};
         return objStuRespAnsbox;
     }
 
