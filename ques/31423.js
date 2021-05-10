@@ -13,7 +13,8 @@ function fnQues31423 ($, objFromMain) {
         const listConferences = Object.keys(objAvgKillsByConf);
 
         const quesVars = {
-            "idxConfPosToReturn": udf.uRand(0, listConferences.length - 1, 1),
+            // I made this fixed because I couldn't get Qualtrics to populate with the student's specific answer.
+            "idxConfPosToReturn": 2, // udf.uRand(0, listConferences.length - 1, 1),
             get theConf() { return listConferences[this.idxConfPosToReturn];} // string e.g., "Big 12", "SoCon"
         };
 
