@@ -40,7 +40,7 @@ function fnQues472(objFromMainQues) {
                 A company offers an annual dividend of \$dispPMT per share.
                 What would you pay today for one share,
                 assuming a discount rate of dispRatePerc% and that 
-                you will receive the first dividend payment until a year from now?
+                you will receive the first dividend payment a year from now?
             </p>
         `;
 
