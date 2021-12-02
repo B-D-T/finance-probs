@@ -225,6 +225,7 @@ function UDFClass($, objFromMain) {
                 if (cumulativeCashFlow > 0) {
                     yearsCounter += Math.abs((cumulativeCashFlow - aryCashFlow[i]) / aryCashFlow[i]);
                     paybackPeriod = yearsCounter;
+                    break;
                 } else {
                     yearsCounter++;
                 }
