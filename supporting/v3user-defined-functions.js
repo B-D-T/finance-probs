@@ -211,18 +211,25 @@ function UDFClass($, objFromMain) {
             // e.g., If number of periods is 5, initial investment is -$50, and the cash flows are $10, $13, $16, $19, and $22 for each year, the payback period is 3.42 years.
             //  finance.PP(5, -50, 10, 13, 16, 19, 22);  => 3.42
 
+            // If the cumulativeCashFlow never turns positive before the yearsCounter reaches the number of periods,
+            // the payback period is undefined (i.e., the investment never pays back).
+            // In this case, this function will return 0 as the payback period.
+            // Thus, whatever calls this function needs to handle the 0 return value.
+
             // for uneven cash flows (I removed the section on even cash flows)
             let cumulativeCashFlow = aryCashFlow[0];
+            let paybackPeriod = 0;
             let yearsCounter = 0;
             for (let i = 1; i <= aryCashFlow.length; i++) {
                 cumulativeCashFlow += aryCashFlow[i];
                 if (cumulativeCashFlow > 0) {
                     yearsCounter += Math.abs((cumulativeCashFlow - aryCashFlow[i]) / aryCashFlow[i]);
-                    return yearsCounter;
+                    paybackPeriod = yearsCounter;
                 } else {
                     yearsCounter++;
                 }
-            }
+            };
+            return paybackPeriod;
         };
 
     };
