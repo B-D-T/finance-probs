@@ -1,3 +1,4 @@
+/* eslint-disable no-extend-native */
 
 // // Treating it as an object works.
 // //In main.js, I run the following:
@@ -17,236 +18,231 @@
 // })();
 // // In udf.js, put the following:
 // function UDFClass($){ this.poodleFunc = (arg) => poodleCall(arg); }
-// function poodleCall(arg){ 
+// function poodleCall(arg){
 //     const $divStem = $('#divQues470-stem');
-//     $divStem.html('poodle'+arg); 
+//     $divStem.html('poodle'+arg);
 //     return 'It is done';
 // }
 // console.log('v3user-defined-functions.js loaded');
 
-function UDFClass($, objFromMain) {
-    const self = this;
-    self.quesNum = quesNumGlobal();
+function UDFClass ($, objFromMain) {
+  const self = this;
+  self.quesNum = quesNumGlobal();
 
-
-    // This add a global method to all numbers for formatting.
-    // To use, append .$$() to the end of a number variable.
-    // E.g., varPV.$$, or varPV.$$(whatever arguments you want)
-    Number.prototype.$$ = function ({minDecimals=0, maxDecimals=2, strRegion="en-US", strCurrency="USD"}={}){
-        // Get primitive copy of number
-        let myNum= this.valueOf();
-        // If only one argument is passed, assume that it's the number of decimals
-        // E.g., varPV.$$(2) means I want 2 decimal places and all other default formatting
-        if (arguments.length==1 && typeof arguments[0] != "object"){
-            minDecimals=arguments[0]; maxDecimals=arguments[0];
-        }
-        // Return modified copy of number using given parameters
-        return myNum.toLocaleString(strRegion, {
-            "style": "currency", "currency": strCurrency,
-            "minimumFractionDigits": minDecimals, "maximumFractionDigits": maxDecimals
-        });
-    };
-
-    // Generate a random number between two numbers
-    self.uRand = function (min, max, step) {
-        if (arguments.length < 2) { max = min; min = 0; }
-        if (!step) { step = 1; }
-        // The adjFactor is to account for computers' binary adding problem. It multiplies at first and divides at the end.
-        const adjFactor = countDecimals(step) === 0 ? 1 : parseInt(1 + "0".repeat(countDecimals(step)));
-        min *= adjFactor; max *= adjFactor; step *= adjFactor;
-
-        const delta = max + step - min; // allows for max to be inclusive
-        const range = delta / step;
-        let rand;
-        rand = Math.random() * range;
-        rand = Math.floor(rand);
-        rand *= step;
-        rand += min;
-        rand /= adjFactor;
-        return rand;
-    };
-
-    // Use scientific notation trick to improve rounding accuracy
-    self.uRound = (value, decimals) => Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
-
-    function countDecimals(value) {
-        if (Math.floor(value) === value) return 0;
-        return value.toString().split(".")[1].length || 0;
+  // This add a global method to all numbers for formatting.
+  // To use, append .$$() to the end of a number variable.
+  // E.g., varPV.$$, or varPV.$$(whatever arguments you want)
+  Number.prototype.$$ = function ({ minDecimals = 0, maxDecimals = 2, strRegion = "en-US", strCurrency = "USD" } = {}) {
+    // Get primitive copy of number
+    let myNum = this.valueOf();
+    // If only one argument is passed, assume that it's the number of decimals
+    // E.g., varPV.$$(2) means I want 2 decimal places and all other default formatting
+    if (arguments.length === 1 && typeof arguments[0] !== "object") {
+      minDecimals = arguments[0]; maxDecimals = arguments[0];
     }
+    // Return modified copy of number using given parameters
+    return myNum.toLocaleString(strRegion, {
+      "style": "currency",
+      "currency": strCurrency,
+      "minimumFractionDigits": minDecimals,
+      "maximumFractionDigits": maxDecimals
+    });
+  };
 
-    // Receives multiple objects as arguments.
-    // Using the first object as starting place, it appends key:value pairs from the subsequent objects to the first object, returning a bigger version of the first object (i.e., with the key:value pairs from all the other objects, too)
-    self.combineVarObjs = (...args) => $.extend(...args);
+  // Generate a random number between two numbers
+  self.uRand = function (min, max, step) {
+    if (arguments.length < 2) { max = min; min = 0; }
+    if (!step) { step = 1; }
+    // The adjFactor is to account for computers' binary adding problem. It multiplies at first and divides at the end.
+    const adjFactor = countDecimals(step) === 0 ? 1 : parseInt(1 + "0".repeat(countDecimals(step)));
+    min *= adjFactor; max *= adjFactor; step *= adjFactor;
 
-    self.ansBoxMessages = function (msgKeyToReturn) {
-        const objAnsBoxMessages = {
-            percAsDecimal: "Submit answer as a decimal. E.g., 65.4321% would be 0.654321",
-            decimalPlaces0: "Decimals are optional. You can round to nearest integer, though decimals are okay too",
-            decimalPlaces2: "Include at least 2 decimal places in your answer",
-            decimalPlaces4: "Include at least 4 decimal places in your answer",
-            writeOutNums: "Write out numbers. E.g., write 12500000; don't write: '12.5'; '12.5 million'; 12,500,000; etc.",
-            excelFormulaNoEqualsSign: "Do NOT include the equals sign at the start. Eg, write SUM(1,2) not \=SUM(1,2)",
-            copyPasteFromWord: "Write your response in Word, then copy-paste into here",
+    const delta = max + step - min; // allows for max to be inclusive
+    const range = delta / step;
+    let rand;
+    rand = Math.random() * range;
+    rand = Math.floor(rand);
+    rand *= step;
+    rand += min;
+    rand /= adjFactor;
+    return rand;
+  };
 
-            usePositiveIfAnsCouldBePosOrNeg: `<p>
+  // Use scientific notation trick to improve rounding accuracy
+  self.uRound = (value, decimals) => Number(Math.round(value + "e" + decimals) + "e-" + decimals);
+
+  function countDecimals (value) {
+    if (Math.floor(value) === value) return 0;
+    return value.toString().split(".")[1].length || 0;
+  }
+
+  // Receives multiple objects as arguments.
+  // Using the first object as starting place, it appends key:value pairs from the subsequent objects to the first object, returning a bigger version of the first object (i.e., with the key:value pairs from all the other objects, too)
+  self.combineVarObjs = (...args) => $.extend(...args);
+
+  self.ansBoxMessages = function (msgKeyToReturn) {
+    const objAnsBoxMessages = {
+      percAsDecimal: "Submit answer as a decimal. E.g., 65.4321% would be 0.654321",
+      decimalPlaces0: "Decimals are optional. You can round to nearest integer, though decimals are okay too",
+      decimalPlaces2: "Include at least 2 decimal places in your answer",
+      decimalPlaces4: "Include at least 4 decimal places in your answer",
+      writeOutNums: "Write out numbers. E.g., write 12500000; don't write: '12.5'; '12.5 million'; 12,500,000; etc.",
+      excelFormulaNoEqualsSign: "Do NOT include the equals sign at the start. Eg, write SUM(1,2) not \=SUM(1,2)",
+      copyPasteFromWord: "Write your response in Word, then copy-paste into here",
+
+      usePositiveIfAnsCouldBePosOrNeg: `<p>
                 If the solution could be a positive or negative value,
                 just put the positive number.<br>
                 E.g., \\(x=\\sqrt{9}\\) could be \\(-3\\) or \\(+3\\);
                 your answer should just be \\(3\\).
                 </p>`,
-            ansreminderDefault: "Enter your response carefully.", // Default text
-        };
-        // Return the default message if the caller asks for a non-existent key
-        const theKey = msgKeyToReturn in objAnsBoxMessages ? msgKeyToReturn : "ansreminderDefault";
-        return objAnsBoxMessages[theKey];
+      ansreminderDefault: "Enter your response carefully.", // Default text
+    };
+    // Return the default message if the caller asks for a non-existent key
+    const theKey = msgKeyToReturn in objAnsBoxMessages ? msgKeyToReturn : "ansreminderDefault";
+    return objAnsBoxMessages[theKey];
+  };
+
+  // This returns a text string of <option> values to build a <select> box.
+  // The first parameter can be an object or array.
+  self.buildDropdownOptions = function (paramOptions, blnShowTopBlank = true) {
+
+    // If the visible choice should be empty, start by putting a blank
+    const aryOptionValues = blnShowTopBlank ? ["emptyspace"] : [];
+    const aryOptionHTMLs = blnShowTopBlank ? [""] : [];
+
+    // Check if input parameter is an array or an object
+    if (Array.isArray(paramOptions)) {
+      // If paramOptions is an array, set the option 'value' and the HTML to be the same thing
+      jQuery.each(paramOptions, function (idx, curAryElement) {
+        aryOptionValues.push(curAryElement);
+        aryOptionHTMLs.push(curAryElement);
+      });
+    } else { // it's an object
+      // If paramOptions is an object, the keys are the 'value' attribute in the option tag and the object's values are the visible HTML
+      jQuery.each(paramOptions, function (k, v) {
+        aryOptionValues.push(k);
+        aryOptionHTMLs.push(v);
+      });
+    }
+
+    let strOptionsHTML = '';
+    jQuery.each(aryOptionValues, function (idx) {
+      const theOptionVal = aryOptionValues[idx];
+      const theOptionHTML = aryOptionHTMLs[idx];
+      strOptionsHTML += `<option value="${theOptionVal}">${theOptionHTML}</option>`;
+    });
+
+    return strOptionsHTML;
+  };
+
+  // When you use console . log( someObj), it passes a REFERENCE to someObj.
+  // That means someObj will change as the code is running, and by the time you look at it,
+  // it will have the final values. If you want to see the object AT THE TIME the line of code happens,
+  // you need to use something like this: console . log("Here's the obj right now:", logObj(theObject) );
+  self.logObj = function (someObj) {
+    return jQuery.isEmptyObject(someObj) ? {} : JSON.parse(JSON.stringify(someObj));
+  };
+
+
+
+
+  // $$$$$$$$$$$$$$$$$$$$$$$$$
+  // FINANCEJS FUNCTIONS
+  // $$$$$$$$$$$$$$$$$$$$$$$$$
+  // I couldn't figure out how to use the financejs module, so I just copied the code I needed into here.
+  // I tweak a few things (probably making them worse), so all credit goes to https://github.com/ebradyjobory/finance.js
+
+  // Internal Rate of Return (IRR)
+  // finance.IRR(initial investment, [cash flows]);
+  self.financejs = function () {
+    this.IRR = (aryCashFlow) => {
+      try { return origIRR(aryCashFlow); }
+      catch (error) { return error.message; }
+    };
+    this.PaybackPeriod = (aryCashFlow) => {
+      try {
+        return origPaybackPeriod(aryCashFlow);
+      } catch (error) { return error.message; }
     };
 
-    // This returns a text string of <option> values to build a <select> box.
-    // The first parameter can be an object or array.
-    self.buildDropdownOptions = function (paramOptions, blnShowTopBlank = true){
+    function origIRR (aryCashFlow) {
+      // https://github.com/ebradyjobory/finance.js#internal-rate-of-return-irrfinanceirrinitial-investment-cash-flows
 
-        // If the visible choice should be empty, start by putting a blank
-        let aryOptionValues = blnShowTopBlank ? ['emptyspace'] : [];
-        let aryOptionHTMLs = blnShowTopBlank ? [''] : [];
-
-        // Check if input parameter is an array or an object
-        if (Array.isArray(paramOptions)) {
-            // If paramOptions is an array, set the option 'value' and the HTML to be the same thing
-            jQuery.each(paramOptions, function(idx, curAryElement){
-                aryOptionValues.push(curAryElement);
-                aryOptionHTMLs.push(curAryElement);
-            });
-        } else { // it's an object
-            // If paramOptions is an object, the keys are the 'value' attribute in the option tag and the object's values are the visible HTML
-            jQuery.each(paramOptions, function(k,v){
-                aryOptionValues.push(k);
-                aryOptionHTMLs.push(v);
-            });
+      // Internal Rate of Return (IRR) is the discount rate often used in capital budgeting that makes the net present value of all cash flows from a particular project equal to zero.6
+      // // e.g., If initial investment is -$500,000 and the cash flows are $200,000, $300,000, and $200,000, IRR is 18.82%.
+      //  finance.IRR(-500000, 200000, 300000, 200000);  => 18.82
+      const args = aryCashFlow;
+      let numberOfTries = 1;
+      // Cash flow values must contain at least one positive value and one negative value
+      let positive, negative;
+      $.each(args, function (idx, value) {
+        if (!positive) positive = value > 0;
+        if (!negative) negative = value < 0;
+      });
+      if (!positive || !negative) throw new Error("IRR requires at least one positive value and one negative value");
+      function npv (rate) {
+        numberOfTries++;
+        if (numberOfTries > 1000) { throw new Error("Cannot find a positive IRR result"); }
+        const rrate = (1 + rate / 100);
+        let npv = args[0];
+        for (let i = 1; i < args.length; i++) {
+          npv += (args[i] / Math.pow(rrate, i));
         }
-        
-        let strOptionsHTML = '';
-        jQuery.each(aryOptionValues, function(idx) {
-            const theOptionVal = aryOptionValues[idx];
-            const theOptionHTML = aryOptionHTMLs[idx];
-            strOptionsHTML += `<option value="${theOptionVal}">${theOptionHTML}</option>`;
-        });
-
-        return strOptionsHTML;
-
-    };
-
-    // When you use console . log( someObj), it passes a REFERENCE to someObj.
-    // That means someObj will change as the code is running, and by the time you look at it,
-    // it will have the final values. If you want to see the object AT THE TIME the line of code happens,
-    // you need to use something like this: console . log("Here's the obj right now:", logObj(theObject) );
-    self.logObj = function(someObj) {
-        return jQuery.isEmptyObject(someObj) ? {} : JSON.parse(JSON.stringify(someObj));
-    };
+        return npv;
+      }
+      // return Math.round(seekZero(npv) * 100) / 100;
+      return self.uRound(seekZero(npv) / 100, 12);
+    }
+    function seekZero (fn) {
+      let x = 1;
+      while (fn(x) > 0) { x += 1; }
+      while (fn(x) < 0) { x -= 0.01; }
+      return x + 0.01;
+    }
 
 
+    function origPaybackPeriod (aryCashFlow) {
+      // Payback Period (PP)
+      // https://github.com/ebradyjobory/finance.js#payback-period-ppfinanceppnumber-of-periods-cash-flows
 
+      // Payback Period (PP) is the length of time required to recover the cost of an investment.
+      // [cash flows] takes any number of projected cash flows.
+      //  #Uneven Cash Flows
+      // e.g., If number of periods is 5, initial investment is -$50, and the cash flows are $10, $13, $16, $19, and $22 for each year, the payback period is 3.42 years.
+      //  finance.PP(5, -50, 10, 13, 16, 19, 22);  => 3.42
 
-    // $$$$$$$$$$$$$$$$$$$$$$$$$
-    // FINANCEJS FUNCTIONS
-    // $$$$$$$$$$$$$$$$$$$$$$$$$
-    // I couldn't figure out how to use the financejs module, so I just copied the code I needed into here.
-    // I tweak a few things (probably making them worse), so all credit goes to https://github.com/ebradyjobory/finance.js
+      // If the cumulativeCashFlow never turns positive before the yearsCounter reaches the number of periods,
+      // the payback period is undefined (i.e., the investment never pays back).
+      // In this case, this function will return 0 as the payback period.
+      // Thus, whatever calls this function needs to handle the 0 return value.
 
-    // Internal Rate of Return (IRR)
-    // finance.IRR(initial investment, [cash flows]);
-    self.financejs = function () {
-        this.IRR = (aryCashFlow) => {
-            try { return origIRR(aryCashFlow); }
-            catch (error) { return error.message; }
-        };
-        this.PaybackPeriod = (aryCashFlow) => {
-            try { return origPaybackPeriod(aryCashFlow); }
-            catch (error) { return error.message; }
-
-        };
-
-        function origIRR(aryCashFlow) {
-            // https://github.com/ebradyjobory/finance.js#internal-rate-of-return-irrfinanceirrinitial-investment-cash-flows
-
-            // Internal Rate of Return (IRR) is the discount rate often used in capital budgeting that makes the net present value of all cash flows from a particular project equal to zero.6
-            // // e.g., If initial investment is -$500,000 and the cash flows are $200,000, $300,000, and $200,000, IRR is 18.82%.
-            //  finance.IRR(-500000, 200000, 300000, 200000);  => 18.82
-            let args = aryCashFlow;
-            let numberOfTries = 1;
-            // Cash flow values must contain at least one positive value and one negative value
-            let positive, negative;
-            $.each(args, function (idx, value) {
-                if (!positive) positive = value > 0;
-                if (!negative) negative = value < 0;
-            });
-            if (!positive || !negative) throw new Error('IRR requires at least one positive value and one negative value');
-            function npv(rate) {
-                numberOfTries++;
-                if (numberOfTries > 1000) { throw new Error('Cannot find a positive IRR result'); }
-                let rrate = (1 + rate / 100);
-                let npv = args[0];
-                for (let i = 1; i < args.length; i++) {
-                    npv += (args[i] / Math.pow(rrate, i));
-                }
-                return npv;
-            }
-            // return Math.round(seekZero(npv) * 100) / 100;
-            return self.uRound(seekZero(npv) / 100, 12);
+      // for uneven cash flows (I removed the section on even cash flows)
+      let cumulativeCashFlow = aryCashFlow[0];
+      let paybackPeriod = 0;
+      let yearsCounter = 0;
+      for (let i = 1; i <= aryCashFlow.length; i++) {
+        cumulativeCashFlow += aryCashFlow[i];
+        if (cumulativeCashFlow > 0) {
+          yearsCounter += Math.abs((cumulativeCashFlow - aryCashFlow[i]) / aryCashFlow[i]);
+          paybackPeriod = yearsCounter;
+          break;
+        } else {
+          yearsCounter++;
         }
-        function seekZero(fn) {
-            let x = 1;
-            while (fn(x) > 0) { x += 1; }
-            while (fn(x) < 0) { x -= 0.01; }
-            return x + 0.01;
-        }
-
-
-        function origPaybackPeriod(aryCashFlow) {
-            // Payback Period (PP)
-            // https://github.com/ebradyjobory/finance.js#payback-period-ppfinanceppnumber-of-periods-cash-flows
-
-            // Payback Period (PP) is the length of time required to recover the cost of an investment.
-            // [cash flows] takes any number of projected cash flows.
-            //  #Uneven Cash Flows
-            // e.g., If number of periods is 5, initial investment is -$50, and the cash flows are $10, $13, $16, $19, and $22 for each year, the payback period is 3.42 years.
-            //  finance.PP(5, -50, 10, 13, 16, 19, 22);  => 3.42
-
-            // If the cumulativeCashFlow never turns positive before the yearsCounter reaches the number of periods,
-            // the payback period is undefined (i.e., the investment never pays back).
-            // In this case, this function will return 0 as the payback period.
-            // Thus, whatever calls this function needs to handle the 0 return value.
-
-            // for uneven cash flows (I removed the section on even cash flows)
-            let cumulativeCashFlow = aryCashFlow[0];
-            let paybackPeriod = 0;
-            let yearsCounter = 0;
-            for (let i = 1; i <= aryCashFlow.length; i++) {
-                cumulativeCashFlow += aryCashFlow[i];
-                if (cumulativeCashFlow > 0) {
-                    yearsCounter += Math.abs((cumulativeCashFlow - aryCashFlow[i]) / aryCashFlow[i]);
-                    paybackPeriod = yearsCounter;
-                    break;
-                } else {
-                    yearsCounter++;
-                }
-            };
-            return paybackPeriod;
-        };
-
+      };
+      return paybackPeriod;
     };
-
+  };
 }
 
 // console.log('v3user-defined-functions.js loaded');
 
-
-
 // // user-defined-functions.js
-
 
 // // Each student sees variables unique to that student (randomly generated)
 // // This function writes those embedded data.
-// // When the student leaves the page, 
+// // When the student leaves the page,
 // // the student's answer will be combined with those variables and written as a different variable in the Qualtrics embedded data.
 // function storeQuesRespVars(theQuesVars, theAns) {
 //     let objQuesResp = {
@@ -371,7 +367,7 @@ function UDFClass($, objFromMain) {
 // // It is called by the function listed before the tagged template literal,
 // // which at this point doesn't even have tags in it.
 // // It doesn't need to be this complicated. But, building it this way gives flexibility.
-// // E.g., if I decide I need to put text before & after every stem, I can do so here. 
+// // E.g., if I decide I need to put text before & after every stem, I can do so here.
 // // Or, I'll be ready if I start using tagged literals like ${myVar} in my ` ` string
 // function probDisplay(objQuesVars) {
 //     return function (aryStrings, ...values) {
