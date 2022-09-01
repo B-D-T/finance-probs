@@ -7,7 +7,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            // "justMyCode": false
+            // "justMyCode": false,
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
