@@ -1,44 +1,42 @@
 fnQues454 = function (objFromMainQues) {
+  let quesVars = {
+    "varA": uRand(2, 9, 1),
+    "varB": uRand(2, 10, 1)
+  };
 
+  quesVars = addPrefix(quesVars);
+  if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)); } else { return buildPage(quesVars); }
 
-    let quesVars = {
-        "varA": uRand(2, 9, 1),
-        "varB": uRand(2, 10, 1)
-    }
+  function buildPage (objQuesVars) {
+    quesVars = objQuesVars; createEDVarInScope(quesVars);
 
-    quesVars = addPrefix(quesVars);
-    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
+    let calcVars = {
+      calcTheAns: Math.sqrt(varB / varA)
+    };
+    createEDVarInScope(calcVars);
 
-    function buildPage(objQuesVars) {
-        quesVars = objQuesVars; createEDVarInScope(quesVars);
+    let displayVars = {};
+    createEDVarInScope(displayVars);
 
-        let calcVars = {
-            calcTheAns: Math.sqrt(varB / varA)
-        }
-        createEDVarInScope(calcVars);
+    jQuery.extend(quesVars, calcVars, displayVars);
+    storeQuesRespVars(quesVars, calcTheAns);
+    return fillPage();
+  }
 
-        let displayVars = {};
-        createEDVarInScope(displayVars);
-        
-        jQuery.extend(quesVars, calcVars, displayVars);
-        storeQuesRespVars(quesVars, calcTheAns);
-        return fillPage();
-    }
+  function fillPage () {
+    let obj = {};
 
-    function fillPage() {
-        let obj = {};
+    obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
 
-        obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
-
-        obj.stem = probDisplay(quesVars)`
+    obj.stem = probDisplay(quesVars)`
         Solve for \\(x\\) given:
         \\[
             {varA}x=\\frac{varB}{x}
         \\]
         ${ansBoxMessages("usePositiveIfAnsCouldBePosOrNeg")}
-    `
+    `;
 
-        obj.solution = probDisplay(quesVars)`
+    obj.solution = probDisplay(quesVars)`
         <p>
         There are a few approaches you can use to solve this problem.  
         We'll look at two possible ways.
@@ -87,7 +85,7 @@ fnQues454 = function (objFromMainQues) {
         </p>
         \\[
             \\begin{aligned}
-                ${texRoot("x^2",2)} &= ${texRoot(`\\frac{${varB}}{${varA}}`,2)} \\\\
+                ${texRoot("x^2", 2)} &= ${texRoot(`\\frac{${varB}}{${varA}}`, 2)} \\\\
                 {}\\\\
                 x &= calcTheAns
             \\end{aligned}
@@ -131,23 +129,22 @@ fnQues454 = function (objFromMainQues) {
         </p>
         \\[
             \\begin{aligned}
-                ${texRoot("x^2",2)} &= ${texRoot(`\\frac{${varB}}{${varA}}`,2)} \\\\
+                ${texRoot("x^2", 2)} &= ${texRoot(`\\frac{${varB}}{${varA}}`, 2)} \\\\
                 {}\\\\
                 x &= calcTheAns
             \\end{aligned}
         \\]
-        `
+        `;
 
-        return obj;
+    return obj;
+  } // end of fillPage
+};
 
-    } // end of fillPage
-}
-
- // received from addOnPageSubmit
-function fnQuesResp(objPageSubmit){
-    const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
-    if (!(jQuery(`${qtrxDivID}-response`).length)){
-        let objRespFeedback = objPageSubmit;
-        return setEDQuesRespVars(objRespFeedback);
-    }
+// received from addOnPageSubmit
+function fnQuesResp (objPageSubmit) {
+  const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
+  if (!(jQuery(`${qtrxDivID}-response`).length)) {
+    let objRespFeedback = objPageSubmit;
+    return setEDQuesRespVars(objRespFeedback);
+  }
 }

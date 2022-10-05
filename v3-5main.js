@@ -1,4 +1,3 @@
-/* eslint-disable padded-blocks */
 // main.js
 
 // GLOBAL

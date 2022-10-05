@@ -1,51 +1,48 @@
 fnQues456 = function (objFromMainQues) {
+  let quesVars = {
+    "varA": 1,
+    "varB": uRand(6, 10, 1),
+    "varC": uRand(3, 20, 1),
+    "varD": uRand(2, 4, 1)
+  };
 
+  quesVars = addPrefix(quesVars);
+  if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)); } else { return buildPage(quesVars); }
 
-    let quesVars = {
-        "varA": 1,
-        "varB": uRand(6, 10, 1),
-        "varC": uRand(3, 20, 1),
-        "varD": uRand(2, 4, 1)
-    }
+  function buildPage(objQuesVars) {
+    quesVars = objQuesVars; createEDVarInScope(quesVars);
 
-    quesVars = addPrefix(quesVars);
-    if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
+    let calcVars = {
+      calcE: (varB - varD),
+      get calcG () { return varC ** (1 / this.calcE); },
+      get calcTheAns () { return this.calcG - 1; }
+    };
+    createEDVarInScope(calcVars);
 
-    function buildPage(objQuesVars) {
-        quesVars = objQuesVars; createEDVarInScope(quesVars);
+    let displayVars = {
+      dispG: uRound(calcG, 5)
+    };
+    createEDVarInScope(displayVars);
 
-        let calcVars = {
-            calcE: (varB - varD),
-            get calcG(){return varC ** (1 / this.calcE) },
-            get calcTheAns() { return this.calcG - 1 }
-        }
-        createEDVarInScope(calcVars);
+    jQuery.extend(quesVars, calcVars, displayVars);
+    storeQuesRespVars(quesVars, calcTheAns);
+    return fillPage();
+  }
 
-        let displayVars = {
-            dispG: uRound(calcG, 5)
-        };
-        createEDVarInScope(displayVars);
+  function fillPage () {
+    let obj = {};
 
-        jQuery.extend(quesVars, calcVars, displayVars);
-        storeQuesRespVars(quesVars, calcTheAns);
-        return fillPage();
-    }
+    obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
 
-    function fillPage() {
-        let obj = {};
-
-        obj.ansBoxMessage = ansBoxMessages("decimalPlaces4");
-
-        obj.stem = probDisplay(quesVars)`
+    obj.stem = probDisplay(quesVars)`
             Solve for \\(x\\) given:
             \\[
                 (varA+x)^{varB} = varC(varA+x)^{varD}
             \\]
             ${ansBoxMessages("usePositiveIfAnsCouldBePosOrNeg")}
-        `
+        `;
 
-
-        obj.solution = probDisplay(quesVars)`
+    obj.solution = probDisplay(quesVars)`
             <p>
             To get the variables on the same side of the equation, 
             divide each side by \\( (varA+x)^{varD} \\).
@@ -108,17 +105,16 @@ fnQues456 = function (objFromMainQues) {
             This is also how you would have to solve the problem if 
             using Excel.
         </p>
-           `
-        return obj;
-
-    } // end of fillPage
-}
+           `;
+    return obj;
+  } // end of fillPage
+};
 
 // received from addOnPageSubmit
-function fnQuesResp(objPageSubmit) {
-    const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
-    if (!(jQuery(`${qtrxDivID}-response`).length)) {
-        let objRespFeedback = objPageSubmit;
-        return setEDQuesRespVars(objRespFeedback);
-    }
+function fnQuesResp (objPageSubmit) {
+  const qtrxDivID = "#divQues" + objPageSubmit.strQuesNum;
+  if (!(jQuery(`${qtrxDivID}-response`).length)) {
+    let objRespFeedback = objPageSubmit;
+    return setEDQuesRespVars(objRespFeedback);
+  }
 }
