@@ -66,7 +66,7 @@ function fPresentValue(qv) {
     const varFV = qv.varFV || fSetLocalVar("varFV", qv.varFV);
     const varPV = qv.varPV || fSetLocalVar("varPV", qv.varPV);
     const varG = qv.varG || fSetLocalVar("varG", qv.varG);
-    const varY = qv.varY || fSetLocalVar("varY", qv.varY);
+    const varY = qv.varY === undefined ? fSetLocalVar("varY", qv.varY) : qv.varY;
     const varReturnInYear = qv.varReturnInYear === undefined ? fSetLocalVar("varReturnInYear", qv.varReturnInYear) : qv.varReturnInYear;
     const varType = (varY !== 1) ? 0 : qv.varType || fSetLocalVar("varType", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
 
@@ -142,7 +142,7 @@ function fFutureValue(qv) {
     const varFV = qv.varFV || fSetLocalVar("varFV", qv.varFV);
     const varPV = qv.varPV || fSetLocalVar("varPV", qv.varPV);
     const varG = qv.varG || fSetLocalVar("varG", qv.varG);
-    const varY = qv.varY || fSetLocalVar("varY", qv.varY);
+    const varY = qv.varY === undefined ? fSetLocalVar("varY", qv.varY) : qv.varY;
     const varReturnInYear = qv.varReturnInYear === undefined ? fSetLocalVar("varReturnInYear", qv.varReturnInYear) : qv.varReturnInYear;
     const varType = (varY !== 1) ? 0 : qv.varType || fSetLocalVar("varType", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
 
