@@ -37,7 +37,7 @@ function fnQues489 (objFromMainQues) {
         What is the present value (the value in year 0) of an annuity that
         pays \$${varPMT.toLocaleString('en-US')} per year, for varN years,
         at a rate of ${uRound(varRate*100,4)}%, 
-        with the first payment being made in year ${varY.toString()}.
+        with the first payment being made in year ${varY.toString()}?
         `
 
         obj.solution = probDisplay(quesVars)`

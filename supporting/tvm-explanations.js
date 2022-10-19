@@ -1260,8 +1260,7 @@ function tvmtreePVAnnuityStand(qv, objColors) {
             First, we use the <b>Present Value of a Standard Annuity formula</b>
             to determine the PV of the series of payments one year before the first
             payment is made (i.e., <b>PV<sub>${qv.varY - 1}</sub></b>).
-            </p>;
-        `
+            </p>`;
     }
     myStr += strPVTiming;
     myStr +=`
