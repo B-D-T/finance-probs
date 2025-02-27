@@ -1,5 +1,31 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable camelcase */
+// v3tvm-explanations.js
+
+class TLHelperFuncs {
+
+    static isNumLike = (val) => {
+        if (typeof val === 'number') {
+            return true;
+        }
+        if (typeof val === 'string' && !isNaN(val) && !isNaN(parseFloat(val))) {
+            return true;
+        }
+        return false;
+    }
+
+    static formatVarPMTForTL = (payment) => {
+        // If it's an integer-like number, this returns a string with the integer only
+        // Otherwise, it returns the input value as is
+        if (!TLHelperFuncs.isNumLike(payment)) {
+            return payment;
+        }
+        // If it's a number, and the integer part is the same as the float part, just show the integer part.
+        const floatPayment = parseFloat(payment);
+        if (Number.isInteger(floatPayment)) { 
+            return floatPayment.toFixed(0);
+        } 
+        return payment;
+    }
+}
 
 // ################################
 // EXPLAINERS
@@ -19,7 +45,7 @@ function TVMExplanation ($, objFromMain) {
     const dispFV = qvObj.varFV.toFixed(2).toLocaleString("en-US");
     const myStr = `
             <p>
-                There is a lump sum (\$${dispFV}) in the future (year varN),
+                There is a lump sum (\$${dispFV}) in the future (year ${qvObj.varN}),
                 and you want to know what it is going to be worth in year ${qvObj.varY - qvObj.varN}.
                 Let's see this on a timeline:
                 ${timelinePVSinglePmt({ "varFV": dispFV, "varN": qvObj.varN, "varY": qvObj.varY, "varPV": "??" })}
@@ -172,16 +198,16 @@ function TVMExplanation ($, objFromMain) {
                 the original ${varN} payments of \$${varPMT.toLocaleString("en-US")} --
                 they are irrelevant now!</i>
                 We've collapsed those payments into a single value.
-                Essentially, we have an entirely new problem now, with "new" variables:</p>
-                <p style="margin-left:30px;">
+                Essentially, we have an entirely new problem now, with "new" variables:
+            </p>
+            <p style="margin-left:30px;">
                 "What is the value in Year 0 of a lump sum payment of
-                \$${theAns.toLocaleString("en-US")}
+                \$${theAns.toFixed(2).toLocaleString("en-US")}
                 happening in year ${varY - 1}, assuming a rate of ${uRound(varRate * 100, 4)}%?"
-                </p>
-                <p>
+            </p>
+            <p>
                 With that, we can walk through the steps necessary to determine
                 ${varY <= 0 ? "FV" : "PV"}<sub>0</sub> of a single payment happening in ${varY - 1}:
-                </p>
             </p>
             `;
       strToReturn += (varY <= 0)
@@ -316,16 +342,16 @@ function TVMExplanation ($, objFromMain) {
                 the original perpetuity --
                 it is irrelevant now!</i>
                 We've collapsed those payments into a single value.
-                Essentially, we have an entirely new problem now, with "new" variables:</p>
-                <p style="margin-left:30px;">
+                Essentially, we have an entirely new problem now, with "new" variables:
+            </p>
+            <p style="margin-left:30px;">
                 "What is the value in Year 0 of a lump sum payment of
                 \$${theAns.toFixed(2).toLocaleString('en-US')}
                 happening in year ${varY - 1}, assuming a rate of ${uRound(varRate * 100, 4)}%?"
-                </p>
-                <p>
+            </p>
+            <p>
                 With that, we can walk through the steps necessary to determine
                 ${varY <= 0 ? "FV" : "PV"}<sub>0</sub> of a single payment happening in ${varY - 1}:
-                </p>
             </p>
             `;
       strToReturn += (varY <= 0)
@@ -336,7 +362,7 @@ function TVMExplanation ($, objFromMain) {
     return strToReturn;
   }
 
-  function explainFVAnnuityStand_FV (qv) {
+  function explainFVAnnuityConst_FV (qv) {
     // Right now I'm just using black because I found the colors distracting. But I'll leave the code in case I change my mind down the road.
     let objColors = {
       varY: "black",
@@ -784,16 +810,16 @@ function TVMExplanation ($, objFromMain) {
                 the original ${varN} payments of \$${varPMT.toLocaleString('en-US')} --
                 they are irrelevant now!</i>
                 We've collapsed those payments into a single value.
-                Essentially, we have an entirely new problem now, with "new" variables:</p>
-                <p style="margin-left:30px;">
+                Essentially, we have an entirely new problem now, with "new" variables:
+            </p>
+            <p style="margin-left:30px;">
                 "What is the value in Year 0 of a lump sum payment of
-                \$${theAns.toLocaleString('en-US')}
+                \$${theAns.toFixed(2).toLocaleString('en-US')}
                 happening in year ${varY - 1}, assuming a rate of ${uRound(varRate * 100, 4)}%?"
-                </p>
-                <p>
+            </p>
+            <p>
                 With that, we can walk through the steps necessary to determine
                 ${varY <= 0 ? "FV" : "PV"}<sub>0</sub> of a single payment happening in ${varY - 1}:
-                </p>
             </p>
             `;
       strToReturn += (varY <= 0)
@@ -908,12 +934,14 @@ function TVMExplanation ($, objFromMain) {
     // This is a function so I can return out of it if I fill up the 'First' array
     function fBuildTimeline () {
       const isGrowingAnn = qv.varG > 0;
+      const midlineEllipsis = "\u22EF"; // It's ⋯, which is like … (or...) but centered vertically
 
       function gannFutPmtAmt (pmtYear) {
         return uRound(fFVSinglePmt({ "varRate": qv.varG, "varN": pmtYear, "varPV": qv.varPMT }), 0);
       }
 
-      let ary2Pmts = [varPMT, varPMT];
+      let varPMTFormatted = TLHelperFuncs.formatVarPMTForTL(varPMT);
+      let ary2Pmts = [varPMTFormatted, varPMTFormatted];
 
       // Start
       tlYears.Start.push(varY === 0 ? -1 : 0);
@@ -926,8 +954,14 @@ function TVMExplanation ($, objFromMain) {
           // Show all payments then skip to the end
           for (let nCount = varY; nCount <= yn - 1; nCount++) {
             tlYears.First.push(nCount);
-            if (isGrowingAnn) { varPMT = (nCount === varY) ? varPMT : `C<sub>${nCount}</sub>`; }
-            tlPmts.First.push(varPMT);
+            if (isGrowingAnn) {
+                if (nCount == varY) {
+                    varPMT = TLHelperFuncs.formatVarPMTForTL(varPMT);
+                } else {
+                    varPMT = `C<sub>${nCount}</sub>`;
+                }
+            }
+            tlPmts.First.push(TLHelperFuncs.formatVarPMTForTL(varPMT));
             TESTARRAY.push("y<=1,n<=7");
           }
           return;
@@ -937,11 +971,11 @@ function TVMExplanation ($, objFromMain) {
           tlYears.First.push(varY, varY + 1);
 
           // If I wanted the dollar values instead of the variables, use [gannFutPmtAmt(0), gannFutPmtAmt(1) ]
-          if (isGrowingAnn) { ary2Pmts = [varPMT, `C<sub>${varY + 1}</sub>`]; }
+          if (isGrowingAnn) { ary2Pmts = [TLHelperFuncs.formatVarPMTForTL(varPMT), `C<sub>${varY + 1}</sub>`]; }
           tlPmts.First.push(...[ary2Pmts]);
 
-          tlYears.Mid.push("\u22EF");
-          tlPmts.Mid.push("\u22EF");
+          tlYears.Mid.push(midlineEllipsis);
+          tlPmts.Mid.push(midlineEllipsis);
 
           tlYears.Last.push(yn - 2, yn - 1);
           if (isGrowingAnn) { ary2Pmts = [`C<sub>${yn - 2}</sub>`, `C<sub>${yn - 1}</sub>`]; }
@@ -961,7 +995,7 @@ function TVMExplanation ($, objFromMain) {
           TESTARRAY.push("Prefill 1");
         }
       } else {
-        tlYears.Delayed.push("\u22EF", varY - 1);
+        tlYears.Delayed.push(midlineEllipsis, varY - 1);
         tlPmts.Delayed.push("", "");
         TESTARRAY.push("Prefill 2");
       }
@@ -969,20 +1003,27 @@ function TVMExplanation ($, objFromMain) {
       // These are delayed annuities that do not need to be broken up with a mid
       if (varN <= 5 || (varY === 2 && varN === 6)) {
         for (let nCount = varY; nCount <= varY + varN - 1; nCount++) {
-          tlYears.First.push(nCount);
-          if (isGrowingAnn) { varPMT = (nCount === varY) ? varPMT : `C<sub>${nCount}</sub>`; }
-          tlPmts.First.push(varPMT);
-          TESTARRAY.push("Unbkn delayed");
+            tlYears.First.push(nCount);
+
+            if (isGrowingAnn) {
+                if (nCount == varY) {
+                    varPMT = TLHelperFuncs.formatVarPMTForTL(varPMT);
+                } else {
+                    varPMT = `C<sub>${nCount}</sub>`;
+                }
+            }
+            tlPmts.First.push(TLHelperFuncs.formatVarPMTForTL(varPMT));
+            TESTARRAY.push("Unbkn delayed");
         }
         return;
       } else {
         // Years to the mid
         tlYears.First.push(varY, varY + 1);
-        if (isGrowingAnn) { ary2Pmts = [varPMT, `C<sub>${varY + 1}</sub>`]; }
+        if (isGrowingAnn) { ary2Pmts = [TLHelperFuncs.formatVarPMTForTL(varPMT), `C<sub>${varY + 1}</sub>`] }
         tlPmts.First.push(...[ary2Pmts]);
         // The dot
-        tlYears.Mid.push("\u22EF");
-        tlPmts.Mid.push("\u22EF");
+        tlYears.Mid.push(midlineEllipsis);
+        tlPmts.Mid.push(midlineEllipsis);
         // The end
         tlYears.Last.push(yn - 2, yn - 1);
         if (isGrowingAnn) { ary2Pmts = [`C<sub>${yn - 2}</sub>`, `C<sub>${yn - 1}</sub>`]; }
@@ -1004,9 +1045,10 @@ function TVMExplanation ($, objFromMain) {
     for (let colCount = aryTLYears.length; colCount < tlMaxCols; colCount++) {
       const mostRecTLYear = mostRecentYear(aryTLYears);
       const nextTLYear = (mostRecTLYear === yn - 1) ? mostRecTLYear + 1 : "";
-      if (isPerpetuity && colCount === tlMaxCols - 1) {
-        aryTLYears.push("\u221E");
-        aryTLPmts.push("C<sub>\u221E</sub>");
+      if (isPerpetuity && colCount == tlMaxCols - 1){
+        const infinitySym = "\u221E";
+        aryTLYears.push(infinitySym);
+        aryTLPmts.push(`C<sub>${infinitySym}</sub>`);
       } else {
         aryTLYears.push(nextTLYear);
         aryTLPmts.push("");
@@ -1049,7 +1091,8 @@ function TVMExplanation ($, objFromMain) {
                 <div style="display:flex; justify-content:center; font-weight:bold;">
                     <div style="width:${tlWidths.RowHead}px;">Year</div>
                     ${timelineDrawMult(aryTLYears)}
-                </div>`;
+                </div>
+                `;
 
     // The line itself
     tlStr += "<div><hr /></div>";
@@ -1058,12 +1101,17 @@ function TVMExplanation ($, objFromMain) {
     tlStr += `<div style="display:flex; justify-content:center;">
                     <div style="width:${tlWidths.RowHead}px; font-weight:bold;">Amt</div>
                     ${timelineDrawMult(aryTLPmts)}
-                </div>`;
+                </div>
+                `;
 
     // Arrow showing the value in correct year
     const countAllPmts = TLYearsShown(aryTLYears);
     function TLYearsShown (theArray) {
-      const tempAry = theArray.map(function (item) { return (Number.isInteger(item) || item === "\u22EF") ? 1 : 0; });
+        // Returns an integer with the number of years actually displayed on the timeline
+        const tempAry = theArray.map(function (item) {
+            const itemIsPopulated = Number.isInteger(item) || item == "\u22EF";
+            return itemIsPopulated ? 1 : 0;
+        });
       return tempAry.reduce((prev, cur) => prev + cur, 0);
     }
     //    let colSpacerEnd = tlWidths.MaxNumOfCols - countAllPmts + 1;// tlWidths.curNumOfCols + 1;
@@ -1071,10 +1119,30 @@ function TVMExplanation ($, objFromMain) {
 
     let arrowBoxCols, startGapCols, arrowBoxText;
     if (tvmType === "pv") {
-      // In order to put the arrow in the correct place, we need to know the flex box
-      // column on the timeline that is one year before the first payment is made (y-1).
-      // Normally that's column 1, but for delayed annuities it's 2 or 3 [Year 0, ..., y-1]
-      const returnsPVInColumn = varY - 1; // FIX: Won't work for delayed annuities??
+
+
+        function getReturnsPVInColumn() {
+            // In order to put the arrow in the correct place, we need to know the flex box
+            // column on the timeline that is one year before the first payment is made (y-1).
+            // Normally that's column 1, but for delayed annuities it's 2 or 3 [Year 0, ..., y-1]
+
+            // Normally, using `y-1` as the `returnsPVInColumn` would be fine.
+            // E.g., if y=4, we'd use column 3.
+
+            // But, with longer annuities -- or delayed annuities to later start years -- 
+            // we often use ⋯ in the timeline, making column 11 not year 11.
+
+            // We also need to adjust because tlWidths.OneYear * startGapCols builds the arrow from the start of the timeline,
+            // not the start of the payments.
+
+            // This finds the start year in the tlYears array
+            const startYearIndex = aryTLYears.findIndex(val => val == varY);
+            const colNum = startYearIndex - 1;
+            return colNum;
+        }
+
+        const returnsPVInColumn = getReturnsPVInColumn();
+
       arrowBoxCols = countAllPmts - 0.5 - (varY === 0 ? 0 : returnsPVInColumn) - 2; // All years - taper adjustment - empty years at start - empty last years
       startGapCols = (varY === 0 ? 0 : returnsPVInColumn) + 1 + 0.5; // +0.5 to create a longer, more tapered pointer
       arrowBoxText = `Returns value<br>in year ${useCallerTL ? 0 : varY - 1}`;
@@ -1087,13 +1155,15 @@ function TVMExplanation ($, objFromMain) {
     }
 
     if (showArrow) {
-      tlStr += `<div style="display:flex; justify-content:left; margin-top:12px;">
-                    <div style="width:${tlWidths.RowHead}px;"></div>
-                    <div style="width:${tlWidths.OneYear * startGapCols}px"></div>
-                    <div id=${"annuity-arrow-" + tvmType} style="width:${tlWidths.OneYear * arrowBoxCols}px";>
-                        ${arrowBoxText}
-                    </div>
-                </div>`;
+        tlStr += `
+        <div style="display: flex; justify-content: left; margin-top: 12px;">
+            <div style="width:${tlWidths.RowHead}px; class="arrow-area-row-head"></div>
+            <div style="width:${tlWidths.OneYear * startGapCols}px;" class="arrow-area-from-row-head-to-end-of-arrow"></div>
+            <div id="annuity-arrow-${tvmType}" style="width:${tlWidths.OneYear * arrowBoxCols}px;">
+                ${arrowBoxText}
+            </div>
+        </div>
+        `;
     }
     // Close out entire timeline section
     tlStr += `</div>`;
@@ -1170,11 +1240,11 @@ function TVMExplanation ($, objFromMain) {
     };
     let myStr = `
             <div>
-                <p style="margin-bottom:4px;">
+                <p style="margin-bottom:1em;">
                     We're discounting a value back (i.e., to the left on the timeline),
                     so we'll start on the <b>Present Value</b> side of the TVM Decision Tree and start asking questions:
                 </p>
-                <p style="margin-left:20px; margin-top:4px;">
+                <p style="margin-left:20px; margin-top:1em;">
                     Are we looking at one amount at two different points in time?
                     Or is there a series of payments? <i>There is a single payment.</i> 
                 </p>
@@ -1184,7 +1254,7 @@ function TVMExplanation ($, objFromMain) {
                 <p>
                     This leads us to the formula for the <b>Present Value of a Single Payment</b>:
                 \\[
-                    varPV_{varY-varN}={varFV}_{varN} \\left( \\frac{1}{(1+{varRate})^{varN}} \\right)
+                    varPV_{varY-varN}={varFV}_{varY} \\left( \\frac{1}{(1+{varRate})^{varN}} \\right)
                 \\]
                 </p>
             </div>
@@ -1203,25 +1273,25 @@ function TVMExplanation ($, objFromMain) {
     };
     let myStr = `
             <div>
-                <p style="margin-bottom:4px;">
+                <p style="margin-bottom:1em;">
                     We're discounting a value back (i.e., to the left on the timeline),
                     so we'll start on the <b>Present Value</b> side of the TVM Decision Tree and start asking questions:
                 </p>
-                <p style="margin-left:20px; margin-top:4px;">
+                <p style="margin-left:20px; margin-top:1em;">
                     Are we looking at one amount at two different points in time?
                     Or is there a series of payments?
                     <i>There is a series of payments.</i> 
                 </p>
-                <p style="margin-left:20px; margin-top:4px;">
+                <p style="margin-left:20px; margin-top:1em;">
                     Do the payments go on forever?
                     Or do they stop after a certain number of payments?
                     <i>They stop after ${qv.varN} payments.</i> 
                 </p>
-                <p style="margin-left:20px; margin-top:4px;">
+                <p style="margin-left:20px; margin-top:1em;">
                     Are the payments variable, the same (constant), or growing at a constant rate?
                     <i>They are constant.</i> 
                 </p>
-                <p style="margin-left:20px; margin-top:4px;">
+                <p style="margin-left:20px; margin-top:1em;">
                     Do the payments start in year 0, year 1, or some later year?
                     <i>They start in Year ${qv.varY}.</i> 
                 </p>`;
@@ -1295,16 +1365,16 @@ function TVMExplanation ($, objFromMain) {
     };
     let myStr = `
             <div>
-                <p style="margin-bottom:4px;">
+                <p style="margin-bottom:1em;">
                     We're discounting a value back (i.e., to the left on the timeline),
                     so we'll start on the <b>Present Value</b> side of the TVM Decision Tree and start asking questions:
                 </p>
-                <p style="margin-left:20px; margin-top:4px;">
+                <p style="margin-left:20px; margin-top:1em;">
                     Are we looking at one amount at two different points in time?
                     Or is there a series of payments?
                     <i>There is a series of payments.</i> 
                 </p>
-                <p style="margin-left:20px; margin-top:4px;">
+                <p style="margin-left:20px; margin-top:1em;">
                     Do the payments go on forever?
                     Or do they stop after a certain number of payments?
                     <i>They go on forever.</i> 
@@ -1346,25 +1416,25 @@ function TVMExplanation ($, objFromMain) {
     };
     let myStr = `
             <div>
-                <p style="margin-bottom:4px;">
+                <p style="margin-bottom:1em;">
                     We're discounting a value back (i.e., to the left on the timeline),
                     so we'll start on the <b>Present Value</b> side of the TVM Decision Tree and start asking questions:
                 </p>
-                <p style="margin-left:20px; margin-top:4px;">
+                <p style="margin-left:20px; margin-top:1em;">
                     Are we looking at one amount at two different points in time?
                     Or is there a series of payments?
                     <i>There is a series of payments.</i> 
                 </p>
-                <p style="margin-left:20px; margin-top:4px;">
+                <p style="margin-left:20px; margin-top:1em;">
                     Do the payments go on forever?
                     Or do they stop after a certain number of payments?
                     <i>They stop after ${qv.varN} payments.</i> 
                 </p>
-                <p style="margin-left:20px; margin-top:4px;">
+                <p style="margin-left:20px; margin-top:1em;">
                     Are the payments variable, the same (constant), or growing at a constant rate?
                     <i>They are growing at a constant rate.</i> 
                 </p>
-                <p style="margin-left:20px; margin-top:4px;">
+                <p style="margin-left:20px; margin-top:1em;">
                     Do the payments start in year 0, year 1, or some later year?
                     <i>They start in Year ${qv.varY}.</i> 
                 </p>
@@ -1409,11 +1479,11 @@ function TVMExplanation ($, objFromMain) {
     };
     let myStr = `
             <div>
-                <p style="margin-bottom:4px;">
+                <p style="margin-bottom:1em;">
                     We're moving to the future,
                     so we'll start on the <b>Future Value</b> side of the TVM Decision Tree and start asking questions:
                 </p>
-                <p style="margin-left:20px; margin-top:4px;">
+                <p style="margin-left:20px; margin-top:1em;">
                     Are we looking at one amount at two different points in time?
                     Or is there a series of payments? <i>There is a single payment.</i> 
                 </p>
@@ -1442,16 +1512,16 @@ function TVMExplanation ($, objFromMain) {
     };
     let myStr = `
             <div>
-                <p style="margin-bottom:4px;">
+                <p style="margin-bottom:1em;">
                     We're compounding a value forward (i.e., to the right on the timeline),
                     so we'll start on the <b>Future Value</b> side of the TVM Decision Tree and start asking questions:
                 </p>
-                <p style="margin-left:20px; margin-top:4px;">
+                <p style="margin-left:20px; margin-top:1em;">
                     Are we looking at one amount at two different points in time?
                     Or is there a series of payments?
                     <i>There is a series of payments.</i> 
                 </p>
-                <p style="margin-left:20px; margin-top:4px;">
+                <p style="margin-left:20px; margin-top:1em;">
                     Are the payments variable, the same (constant), or growing at a constant rate?
                     <i>They are constant.</i> 
                 </p>
@@ -1542,7 +1612,7 @@ function TVMExplanation ($, objFromMain) {
             \\[
                 \\begin{aligned}
                     C_{varN} &= {varFV} \\\\
-                    PV_{varY-varN} &= {varPV} \\\\
+                    PV_{varY-varN} &= ${varPV} \\\\
                     i &= ${dispRate} \\\\
                     n &= varN \\\\
                     y &= varY

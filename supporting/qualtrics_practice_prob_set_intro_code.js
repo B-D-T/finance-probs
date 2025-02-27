@@ -1,7 +1,14 @@
 // qualtrics_practice_prob_set_intro_code.js
 
-// This is code that I manually add to the first question of the ProbSet_Practice survey in Qualtrics.
-// I didn't know where else to put it, so I'm dumping the code in here.
+/*
+This is code that I manually add to the first question of the ProbSet_Practice survey in Qualtrics.
+I didn't know where else to put it, so I'm dumping the code in here.
+*/
+
+/*
+Annuities2: [489, 490, 491, 492, 493, 494, 495]
+BondValuation: [462, 463, 464, 465, 466]
+*/
 
 
 // This is sample HTML for the cover image on the first question of the ProbSet_Practice survey in Qualtrics.

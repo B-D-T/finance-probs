@@ -39,6 +39,9 @@ function fnQues491 (objFromMainQues) {
 
         // const dispPMT = uRound(varPMT,4).toLocaleString('en-US');
         const dispRatePerc = uRound(varRate*100,4);
+        const strStyleAnnA = 'background-color:#CE960E; color:black; padding-left:1px;padding-right:1px;';
+        const strStyleAnnB = 'background-color:#FE6EA8; color:black; padding-left:1px;padding-right:1px;';
+        const strAddBackTogether = 'background-color:black; color:white; padding-left:1px;padding-right:1px;';
 
         obj.ansBoxMessage = ansBoxMessages("writeOutNums");
 
@@ -62,16 +65,70 @@ function fnQues491 (objFromMainQues) {
         </p>
         `;
 
-        obj.solution = probDisplay(quesVars)`
-        <p>Step-by-step solution unavailable at this time.
-        In short, you need to add the PV in year 0 of the first annuity (\$${calcPV0Ann1.toLocaleString()})
-        and the PV in year 0 of the second annuity (\$${calcPV0Ann2.toLocaleString()}).
-        Remember - for the second annuity,
-        using the PV formula once gives you the value in year ${varAnn2Y-1};
-        once you have that, you need to discount it again to get to year 0.</p>
+        obj.solution = probDisplay(quesVars)`<div>
         <p>
-        The correct answer is \$${calcTheAns.toLocaleString('en-US')}.</p>`;
-    //    ${explainPVAnnuityConst_PV(quesVars)}
+            We have a
+            <span style="${strStyleAnnA}">standard annuity</span>
+            and a
+            <span style="${strStyleAnnB}">delayed annuity</span>.
+            We need to find the value of each in year 0,
+            then add them together to get the total value of the investment.
+        </p>
+        </div>
+
+        <h2 style="${strStyleAnnA}">
+            Annuity A
+        </h2>
+        <div>
+            ${explainPVAnnuityConst_PV({
+                "varPMT": varAnn1PMT,
+                "varN": varAnn1N,
+                "varY": varAnn1Y,
+                "varRate": varRate
+            })}
+        </div>
+        
+        <h2 style="${strStyleAnnB}">
+            Annuity B
+        </h2>
+        <div>
+            ${explainPVAnnuityConst_PV({
+                "varPMT": varAnn2PMT,
+                "varN": varAnn2N,
+                "varY": varAnn2Y,
+                "varRate": varRate
+            })}
+        </div>
+
+        <div>
+            <h2 style="${strAddBackTogether}">
+                Add PV<sub>A</sub> and PV<sub>B</sub>
+            </h2>
+            <p>
+                Now that we know the PV of the
+                <span style="${strStyleAnnA}">standard annuity</span>
+                and the PV of the
+                <span style="${strStyleAnnB}">delayed annuity</span> in Year 0,
+                we can just add those two values together
+                to determine the total present value of the investment.
+            </p>
+            <p>
+                \\[
+                    \\begin{aligned}
+                        ${calcPV0Ann1} \\\\
+                        + ${calcPV0Ann2} \\\\
+                        = ${calcTheAns}
+                    \\end{aligned}
+                \\]
+            </p>
+            <p>
+                Thus, the price of the investment is <b>\$${calcTheAns.toFixed(2).toLocaleString('en-US')}</b>.
+                If anyone pays more than that in today's dollars,
+                they will not break even on their investment due to the
+                discounting effect over time (assuming i=${dispRatePerc}%).
+            </p>
+        </div>
+        `;
         return obj;
 
     } // end of fillPage

@@ -49,17 +49,22 @@ for (let objProp in qv){ if (qv.hasOwnProperty(objProp)) {eval(objProp + " = qv[
 // Default values
 function fSetLocalVar(tvmPart, curVal) {
     const objTVMDefaults = {
-        "varRate": 0, "varN": 0, "varPMT": 0, "varFV": 0, "varPV": 0, "varG": 0, "varReturnInYear": 0,
+        "varRate": 0, 
+        "varN": 0,
+        "varPMT": 0,
+        "varFV": 0,
+        "varPV": 0,
+        "varG": 0,
+        "varReturnInYear": 0,
         "varY": 1, // If varY doesn't exist, we assume that annuity payments start at the end of year 1
         "varType": 0, // If varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
     }
-    return !(curVal === "undefined") ? objTVMDefaults[tvmPart] : curVal;
+    return curVal ?? objTVMDefaults[tvmPart];
 }
 
 
 // ##### =PV (varRate, varN, varPMT, [varFV], [varType], [varG], [varY]) ##### 
 function fPresentValue(qv) {
-
     const varRate = qv.varRate || fSetLocalVar("varRate", qv.varRate);
     const varN = qv.varN || fSetLocalVar("varN", qv.varN);
     const varPMT = qv.varPMT || fSetLocalVar("varPMT", qv.varPMT);
@@ -70,14 +75,13 @@ function fPresentValue(qv) {
     const varReturnInYear = qv.varReturnInYear === undefined ? fSetLocalVar("varReturnInYear", qv.varReturnInYear) : qv.varReturnInYear;
     const varType = (varY !== 1) ? 0 : qv.varType || fSetLocalVar("varType", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
 
-
     // ---Step through the TVM decision tree-------
     // With all functions, I pass an object with the key:value pairs, then recreate the variables within the subroutine.
     // I could just pass the variables in order and read them based on the position,
     // but I wanted to be explicit with the variable names to reduce the chance of mistakes.
 
     // Single payment
-    if (varPMT == 0 && varFV != 0) { return fPVSinglePmt({ varRate, varN, varFV }); }
+    if (varPMT == 0 && varFV != 0) { return fPVSinglePmt({ varRate, varN, varFV, varReturnInYear }); }
 
     // 	Perpetuity (if varN is undefined or 0)
     if (!varN) {
@@ -264,6 +268,12 @@ function fFVGrowingAnnuity(tvm) {
 function ftvm1Rate(tvm, decimals=12) {
     const varRate = tvm.varRate;
     return uRound(1 + varRate, decimals);
+}
+
+// 1 + g
+function ftvm1Growth(tvm, decimals=12) {
+    const varG = tvm.varG;
+    return uRound(1 + varG, decimals);
 }
 
 // Future value interest factor (FVIF)

@@ -11,7 +11,6 @@ function fnQues495(objFromMainQues) {
         varFV: "??"
     };
 
-    
     quesVars = addPrefix(quesVars);
     if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
 
@@ -47,13 +46,7 @@ function fnQues495(objFromMainQues) {
         `;
 
 
-        obj.solution = probDisplay(quesVars)`
-        Step-by-step solution unavailable at this time.<br />
-        In short, you need to determine the FV of the annuity portion
-        (FV<sub>${varY + varN - 1}</sub> = ${calcFVofAnn.toLocaleString('en-US')}),
-        then compound that lump sum forward ${calcNforSinglePmt} years to get
-        the final answer: <br>
-        FV<sub>${varReturnInYear}</sub> = \$${calcTheAns.toLocaleString('en-US')}.`;
+        obj.solution = probDisplay(quesVars)`${explainFVAnnuityConst_FV(quesVars)}`;
 
         return obj;
     } // end of fillPage

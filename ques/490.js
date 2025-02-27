@@ -6,7 +6,9 @@ function fnQues490 (objFromMainQues) {
         "varRate": uRand(.04, .08, .005),
         "varN": uRand(3, 10, 1),
         "varReturnInYear": 0,
-        get varY() {return uRand(11, this.varN + 9, 1) },
+        get varY() {
+            return uRand(11, this.varN + 9, 1)
+        },
         "varPV": "??"
     };
 
@@ -46,10 +48,11 @@ function fnQues490 (objFromMainQues) {
         </p>
         `;
 
-        obj.solution = probDisplay(quesVars)`
-        Step-by-step solution unavailable at this time.
-        The correct answer is \$${calcTheAns.toLocaleString('en-US')}.`;
-    //    ${explainPVAnnuityConst_PV(quesVars)}
+        obj.solution = probDisplay(quesVars)`<div>
+        ${explainPVAnnuityConst_PV(quesVars)}
+        </div>
+        `;
+        
         return obj;
 
     } // end of fillPage

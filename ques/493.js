@@ -11,7 +11,6 @@ function fnQues493(objFromMainQues) {
         //varFV: "??"
     };
 
-    
     quesVars = addPrefix(quesVars);
     if (objFromMainQues.isProduction) { return buildPage(fetchQuesVars(quesVars)) } else { return buildPage(quesVars) }
 
@@ -47,7 +46,6 @@ function fnQues493(objFromMainQues) {
 
 
         obj.solution = probDisplay(quesVars)`${explainFVGrowingAnn_FV(quesVars)}
-
         `;
 
         return obj;

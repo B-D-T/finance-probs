@@ -37,7 +37,7 @@ function fnQues486 (objFromMainQues) {
         `
 
         obj.solution = probDisplay(quesVars)`
-        ${explainFVAnnuityStand_FV(quesVars)}
+        ${explainFVAnnuityConst_FV(quesVars)}
         `
         return obj;
 

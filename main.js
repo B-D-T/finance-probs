@@ -1,7 +1,7 @@
 
 // main.js
 
-strCurrentPackage = "0.2.8";
+strCurrentPackage = "0.2.9";
 
 // Declare the object that accepts each question's info
 objQuesCaller = { "isProduction": false };
