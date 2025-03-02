@@ -14,10 +14,10 @@ function fnQues469 ($, objFromMain) {
         
         // Build the cash flow timeline with random values (This is overwritten in next step. So why is it here??)
         function populateInvestmentTL(ary){
-            for (let index = 1; index < ary.length; index++) {
-                ary[index] = udf.uRand(8000,10000,200);
-            }
-            return ary;
+            return ary.map((value, idx) => 
+                idx === 0 ? value : udf.uRand(8000, 10000, 200)
+            );
+        
         }
 
         const quesVars = {
