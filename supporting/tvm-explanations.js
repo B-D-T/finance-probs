@@ -50,7 +50,7 @@ function explainPVSinglePmt_PV(qvObj) {
     // Overwrite varReturnInYear if it hasn't been overwritten already
     qvExplainer.varReturnInYear = qvExplainer.varReturnInYear ?? qvExplainer.varY - qvExplainer.varN;
 
-    const dispFV = qvExplainer.varFV.toFixed(2).toLocaleString('en-US');
+    const dispFV = TLHelperFuncs.formatVarPMTForTL(qvExplainer.varFV).toLocaleString('en-US');
 
     let myStr = `
         <p>
@@ -935,6 +935,13 @@ function timelinePVSinglePmt(qv) {
     const varY = qv.varY ?? fSetLocalVar("varY", qv.varY);
     const varReturnInYear = qv.varReturnInYear ?? varY - varN;
 
+    let dispFV = qv.varFV;
+    try {
+        dispFV = Number(qv.varFV).toLocaleString('en-US');
+    } catch (e) {
+        // Do nothing
+    }
+
     let myStr = `
     <div style="width:300px;text-align: center; margin:25px;">
         <div style="display:flex; justify-content:center; font-weight:bold;">
@@ -948,7 +955,7 @@ function timelinePVSinglePmt(qv) {
             <div style="width:15%; font-weight:bold;">Amt</div>
             <div style="width:20%;">varPV</div>
             <div style="width:45%;"></div>
-            <div style="width:20%;">varFV</div>
+            <div style="width:20%;">${dispFV}</div>
         </div>
         <div style="margin-left:15%;">
             \\( \\overleftarrow{\\text{Bring back}} \\)
@@ -959,15 +966,47 @@ function timelinePVSinglePmt(qv) {
 }
 
 function timelineFVSinglePmt(qv) {
-    const dispPV = (qv.varPV.toString()).includes("?") ? "??" : (qv.varPV).toLocaleString('en-US');
-    const dispFV = (qv.varFV.toString()).includes("?") ? "??" : (qv.varFV).toLocaleString('en-US');
+
+    const containsQuestionMark = (qvVar) => qvVar.toString().includes("?");
+
+    function getDispReturnInYear(qv) {
+        if (containsQuestionMark(qv.varReturnInYear)) {
+            return "??";
+        }
+        if (qv.varReturnInYear === undefined) {
+            if (containsQuestionMark(qv.varY) || containsQuestionMark(qv.varN)) {
+                return "??";
+            }
+            return qv.varY + qv.varN;
+        }
+        return qv.varReturnInYear;
+    }
+
+    function getDispTimelineValue(qv, varName) {
+        const varValue = qv[varName];
+        if (containsQuestionMark(varValue)) {
+            return "??";
+        }
+        let dispVal = varValue;
+        try {
+            dispVal = Number(varValue).toLocaleString('en-US');
+        } catch (e) {
+            // Do nothing
+        }
+        return dispVal;
+    }
+
+    const dispPV = getDispTimelineValue(qv, "varPV");
+    const dispFV = getDispTimelineValue(qv, "varFV");
+    const dispReturnInYear = getDispReturnInYear(qv);
+
     let myStr = `
     <div style="width:350px;text-align: center; margin:25px;">
         <div style="display:flex; justify-content:center; font-weight:bold;">
             <div style="width:15%;">Year</div>
             <div style="width:20%;">${qv.varY}</div>
             <div style="width:45%;"></div>
-            <div style="width:20%;">${qv.varY + qv.varN}</div>
+            <div style="width:20%;">${dispReturnInYear}</div>
         </div>
         <div><hr /></div>
         <div style="display:flex; justify-content:center;">

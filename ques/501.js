@@ -5,7 +5,8 @@ function fnQues501 (objFromMainQues) {
         varRate: uRand(.05, .10, .01),
         varFV: 1000000000,
         varY: 0,
-        varN: "??"
+        varN: "??",
+        varReturnInYear: "??"
     };
 
     quesVars = addPrefix(quesVars);
