@@ -47,6 +47,12 @@ for (let objProp in qv){ if (qv.hasOwnProperty(objProp)) {eval(objProp + " = qv[
 
 
 // Default values
+
+/**
+ * @param {string} tvmPart - The TVM variable name
+ * @param {number} curVal - The current value of the TVM variable
+ * @returns {number} - The new value of the TVM variable, with a default value if the current value is undefined.
+ */
 function fSetLocalVar(tvmPart, curVal) {
     const objTVMDefaults = {
         "varRate": 0, 

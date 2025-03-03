@@ -47,12 +47,15 @@ function explainPVSinglePmt_PV(qvObj) {
     // Overwrite varY if it hasn't been overwritten already
     qvExplainer.varY = qvExplainer.varY ?? qvExplainer.varN;
 
+    // Overwrite varReturnInYear if it hasn't been overwritten already
+    qvExplainer.varReturnInYear = qvExplainer.varReturnInYear ?? qvExplainer.varY - qvExplainer.varN;
+
     const dispFV = qvExplainer.varFV.toFixed(2).toLocaleString('en-US');
 
     let myStr = `
         <p>
             There is a lump sum (\$${dispFV}) in the future (year ${qvExplainer.varY}),
-            and you want to know what it is going to be worth in year ${qvExplainer.varY - qvExplainer.varN}.
+            and you want to know what it is going to be worth in year ${qvExplainer.varReturnInYear}.
             Let's see this on a timeline:
             ${timelinePVSinglePmt({"varFV":dispFV, "varN":qvExplainer.varN, "varY":qvExplainer.varY, "varReturnInYear":qvExplainer.varReturnInYear, "varPV":"??"})}
         </p>
@@ -85,7 +88,7 @@ function explainFVSinglePmt_FV(qvObj) {
     const varFV     = "??";
     const varPV     = qvObj.varPV === undefined    ? fSetLocalVar("varPV", qvObj.varPV)       : qvObj.varPV
     const varY      = qvObj.varY === undefined     ? fSetLocalVar("varY", qvObj.varY)         : qvObj.varY
-    const varReturnInYear = qvObj.varReturnInYear === undefined ? fSetLocalVar("varReturnInYear", qvObj.varReturnInYear) : qvObj.varReturnInYear
+    const varReturnInYear = qvObj.varReturnInYear ?? varY + varN;
 
     qvObj = { varRate, varN, varFV, varPV, varY, varReturnInYear };
 
@@ -161,7 +164,7 @@ function explainPVAnnuityConst_PV(qv) {
     const varPV           = qv.varPV           ?? fSetLocalVar("varPV", qv.varPV);
     const varG            = qv.varG            ?? fSetLocalVar("varG", qv.varG);
     const varY            = qv.varY            ?? fSetLocalVar("varY", qv.varY);
-    const varReturnInYear = qv.varReturnInYear ?? fSetLocalVar("varReturnInYear", qv.varReturnInYear);
+    const varReturnInYear = qv.varReturnInYear ?? varY - 1;
     const varType  = (varY !== 1) ? 0 : qv.varType || fSetLocalVar("type", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
     const qvObj = { varRate, varN, varPMT, varFV, varPV, varG, varY, varType, varReturnInYear };
 
@@ -258,7 +261,7 @@ function explainPVGrowingAnnuityStand_PV(qv) {
     const varPV     = qv.varPV === undefined    ? fSetLocalVar("varPV", qv.varPV)       : qv.varPV
     const varG      = qv.varG === undefined     ? fSetLocalVar("varG", qv.varG)         : qv.varG
     const varY      = qv.varY === undefined     ? fSetLocalVar("varY", qv.varY)         : qv.varY
-    const varReturnInYear = qv.varReturnInYear === undefined ? fSetLocalVar("varReturnInYear", qv.varReturnInYear) : qv.varReturnInYear
+    const varReturnInYear = qv.varReturnInYear ?? varY - 1;
     const varType = (varY !== 1) ? 0 : qv.varType || fSetLocalVar("type", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
 
     const qvObj = { varRate, varN, varPMT, varFV, varPV, varG, varY, varType, varReturnInYear};
@@ -307,10 +310,10 @@ function explainPVPerpetuityConst_PV(qv) {
     const varPV     = qv.varPV === undefined    ? fSetLocalVar("varPV", qv.varPV)       : qv.varPV
     const varG      = qv.varG === undefined     ? fSetLocalVar("varG", qv.varG)         : qv.varG
     const varY      = qv.varY === undefined     ? fSetLocalVar("varY", qv.varY)         : qv.varY
-    const varReturnInYear = qv.varReturnInYear === undefined ? fSetLocalVar("varReturnInYear", qv.varReturnInYear) : qv.varReturnInYear
+    const varReturnInYear = qv.varReturnInYear  ?? varY - 1;
     const varType = (varY !== 1) ? 0 : qv.varType || fSetLocalVar("type", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
 
-    const qvObj = { varRate, varN, varPMT, varFV, varPV, varG, varY, varType };
+    const qvObj = { varRate, varN, varPMT, varFV, varPV, varG, varY, varType, varReturnInYear};
 
     let myStr =
         `
@@ -386,6 +389,7 @@ function explainPVPerpetuityConst_PV(qv) {
 }
 
 function explainFVAnnuityConst_FV(qv) {
+
     // Right now I'm just using black because I found the colors distracting. But I'll leave the code in case I change my mind down the road.
     let objColors = {
         varY: "black",
@@ -395,16 +399,17 @@ function explainFVAnnuityConst_FV(qv) {
         varFV: "black"
     };
 
-    const varRate   = qv.varRate === undefined  ? fSetLocalVar("varRate", qv.varRate)   : qv.varRate
-    const varN      = qv.varN === undefined     ? fSetLocalVar("varN", qv.varN)         : qv.varN
-    const varPMT    = qv.varPMT === undefined   ? fSetLocalVar("varPMT", qv.varPMT)     : qv.varPMT
-    const varFV     = qv.varFV === undefined    ? fSetLocalVar("varFV", qv.varFV)       : qv.varFV
+    const varRate   = qv.varRate === undefined  ? fSetLocalVar("varRate", qv.varRate)   : qv.varRate;
+    const varN      = qv.varN === undefined     ? fSetLocalVar("varN", qv.varN)         : qv.varN;
+    const varPMT    = qv.varPMT === undefined   ? fSetLocalVar("varPMT", qv.varPMT)     : qv.varPMT;
+    const varFV     = qv.varFV === undefined    ? fSetLocalVar("varFV", qv.varFV)       : qv.varFV;
 //    const varFV = "??";// qv.varFV || fSetLocalVar("varFV", qv.varFV);
-    const varPV     = qv.varPV === undefined    ? fSetLocalVar("varPV", qv.varPV)       : qv.varPV
-    const varG      = qv.varG === undefined     ? fSetLocalVar("varG", qv.varG)         : qv.varG
-    const varY      = qv.varY === undefined     ? fSetLocalVar("varY", qv.varY)         : qv.varY
+    const varPV     = qv.varPV === undefined    ? fSetLocalVar("varPV", qv.varPV)       : qv.varPV;
+    const varG      = qv.varG === undefined     ? fSetLocalVar("varG", qv.varG)         : qv.varG;
+    const varY      = qv.varY === undefined     ? fSetLocalVar("varY", qv.varY)         : qv.varY;
     const varType = (varY !== 1) ? 0 : qv.varType || fSetLocalVar("type", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
-    const varReturnInYear = qv.varReturnInYear === undefined ? fSetLocalVar("varReturnInYear", qv.varReturnInYear) : qv.varReturnInYear
+
+    const varReturnInYear = qv.varReturnInYear ?? varY + varN - 1;
 
     const qvObj = { varRate, varN, varPMT, varFV, varPV, varG, varY, varType, varReturnInYear };
 
@@ -435,7 +440,8 @@ function explainFVAnnuityConst_FV(qv) {
 
     const annLastYr = (varY + varN - 1);
     const absDiff_AnnLastYr_ReturnInYear = Math.abs(varReturnInYear - annLastYr);
-     let explanationToShow = "";
+console.log(`||| annLastYr: ${annLastYr}, varReturnInYear: ${varReturnInYear}`);
+    let explanationToShow = "";
     if (annLastYr == varReturnInYear) {
         // Do nothing, we're already in the correct year. E.g., varY = 1 and varReturnInYear = 0
         explanationToShow = "";
@@ -506,7 +512,7 @@ function explainFVGrowingAnn_FV(qv) {
     const varG      = qv.varG === undefined     ? fSetLocalVar("varG", qv.varG)         : qv.varG
     const varY      = qv.varY === undefined     ? fSetLocalVar("varY", qv.varY)         : qv.varY
     const varType = (varY !== 1) ? 0 : qv.varType || fSetLocalVar("type", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
-    const varReturnInYear = qv.varReturnInYear === undefined ? fSetLocalVar("varReturnInYear", qv.varReturnInYear) : qv.varReturnInYear
+    const varReturnInYear = qv.varReturnInYear ?? varY + varN - 1;
 
     const qvObj = { varRate, varN, varPMT, varFV, varPV, varG, varY, varType, varReturnInYear};
 
@@ -562,11 +568,11 @@ function explainPVBondLevelAnnual_PV(qv){
     const varPV     = qv.varPV === undefined    ? fSetLocalVar("varPV", qv.varPV)       : qv.varPV
     const varG      = qv.varG === undefined     ? fSetLocalVar("varG", qv.varG)         : qv.varG
     const varY      = qv.varY === undefined     ? fSetLocalVar("varY", qv.varY)         : qv.varY
-    const varReturnInYear = qv.varReturnInYear === undefined ? fSetLocalVar("varReturnInYear", qv.varReturnInYear) : qv.varReturnInYear
+    const varReturnInYear = qv.varReturnInYear ?? varY - 1;
     const varType   = (varY !== 1) ? 0 : qv.varType || fSetLocalVar("type", qv.varType); // if varY is anything OTHER than 1, that means it rules and we should ignore the varType argument.
     
+    const qvObj = { varRate, varN, varPMT, varFV, varPV, varG, varY, varType, varReturnInYear};
 
-    const qvObj = { varRate, varN, varPMT, varFV, varPV, varG, varY, varType };
     const
         dispCouponRatePerc = uRound(varCouponRate*100,4),
         dispPMT = qv.dispPMT,
@@ -1742,6 +1748,7 @@ function identifyPVVars(qv, objColors) {
         dispRate = uRound(qv.varRate, 5),
         dispG = uRound(qv.varG, 5),
         dispPMT = uRound(qv.varPMT,9);
+
     if (isAnnuity) {
         if (isPerpetuity){
                 // PV of a perpetuity (whether it's growing or not)
@@ -1777,7 +1784,7 @@ function identifyPVVars(qv, objColors) {
                 \\[
                     \\begin{aligned}
                         C_{varY} &= ${dispPMT} \\\\
-                        PV_{varY-1} &= {varPV} \\\\
+                        PV_{varY-1} &= \\text{??} \\\\
                         i &= ${dispRate} \\\\
                         n &= varN \\\\
                         y &= varY
@@ -1792,7 +1799,7 @@ function identifyPVVars(qv, objColors) {
         \\[
             \\begin{aligned}
                 C_{varY} &= {varFV} \\\\
-                PV_{varY-varN} &= ${varPV} \\\\
+                PV_{varY-varN} &= \\text{??} \\\\
                 i &= ${dispRate} \\\\
                 n &= varN \\\\
                 y &= varY
