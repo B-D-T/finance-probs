@@ -440,7 +440,6 @@ function explainFVAnnuityConst_FV(qv) {
 
     const annLastYr = (varY + varN - 1);
     const absDiff_AnnLastYr_ReturnInYear = Math.abs(varReturnInYear - annLastYr);
-console.log(`||| annLastYr: ${annLastYr}, varReturnInYear: ${varReturnInYear}`);
     let explanationToShow = "";
     if (annLastYr == varReturnInYear) {
         // Do nothing, we're already in the correct year. E.g., varY = 1 and varReturnInYear = 0

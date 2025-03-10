@@ -6,6 +6,7 @@ function fnQues489 (objFromMainQues) {
         "varRate": uRand(.04, .08, .005),
         "varN": uRand(8, 16, 1),
         "varY": 0,
+        "varReturnInYear": 0,
         "varPV": "??"
     };
 
