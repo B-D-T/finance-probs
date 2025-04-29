@@ -99,7 +99,8 @@ function fnQues467 ($, objFromMain) {
         <p>
             Below is the completed table with the correct variables from the prompt. 
         </p>
-        <div id="capbudgVarTableQues467Solutions">${capbudg.htmlVariableTable(true,v.calcTheAns)}</div>`;
+        <div id="capbudgVarTableQues467Solutions">${capbudg.htmlVariableTable(true,v.calcTheAns)}</div>
+        `;
         
         return obj;
 
@@ -110,4 +111,4 @@ function fnQues467 ($, objFromMain) {
 try { fnQues467(); }
 catch (error) { console.error();}
 
-console.log('Question loaded');
+console.log('Question 467 loaded');

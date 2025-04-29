@@ -71,7 +71,8 @@ function fnQues468 ($, objFromMain) {
         <p>
             Below is the completed table with the correct variables from the prompt. 
         </p>
-        <div id="capbudgVarTableQues468Solutions">${capbudg.htmlVariableTable(true,v.calcTheAns)}</div>`;
+        <div id="capbudgVarTableQues468Solutions">${capbudg.htmlVariableTable(true,v.calcTheAns)}</div>
+        `;
 
         obj.response = `<p>Can you read <b>this</b>??`
         

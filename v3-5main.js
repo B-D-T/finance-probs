@@ -20,7 +20,7 @@ function quesNumGlobal () {
     // Right now this only works for capital budgeting questions and questions from Sport Data Analytics (IDs >31400)
     // If students are working on any earlier questions, quit out of here by setting IS_QUES_PAGE to false.
     const regexMatch = divID.match(/(divQues)(\d*)(-*)/);
-    const thisQuesNum = parseInt(regexMatch[2]);
+    const thisQuesNum = Number.parseInt(regexMatch[2]);
     const capBudgQues = [467, 468, 469, 470, 471];
     if (capBudgQues.includes(thisQuesNum) || (thisQuesNum > 31400)) { IS_QUES_PAGE = true; };
 
