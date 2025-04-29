@@ -35,7 +35,6 @@ function fnQues469 ($, objFromMain) {
             dispIRRInv01: codeCouldCalcIRR ? udf.uRound(calcVars.calcTheAns.ansIRR,5).toFixed(4) : strNoIRRFound,
             dispIRRInv01AsPerc: codeCouldCalcIRR ? (calcVars.calcTheAns.ansIRR * 100).toFixed(2) : strNoIRRFound
         };
-        console.log('displayVars', displayVars);
 
         return udf.combineVarObjs(quesVars, calcVars, displayVars);
     }
