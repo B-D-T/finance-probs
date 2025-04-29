@@ -1676,7 +1676,7 @@ function TVMExplanation ($, objFromMain) {
     const calcFVIF = (1 + varRate) ** varN;
     const calcPVIF = 1 / calcFVIF;
     const dispFV = uRound(varFV, 5);
-    const dispRate = uRound(1 + varRate, 4);
+    const dispRate = uRound(varRate, 4);
     const dispGrowthRate = uRound(1 + varRate, 4);
     const dispFVIF = uRound(calcFVIF, 5);
     const dispPVIF = uRound(calcPVIF, 5);
