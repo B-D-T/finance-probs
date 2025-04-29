@@ -44,7 +44,7 @@ function CapitalBudgeting ($, objFromMain) {
   // Create an array of values per year
   function capbudgTimeline (objCBVars, varAbbr) {
     const periods = objCBVars.varLifespan + 1;
-    let tl = Array(periods);
+    let tl = Array(periods); // This is sparse array, which means it has length but values. e.g, you cannot iterate over it.
     tl[0] = objCBVars.calcIC;
     switch (varAbbr) {
       case "IC":
@@ -202,7 +202,7 @@ function CapitalBudgeting ($, objFromMain) {
   // This builds an HTML table from an array of cash flows starting in year 0
   this.htmlCashFlowTable = function (aryCashFlows) {
     let aryYears = aryCashFlows.map((elem, idx) => `<div class="entry year">${idx}</div>`);
-    let aryAmts = aryCashFlows.map((elem) => `<div class="entry amt">${elem.$$()}</div>`);
+    let aryAmts = aryCashFlows.map((elem) => `<div class="entry amt">${udf.uCurrency(elem)}</div>`);
     return [
             `<div class="cash-flow-table">`,
                 `<div class="years-container">`,

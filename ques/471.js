@@ -33,7 +33,7 @@ function fnQues471 ($, objFromMain) {
                 let ans = ansVars.ansPaybackPeriodDisc;
                 return ans == undefined ? `Does not pay back within ${quesVars.varLifespan} years.` : ans.toFixed(5).toLocaleString('en-US') + " years"
             },
-            "dispAnsNPV": ansVars.ansNPV.$$(5)
+            "dispAnsNPV": udf.uCurrency(ansVars.ansNPV, 5)
         };
 
         return udf.combineVarObjs(quesVars, calcVars, displayVars);
@@ -47,13 +47,13 @@ function fnQues471 ($, objFromMain) {
         obj.stem = `
         <p>
             Stanford University is considering adding new seats to its basketball arena.
-            The 688 new seats will bring in a total of ${v.varENEPIRev.$$()} in additional revenue per season.
+            The 688 new seats will bring in a total of ${udf.uCurrency(v.varENEPIRev)} in additional revenue per season.
             There is a miniscule added annual expense and it is not being factored into the decision-making process.
         </p>
 
         <p>
-            The cost of the purchasing the seats is ${(-1*v.varIP).$$()},
-            and installation costs are ${(-1*v.varATP).$$()},
+            The cost of the purchasing the seats is ${udf.uCurrency((-1*v.varIP))},
+            and installation costs are ${udf.uCurrency((-1*v.varATP))},
             all of which are incurred today.
             The University's basketball facility is scheduled to be replaced,
             but that will not happen for another ${v.varLifespan} years.

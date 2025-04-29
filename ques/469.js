@@ -32,7 +32,7 @@ function fnQues469 ($, objFromMain) {
         const codeCouldCalcIRR = Number(calcVars.calcTheAns.ansIRR) ? true : false;
         const displayVars = {
             dispCodeCouldCalcIRR: codeCouldCalcIRR,
-            dispIRRInv01: codeCouldCalcIRR ? udf.uRound(calcVars.calcTheAns.ansIRR,6).toFixed(5) : strNoIRRFound,
+            dispIRRInv01: codeCouldCalcIRR ? udf.uRound(calcVars.calcTheAns.ansIRR,5).toFixed(4) : strNoIRRFound,
             dispIRRInv01AsPerc: codeCouldCalcIRR ? (calcVars.calcTheAns.ansIRR * 100).toFixed(2) : strNoIRRFound
         };
         console.log('displayVars', displayVars);

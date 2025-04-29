@@ -56,19 +56,19 @@ function fnQues467 ($, objFromMain) {
             BDT Enterprises, which owns The Park (a local sports bar and bowling alley), 
             is considering updating by putting in seven new pin-setting machines.
             The current machines allow for ${v.varGamesPerYr.toLocaleString("en-US")} bowled games per year
-            at ${v.varCostPerGameOld.$$(2)} per game.
+            at ${udf.uCurrency(v.varCostPerGameOld, 2)} per game.
             Despite being old, they have held up well and
-            only require a total of ${(-1*v.varENEWPExp).$$()} per year in maintenance.
-            The seven current machines can be sold to individuals for in-home use for ${v.varResalePricePer.$$()} each.
+            only require a total of ${udf.uCurrency(-1*v.varENEWPExp)} per year in maintenance.
+            The seven current machines can be sold to individuals for in-home use for ${udf.uCurrency(v.varResalePricePer)} each.
         </p>
         <p>
-            The total cost of the new machines is ${(-1*v.varIP).$$()},
-            installation is an additional ${(-1*v.varATP).$$()},
+            The total cost of the new machines is ${udf.uCurrency(-1*v.varIP)},
+            installation is an additional ${udf.uCurrency(-1*v.varATP)},
             and those costs are incurred today (i.e., at t=0).
             The new machines will have a useful life of ${v.varLifespan} years
             and can be depreciated in a straight-line method over these  ${v.varLifespan} years.
             At the end of the ${v.varLifespan} years,
-            they are expected to have a salvage/scrap value of ${v.varSalvagePerUnit.$$()} each.
+            they are expected to have a salvage/scrap value of ${udf.uCurrency(v.varSalvagePerUnit)} each.
         </p>
         <p>
             The machines will reset the pins faster after each bowler rolls,
@@ -76,8 +76,8 @@ function fnQues467 ($, objFromMain) {
             Based on a market survey,
             it is expected that the machines will increase the number of games bowled by ${v.varAddlGames.toLocaleString('en-US')} each year,
             for the ${v.varLifespan} years.
-            The price of each game ${(v.varCostPerGameOld==v.varCostPerGameNew ? "will remain at " : "is now ") + v.varCostPerGameNew.$$(2)} per game.
-            The new machines will have annual maintenance expenses of ${(-1*v.varENEPIExp).$$()} per year.
+            The price of each game ${(v.varCostPerGameOld==v.varCostPerGameNew ? "will remain at " : "is now ") + udf.uCurrency(v.varCostPerGameNew, 2)} per game.
+            The new machines will have annual maintenance expenses of ${udf.uCurrency(-1*v.varENEPIExp)} per year.
         </p>
         <p>
             BDT faces a ${v.dispTaxRate} tax rate, and it has a cost of capital of ${v.dispRate}.

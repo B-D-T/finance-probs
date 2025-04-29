@@ -37,7 +37,7 @@ function fnQues470 ($, objFromMain) {
         let ans = ansVars.ansPaybackPeriodDisc;
         return ans === undefined ? `Does not pay back within ${quesVars.varLifespan} years.` : ans.toFixed(5).toLocaleString("en-US") + " years"
       },
-      "dispAnsNPV": ansVars.ansNPV.$$(5)
+      "dispAnsNPV": udf.uCurrency(ansVars.ansNPV, 5)
     };
 
     return udf.combineVarObjs(quesVars, calcVars, displayVars);

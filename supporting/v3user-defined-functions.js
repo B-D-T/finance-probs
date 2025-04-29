@@ -25,27 +25,107 @@
 // }
 // console.log('v3user-defined-functions.js loaded');
 
+
 function UDFClass ($, objFromMain) {
   const self = this;
   self.quesNum = quesNumGlobal();
 
-  // This add a global method to all numbers for formatting.
-  // To use, append .$$() to the end of a number variable.
-  // E.g., varPV.$$, or varPV.$$(whatever arguments you want)
-  Number.prototype.$$ = function ({ minDecimals = 0, maxDecimals = 2, strRegion = "en-US", strCurrency = "USD" } = {}) {
-    // Get primitive copy of number
-    let myNum = this.valueOf();
-    // If only one argument is passed, assume that it's the number of decimals
-    // E.g., varPV.$$(2) means I want 2 decimal places and all other default formatting
-    if (arguments.length === 1 && typeof arguments[0] !== "object") {
-      minDecimals = arguments[0]; maxDecimals = arguments[0];
+  /**
+   * Formats a number as a localized currency string.
+   *
+   * @param {number|string} number - The number to format. Can be a numeric value or a string that can be parsed into a number. Invalid strings will result in `undefined`.
+   * @param {number} [minDecimals=0] - The minimum number of decimal places to display. Must be a non-negative integer.
+   * @param {number} [maxDecimals=2] - The maximum number of decimal places to display. Must be a non-negative integer.
+   * @param {string} [strRegion="en-US"] - The locale to use for formatting (e.g., a valid BCP 47 language tag like "en-US").
+   * @param {string} [strCurrency="USD"] - The currency code to use for formatting (e.g., a valid ISO 4217 currency code like "USD").
+   * @returns {string|undefined} - The formatted currency string, or `undefined` if the input number is invalid.
+   *
+   * @example
+   * udf.uCurrency(1234.56); // "$1,234.56" (default locale and currency)
+   * udf.uCurrency(1234.56, 3); // "$1,234.560" (minimum 3 decimal places)
+   * udf.uCurrency(1234.56, 1, 3, "de-DE", "EUR"); // "1.234,56 €" (German locale, Euro currency)
+   * udf.uCurrency("invalid"); // Logs an error and returns undefined
+   */
+  self.uCurrency = (number, minDecimals = 0, maxDecimals = 2, strRegion = "en-US", strCurrency = "USD") => {
+
+    /** @type {number} */
+    const defaultMinDecimals = 0;
+    
+    /** @type {number} */
+    const defaultMaxDecimals = 2;
+
+    /**
+     * Processes the input number and converts it to a float.
+     * If the conversion fails, it logs an error and returns undefined.
+     * 
+     * @param {number|string} inputNum - The input number to process. Can be a numeric value or a string that can be parsed into a number.
+     * @return {number|undefined} - The processed number, or `undefined` if the input is invalid.
+     */
+    function processParamNumber (inputNum) {
+
+      /** @type {number} */
+      let myNum = undefined;
+
+      try {
+        myNum = Number.parseFloat(inputNum);
+      } catch (err) {
+        // pass
+      }
+      if (isNaN(myNum) || myNum === undefined) {
+        console.error(`${this.formatCurrency.name}: Error converting number (${number}) to a number. Returning undefined.`);
+        return undefined;
+      }
+      return myNum;
     }
+
+    /**
+     * Processes the input decimal parameter and converts it to an integer.
+     * If the conversion fails or the value is negative, it logs an error and returns a default value.
+     * 
+     * @param {"minDecimals"|"maxDecimals"} argName - The name of the argument to process.
+     * @param {number|string} argValue - The value of the argument to process. Should be a non-negative integer or a string that can be parsed into one.
+     * @param {number} defaultVal - The default value to return if conversion fails or the value is negative.
+     * @return {number} - The processed decimal value or the default value.
+     */
+    function processParamDecimal (argName, argValue, defaultVal) {
+      /** @type {number} */
+      let valToReturn = defaultVal;
+
+      try {
+        valToReturn = Number.parseInt(argValue);
+      } catch (err) {
+        console.error(`${this.formatCurrency.name}: Error converting ${argName} argument (${argValue}) to a number. Using default (${defaultVal}) instead.`);
+      }
+      if (valToReturn < 0) {
+        console.error(`${this.formatCurrency.name}: ${argName} (${argValue}) is negative. Using 0 instead.`);
+        valToReturn = 0;
+      }
+      return valToReturn;
+    }
+
+    /** @type {number} */
+    const myNum = processParamNumber(number);
+
+    if (myNum === undefined) {
+      return undefined;
+    }
+
+    /** @type {number} */
+    const myMinDecimals = processParamDecimal("minDecimals", minDecimals, defaultMinDecimals);
+
+    /** @type {number} */
+    let myMaxDecimals = processParamDecimal("maxDecimals", maxDecimals, defaultMaxDecimals);
+
+    if (myMaxDecimals < myMinDecimals) {
+      myMaxDecimals = myMinDecimals;
+    }
+
     // Return modified copy of number using given parameters
     return myNum.toLocaleString(strRegion, {
       "style": "currency",
       "currency": strCurrency,
-      "minimumFractionDigits": minDecimals,
-      "maximumFractionDigits": maxDecimals
+      "minimumFractionDigits": myMinDecimals,
+      "maximumFractionDigits": myMaxDecimals
     });
   };
 
@@ -54,7 +134,7 @@ function UDFClass ($, objFromMain) {
     if (arguments.length < 2) { max = min; min = 0; }
     if (!step) { step = 1; }
     // The adjFactor is to account for computers' binary adding problem. It multiplies at first and divides at the end.
-    const adjFactor = countDecimals(step) === 0 ? 1 : parseInt(1 + "0".repeat(countDecimals(step)));
+    const adjFactor = countDecimals(step) === 0 ? 1 : Number.parseInt(1 + "0".repeat(countDecimals(step)));
     min *= adjFactor; max *= adjFactor; step *= adjFactor;
 
     const delta = max + step - min; // allows for max to be inclusive
@@ -300,7 +380,7 @@ function UDFClass ($, objFromMain) {
 //     let dispPercCorrect, resultIcon, stuRespLocal;
 
 //     try {
-//         dispPercCorrect = parseFloat(objQuesResp.percCorrect * 100).toFixed(0) + "%";
+//         dispPercCorrect = Number.parseFloat(objQuesResp.percCorrect * 100).toFixed(0) + "%";
 //         resultIcon = dispPercCorrect == "100%"
 //             ? `<span style="color: green;">&#10004;</span>`
 //             : `<span style="color: red;">&#10008;</span>`;
@@ -435,7 +515,7 @@ function UDFClass ($, objFromMain) {
 //     return ptsEarned / ptsPossible;
 
 //     function percCorrect(respToEvaluate, paramCorrectAns, rawTolerance) {
-//         curCorrectAns = parseFloat(paramCorrectAns);
+//         curCorrectAns = Number.parseFloat(paramCorrectAns);
 
 //         // If a rawTolerance is passed, the code will accept answers +/- that amount.
 //         // Otherwise, it uses a percent difference (i.e., curCorrectAns +/- 1.25% ).
@@ -459,7 +539,7 @@ function UDFClass ($, objFromMain) {
 //             resp = resp.replace(regex, '');
 //         });
 
-//         return parseFloat(resp);
+//         return Number.parseFloat(resp);
 //     }
 // }
 
