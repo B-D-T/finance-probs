@@ -1,6 +1,5 @@
 function fnQues490 (objFromMainQues) {
 
-
     let quesVars = {
         "varPMT": uRand(400, 600, 10),
         "varRate": uRand(.04, .08, .005),
@@ -66,3 +65,5 @@ function fnQuesResp(objPageSubmit){
         return setEDQuesRespVars(objRespFeedback);
     }
 }
+
+//# sourceURL=ques/490.js

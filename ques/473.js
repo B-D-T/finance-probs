@@ -23,7 +23,7 @@ function fnQues473(objFromMainQues) {
         let displayVars = {
             dispRatePerc: uRound(varRate * 100, 4), // perr
             dispGPerc: uRound(varG * 100, 4), // perg
-            dispPMT: varPMT.toFixed(2).toLocaleString('en-US') //$D
+            dispPMT: varPMT.toLocaleString('en-US', {'minimumFractionDigits': 2, 'maximumFractionDigits': 2}) //$D
         };
         createEDVarInScope(displayVars);
 
