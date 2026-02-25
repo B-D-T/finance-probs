@@ -96,10 +96,10 @@ function fnQues491 (objFromMainQues) {
                 "varPMT": varAnn2PMT,
                 "varN": varAnn2N,
                 "varY": varAnn2Y,
-                "varRate": varRate
+                "varRate": varRate,
+                "varReturnInYear": 0
             })}
         </div>
-
         <div>
             <h2 style="${strAddBackTogether}">
                 Add PV<sub>A</sub> and PV<sub>B</sub>
@@ -122,7 +122,7 @@ function fnQues491 (objFromMainQues) {
                 \\]
             </p>
             <p>
-                Thus, the price of the investment is <b>\$${calcTheAns.toFixed(2).toLocaleString('en-US')}</b>.
+                Thus, the price of the investment is <b>\$${calcTheAns.toLocaleString('en-US', {'minimumFractionDigits': 2, 'maximumFractionDigits': 2})}</b>.
                 If anyone pays more than that in today's dollars,
                 they will not break even on their investment due to the
                 discounting effect over time (assuming i=${dispRatePerc}%).
@@ -142,3 +142,5 @@ function fnQuesResp(objPageSubmit){
         return setEDQuesRespVars(objRespFeedback);
     }
 }
+
+//# sourceURL=ques/491.js
