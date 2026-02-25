@@ -76,15 +76,15 @@ function writeHTML(obj) {
   jQuery(qtrxDivID + "-stem").html(obj.stem);
 
   const qtrxQuesID = objQuesCaller.qtrxQuesInfo.questionId; // this is the internal Qualtrics ID
-  jQuery("#" + qtrxQuesID + " .InputText").attr("placeholder", obj.ansBoxMessage);
+  const el = document.querySelector(`#${qtrxQuesID} .InputText`);
+  if (el) el.setAttribute("placeholder", obj.ansBoxMessage);
 
   jQuery(qtrxDivID + "-solution").html(obj.solution);
 
 
-
   // Only run this on questions
   const divQuesRespName = qtrxDivID + "-response";
-  if (jQuery(divQuesRespName).length) {
+  if (document.querySelector(divQuesRespName)) {
     if (!(objQuesCaller.isProduction === false)) {
       jQuery.when(getEDValue("objQuesResp" + strQuesNum)).then(function (edValue) {
         jQuery(divQuesRespName).html(showFeedback(edValue));

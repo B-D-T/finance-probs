@@ -460,13 +460,18 @@ function UDFClass ($, objFromMain) {
 //     }
 // }
 
-// function fStrReplaceVarsWithVals(paramStr, theObj) {
-//     jQuery.each(theObj, function (origVar, newVar) {
-//         paramStr = paramStr.replace(RegExp(origVar, "g"), newVar);
+// function fStrReplaceVarsWithVals (paramStr, theObj) {
+//   if (Array.isArray(theObj)) {
+//     theObj.forEach((newVar, origVar) => {
+//       paramStr = paramStr.replace(new RegExp(origVar, "g"), newVar);
 //     });
-//     return paramStr;
+//   } else if (theObj && typeof theObj === "object") {
+//     Object.entries(theObj).forEach(([origVar, newVar]) => {
+//       paramStr = paramStr.replace(new RegExp(origVar, "g"), newVar);
+//     });
+//   }
+//   return paramStr;
 // }
-
 
 
 
