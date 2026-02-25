@@ -1,13 +1,13 @@
 // v3tvm-explanations.js
 
-class TLHelperFuncs {
+class ExplainerHelperFuncs {
 
     static isNumLike = (val) => {
-        if (typeof val === 'number') {
-            return true;
+        if (typeof val === "number") {
+            return Number.isFinite(val);
         }
-        if (typeof val === 'string' && !isNaN(val) && !isNaN(parseFloat(val))) {
-            return true;
+        if (typeof val === "string") {
+            return val.trim() !== "" && Number.isFinite(Number(val));
         }
         return false;
     }
@@ -15,16 +15,65 @@ class TLHelperFuncs {
     static formatVarPMTForTL = (payment) => {
         // If it's an integer-like number, this returns a string with the integer only
         // Otherwise, it returns the input value as is
-        if (!TLHelperFuncs.isNumLike(payment)) {
+        if (!ExplainerHelperFuncs.isNumLike(payment)) {
             return payment;
         }
         // If it's a number, and the integer part is the same as the float part, just show the integer part.
-        const floatPayment = parseFloat(payment);
-        if (Number.isInteger(floatPayment)) { 
-            return floatPayment.toFixed(0);
-        } 
-        return payment;
+        const numPmt = Number(payment);
+        return Number.isInteger(numPmt) ? numPmt.toFixed(0) : payment;
     }
+
+    static numToLocaleStr = (val, {
+        minimumFractionDigits = 0,
+        maximumFractionDigits = 5,
+        localeCode = 'en-US'
+    } = {}) => {
+        // This is a simplified adaptation of the toLocaleString method.
+        // If the value is not number-like, it just returns the value as is.
+        // If the value is number-like, it converts it to a number and then formats it using toLocaleString with the specified number of digits and locale code.
+        if (!ExplainerHelperFuncs.isNumLike(val)) {
+            return val;
+        }
+        return Number(val).toLocaleString(localeCode, {
+            minimumFractionDigits: minimumFractionDigits,
+            maximumFractionDigits: maximumFractionDigits
+        });
+    }
+
+    static numToLocaleStrCurrency = (val, {
+        minimumFractionDigits = 0,
+        maximumFractionDigits = 5,
+        localeCode = 'en-US',
+        style = 'currency',
+        currency = 'USD'
+    } = {}) => {
+        // This is a simplified adaptation of the toLocaleString method for currency formatting.
+        // If the value is not number-like, it just returns the value as is.
+        // If the value is number-like, it converts it to a number and then formats it using toLocaleString with the specified number of digits, locale code, style, and currency.
+        if (!ExplainerHelperFuncs.isNumLike(val)) {
+            return val;
+        }
+        return Number(val).toLocaleString(localeCode, {
+            style,
+            currency,
+            minimumFractionDigits: minimumFractionDigits,
+            maximumFractionDigits: maximumFractionDigits
+        });
+    }
+
+    static numToLocaleStr2Digits = (val) =>
+        ExplainerHelperFuncs.numToLocaleStr(val, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    static numToLocaleStrOto2Digits = (val) =>
+        ExplainerHelperFuncs.numToLocaleStr(val, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    static numToLocaleStr0to5Digits = (val) =>
+        ExplainerHelperFuncs.numToLocaleStr(val, { minimumFractionDigits: 0, maximumFractionDigits: 5 });
+    static numToLocaleStrCurrency0Digits = (val) =>
+        ExplainerHelperFuncs.numToLocaleStrCurrency(val, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    static numToLocaleStrCurrency2Digits = (val) =>
+        ExplainerHelperFuncs.numToLocaleStrCurrency(val, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    static numToLocaleStrCurrency0to5Digits = (val) =>
+        ExplainerHelperFuncs.numToLocaleStrCurrency(val, { minimumFractionDigits: 0, maximumFractionDigits: 5 });
+
 }
 
 // ################################
@@ -42,7 +91,7 @@ function TVMExplanation ($, objFromMain) {
       varFV: "black"
     };
 
-    const dispFV = qvObj.varFV.toFixed(2).toLocaleString("en-US");
+    const dispFV = ExplainerHelperFuncs.numToLocaleStr2Digits(qvObj.varFV);
     const myStr = `
             <p>
                 There is a lump sum (\$${dispFV}) in the future (year ${qvObj.varN}),
@@ -86,7 +135,7 @@ function TVMExplanation ($, objFromMain) {
 
     const myStr = `
             <p>
-                You have a lump sum (\$${varPV.toLocaleString("en-US")}) in year ${varY},
+                You have a lump sum (\$${ExplainerHelperFuncs.numToLocaleStr0to5Digits(varPV)}) in year ${varY},
                 and you want to know what it is worth in year ${varY + varN}.
                 Let's see this on a timeline:
                 ${timelineFVSinglePmt(qvObj)}
@@ -117,8 +166,8 @@ function TVMExplanation ($, objFromMain) {
 
     const myStr = `
             <p>
-                You know PV<sub>varY</sub> (\$${varPV.toLocaleString("en-US")})
-                and FV<sub>??</sub> (\$${varFV.toLocaleString("en-US")}),
+                You know PV<sub>varY</sub> (\$${ExplainerHelperFuncs.numToLocaleStr0to5Digits(varPV)})
+                and FV<sub>??</sub> (\$${ExplainerHelperFuncs.numToLocaleStr0to5Digits(varFV)}),
                 but you don't know how long it will take for the
                 PV to grow to the FV amount.
                 Let's see this on a timeline:
@@ -195,14 +244,14 @@ function TVMExplanation ($, objFromMain) {
                 but we want PV<sub>0</sub> (the Present Value of the payments in Year 0).
                 At this point, we can (and should)
                 <i>completely forget about
-                the original ${varN} payments of \$${varPMT.toLocaleString("en-US")} --
+                the original ${varN} payments of ${ExplainerHelperFuncs.numToLocaleStrCurrency0to5Digits(varPMT)} --
                 they are irrelevant now!</i>
                 We've collapsed those payments into a single value.
                 Essentially, we have an entirely new problem now, with "new" variables:
             </p>
             <p style="margin-left:30px;">
                 "What is the value in Year 0 of a lump sum payment of
-                \$${theAns.toFixed(2).toLocaleString("en-US")}
+                ${ExplainerHelperFuncs.numToLocaleStrCurrency2Digits(theAns)}
                 happening in year ${varY - 1}, assuming a rate of ${uRound(varRate * 100, 4)}%?"
             </p>
             <p>
@@ -244,7 +293,7 @@ function TVMExplanation ($, objFromMain) {
             `
             <p>
                 There is a series of varN payments.
-                The first payment (in year varY) is \$${varPMT.toLocaleString('en-US')},
+                The first payment (in year varY) is ${ExplainerHelperFuncs.numToLocaleStrCurrency0to5Digits(varPMT)},
                 and the payment amount changes each year at a rate of ${uRound(varG * 100, 4)}%.
                 Let's see these on a timeline:
                 ${timelineAnnuity(qvObj, "pv")}
@@ -293,7 +342,7 @@ function TVMExplanation ($, objFromMain) {
             `
             <p>
                 This is a series of payments that go on forever, with
-                the first payment of \$${varPMT.toLocaleString('en-US')}
+                the first payment of ${ExplainerHelperFuncs.numToLocaleStrCurrency0to5Digits(varPMT)}
                 happening in year varY.
         `;
 
@@ -346,7 +395,7 @@ function TVMExplanation ($, objFromMain) {
             </p>
             <p style="margin-left:30px;">
                 "What is the value in Year 0 of a lump sum payment of
-                \$${theAns.toFixed(2).toLocaleString('en-US')}
+                ${ExplainerHelperFuncs.numToLocaleStrCurrency2Digits(theAns)}
                 happening in year ${varY - 1}, assuming a rate of ${uRound(varRate * 100, 4)}%?"
             </p>
             <p>
@@ -728,7 +777,7 @@ function TVMExplanation ($, objFromMain) {
         `;
 
     // Add them back together
-    const dispTheAns = uRound(qv.calcTheAns, 4).toLocaleString('en-US');
+    const dispTheAns = ExplainerHelperFuncs.numToLocaleStrCurrency(uRound(qv.calcTheAns, 4), {minimumFractionDigits: 0, maximumFractionDigits: 4});
     myStr += `
             <div>
                 <h2 style="${strAddBackTogether}">
@@ -752,7 +801,7 @@ function TVMExplanation ($, objFromMain) {
                     \\]
                 </p>
                 <p>
-                    Thus, the price of the bond is <b>\$${dispTheAns}</b>.
+                    Thus, the price of the bond is <b>${dispTheAns}</b>.
                     If anyone pays more than that in today's dollars,
                     they will not break even on their investment due to the
                     discounting effect over time (assuming i=${qv.dispRatePerc}%).
@@ -767,7 +816,7 @@ function TVMExplanation ($, objFromMain) {
                     <p>
                         We can compare our answer to we knew from the pre-check process.
                         As expected, the price of the bond is equal to the par value:<br />
-                        \$${uRound(qv.calcTheAns, 0).toLocaleString('en-US')} = \$${dispFV}
+                        ${ExplainerHelperFuncs.numToLocaleStrCurrency0Digits(uRound(qv.calcTheAns, 0))} = \$${dispFV}
                     </p>
                 </div>
             `;
@@ -778,7 +827,7 @@ function TVMExplanation ($, objFromMain) {
                     <p>
                         We can compare our answer to we knew from the pre-check process.
                         As expected, the price of the bond is greater than the par value:<br />
-                        \$${uRound(qv.calcTheAns, 0).toLocaleString('en-US')} > \$${dispFV}
+                        ${ExplainerHelperFuncs.numToLocaleStrCurrency0Digits(uRound(qv.calcTheAns, 0))} > \$${dispFV}
                     </p>
                 </div>
             `;
@@ -789,7 +838,7 @@ function TVMExplanation ($, objFromMain) {
                     <p>
                         We can compare our answer to we knew from the pre-check process.
                         As expected, the price of the bond is less than the par value:<br />
-                        \$${uRound(qv.calcTheAns, 0).toLocaleString('en-US')} < \$${dispFV}
+                        ${ExplainerHelperFuncs.numToLocaleStrCurrency0Digits(uRound(qv.calcTheAns, 0))} < \$${dispFV}
                     </p>
                 </div>
             `;
@@ -807,14 +856,14 @@ function TVMExplanation ($, objFromMain) {
                 but we want PV<sub>0</sub> (the Present Value of the payments in Year 0).
                 At this point, we can (and should)
                 <i>completely forget about
-                the original ${varN} payments of \$${varPMT.toLocaleString('en-US')} --
+                the original ${varN} payments of ${ExplainerHelperFuncs.numToLocaleStrCurrency0to5Digits(varPMT)} --
                 they are irrelevant now!</i>
                 We've collapsed those payments into a single value.
                 Essentially, we have an entirely new problem now, with "new" variables:
             </p>
             <p style="margin-left:30px;">
                 "What is the value in Year 0 of a lump sum payment of
-                \$${theAns.toFixed(2).toLocaleString('en-US')}
+                ${ExplainerHelperFuncs.numToLocaleStrCurrency2Digits(theAns)}
                 happening in year ${varY - 1}, assuming a rate of ${uRound(varRate * 100, 4)}%?"
             </p>
             <p>
@@ -861,8 +910,8 @@ function TVMExplanation ($, objFromMain) {
   }
 
   function timelineFVSinglePmt (qv) {
-    const dispPV = (qv.varPV.toString()).includes("?") ? "??" : (qv.varPV).toLocaleString('en-US');
-    const dispFV = (qv.varFV.toString()).includes("?") ? "??" : (qv.varFV).toLocaleString('en-US');
+    const dispPV = (qv.varPV.toString()).includes("?") ? "??" : ExplainerHelperFuncs.numToLocaleStr0to5Digits(qv.varPV);
+    const dispFV = (qv.varFV.toString()).includes("?") ? "??" : ExplainerHelperFuncs.numToLocaleStr0to5Digits(qv.varFV);
     let myStr = `
         <div style="width:350px;text-align: center; margin:25px;">
             <div style="display:flex; justify-content:center; font-weight:bold;">
@@ -902,7 +951,7 @@ function TVMExplanation ($, objFromMain) {
       varN = isPerpetuity ? tlMaxCols - 2 : qv.varN,
       varY = qv.varY;
     if (!(typeof qv.varPMT === "undefined")) {
-      varPMT = qv.varPMT.toFixed(2).toLocaleString('en-US');
+      varPMT = ExplainerHelperFuncs.numToLocaleStr0to5Digits(qv.varPMT);
     }
 
     // If a payment timeline (annPmts) is passed, that's used instead of the qv values.
@@ -940,7 +989,7 @@ function TVMExplanation ($, objFromMain) {
         return uRound(fFVSinglePmt({ "varRate": qv.varG, "varN": pmtYear, "varPV": qv.varPMT }), 0);
       }
 
-      let varPMTFormatted = TLHelperFuncs.formatVarPMTForTL(varPMT);
+      let varPMTFormatted = ExplainerHelperFuncs.formatVarPMTForTL(varPMT);
       let ary2Pmts = [varPMTFormatted, varPMTFormatted];
 
       // Start
@@ -956,12 +1005,12 @@ function TVMExplanation ($, objFromMain) {
             tlYears.First.push(nCount);
             if (isGrowingAnn) {
                 if (nCount == varY) {
-                    varPMT = TLHelperFuncs.formatVarPMTForTL(varPMT);
+                    varPMT = ExplainerHelperFuncs.formatVarPMTForTL(varPMT);
                 } else {
                     varPMT = `C<sub>${nCount}</sub>`;
                 }
             }
-            tlPmts.First.push(TLHelperFuncs.formatVarPMTForTL(varPMT));
+            tlPmts.First.push(ExplainerHelperFuncs.formatVarPMTForTL(varPMT));
             TESTARRAY.push("y<=1,n<=7");
           }
           return;
@@ -971,7 +1020,7 @@ function TVMExplanation ($, objFromMain) {
           tlYears.First.push(varY, varY + 1);
 
           // If I wanted the dollar values instead of the variables, use [gannFutPmtAmt(0), gannFutPmtAmt(1) ]
-          if (isGrowingAnn) { ary2Pmts = [TLHelperFuncs.formatVarPMTForTL(varPMT), `C<sub>${varY + 1}</sub>`]; }
+          if (isGrowingAnn) { ary2Pmts = [ExplainerHelperFuncs.formatVarPMTForTL(varPMT), `C<sub>${varY + 1}</sub>`]; }
           tlPmts.First.push(...[ary2Pmts]);
 
           tlYears.Mid.push(midlineEllipsis);
@@ -1007,19 +1056,19 @@ function TVMExplanation ($, objFromMain) {
 
             if (isGrowingAnn) {
                 if (nCount == varY) {
-                    varPMT = TLHelperFuncs.formatVarPMTForTL(varPMT);
+                    varPMT = ExplainerHelperFuncs.formatVarPMTForTL(varPMT);
                 } else {
                     varPMT = `C<sub>${nCount}</sub>`;
                 }
             }
-            tlPmts.First.push(TLHelperFuncs.formatVarPMTForTL(varPMT));
+            tlPmts.First.push(ExplainerHelperFuncs.formatVarPMTForTL(varPMT));
             TESTARRAY.push("Unbkn delayed");
         }
         return;
       } else {
         // Years to the mid
         tlYears.First.push(varY, varY + 1);
-        if (isGrowingAnn) { ary2Pmts = [TLHelperFuncs.formatVarPMTForTL(varPMT), `C<sub>${varY + 1}</sub>`] }
+        if (isGrowingAnn) { ary2Pmts = [ExplainerHelperFuncs.formatVarPMTForTL(varPMT), `C<sub>${varY + 1}</sub>`] }
         tlPmts.First.push(...[ary2Pmts]);
         // The dot
         tlYears.Mid.push(midlineEllipsis);
@@ -1035,7 +1084,7 @@ function TVMExplanation ($, objFromMain) {
 
     // Concatenate the timelines so far
     let aryTLYears = []; let aryTLPmts = [];
-    jQuery.each(tlSecOrder, function (idx, val) {
+    tlSecOrder.forEach( (val, idx) => {
       aryTLYears = aryTLYears.concat(...tlYears[val]);
       aryTLPmts = aryTLPmts.concat(...tlPmts[val]);
     });
@@ -1068,7 +1117,7 @@ function TVMExplanation ($, objFromMain) {
 
     function timelineDrawMult (paramAry) {
       let strTLRow = ``;
-      jQuery.each(paramAry, function (index, theEntry) {
+      paramAry.forEach( (theEntry, idx) => {
         strTLRow += `<div style="width:${tlWidths.OneYear}px;">${theEntry}</div>`;
       });
       return strTLRow;
@@ -1346,8 +1395,12 @@ function TVMExplanation ($, objFromMain) {
                     <span style="color: red; font-weight:bold"><br />
                     The annuity formula returns the PV of the series of payments 
                     one year before the first payment is made.</span> <br />
-                    (First payment: Year ${qv.varY}. Formula returns: PV<sub>${qv.varY - 1}</sub>.)
+                    (First payment: 
+                    Year <span style="color: red; font-weight:bold;">${qv.varY}</span>.
+                    Formula returns:
+                    PV<span style="vertical-align: sub; font-size: 0.8em; color:red; font-weight:bold;">${qv.varY - 1}</span>.)
                 </p>
+
             </div>
         `;
 
@@ -1397,7 +1450,10 @@ function TVMExplanation ($, objFromMain) {
                     <span style="color: red; font-weight:bold"><br />
                     The perpetuity formula returns the PV of the series of payments 
                     one year before the first payment is made.</span> <br />
-                    (First payment: Year ${qv.varY}. Formula returns: PV<sub>${qv.varY - 1}</sub>.)
+                    (First payment: 
+                    Year <span style="color: red; font-weight:bold;">${qv.varY}</span>.
+                    Formula returns:
+                    PV<span style="vertical-align: sub; font-size: 0.8em; color:red; font-weight:bold;">${qv.varY - 1}</span>.)
                 </p>
             </div>
         `;
@@ -1460,7 +1516,10 @@ function TVMExplanation ($, objFromMain) {
                     <span style="color: red; font-weight:bold"><br />
                     The growing annuity formula returns the PV of the series of payments 
                     one year before the first payment is made.</span> <br />
-                    (First payment: Year ${qv.varY}. Formula returns: PV<sub>${qv.varY - 1}</sub>.)
+                    (First payment: 
+                    Year <span style="color: red; font-weight:bold;">${qv.varY}</span>.
+                    Formula returns:
+                    PV<span style="vertical-align: sub; font-size: 0.8em; color:red; font-weight:bold;">${qv.varY - 1}</span>.)
                 </p>
             </div>
         `;
@@ -1736,7 +1795,7 @@ function TVMExplanation ($, objFromMain) {
         <p>
             This can be interpreted as follows:
             The value in Year ${varY - 1} of ${varN} payments of \$${varPMT} each, starting in year ${varY},
-            is the same as a lump sum of \$${uRound(theAns, 2).toLocaleString('en-US')} in year ${varY - 1}.
+            is the same as a lump sum of ${ExplainerHelperFuncs.numToLocaleStrCurrency2Digits(uRound(theAns, 2))} in year ${varY - 1}.
         </p>
     `;
     myStr = addColorToVars(myStr, objColors);
@@ -1791,7 +1850,7 @@ function TVMExplanation ($, objFromMain) {
             This can be interpreted as follows:
             The value in Year ${varY - 1} of an annuity growing at ${uRound(varG * 100, 4)}% over ${varN} payments,
             where the first payment of \$${varPMT} is in year ${varY},
-            is the same as a lump sum of \$${uRound(theAns, 2).toLocaleString('en-US')} in year ${varY - 1}.
+            is the same as a lump sum of ${ExplainerHelperFuncs.numToLocaleStrCurrency2Digits(uRound(theAns, 2))} in year ${varY - 1}.
         </p>
     `;
     myStr = addColorToVars(myStr, objColors);
@@ -1831,8 +1890,8 @@ function TVMExplanation ($, objFromMain) {
         <p>
             This can be interpreted as follows:
             The value in Year ${varY - 1} of a perpetuity growing at ${uRound(varG * 100, 4)}% indefinitely,
-            where the first payment of \$${varPMT.toFixed(2)} is in year ${varY},
-            is the same as a lump sum of \$${theAns.toFixed(2).toLocaleString('en-US')} in year ${varY - 1}.
+            where the first payment of ${ExplainerHelperFuncs.numToLocaleStrCurrency2Digits(varPMT)} is in year ${varY},
+            is the same as a lump sum of ${ExplainerHelperFuncs.numToLocaleStrCurrency2Digits(theAns)} in year ${varY - 1}.
         </p>
     `;
     myStr = addColorToVars(myStr, objColors);
@@ -2029,7 +2088,7 @@ function TVMExplanation ($, objFromMain) {
         <p>
             This can be interpreted as follows:
             The value in year ${fvInYear} of ${varN} payments of \$${varPMT} each
-            is the same as a lump sum of \$${uRound(theAns, 2).toLocaleString('en-US')} in year ${fvInYear}.
+            is the same as a lump sum of ${ExplainerHelperFuncs.numToLocaleStrCurrency2Digits(uRound(theAns, 2))} in year ${fvInYear}.
         </p>
     `;
     myStr = addColorToVars(myStr, objColors);
